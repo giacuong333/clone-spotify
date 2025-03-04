@@ -1,6 +1,4 @@
 import React, { lazy, Suspense } from "react";
-import { useLocation } from "react-router-dom";
-import paths from "../../constants/paths";
 import { Spin } from "antd";
 
 const Navbar = lazy(() => import("../../components/Navbar"));
@@ -13,14 +11,16 @@ const Home = () => {
       fallback={
         <Spin spinning tip='Please wait...' fullscreen size='large'></Spin>
       }>
-      <section className={`bg-black w-full max-h-full h-screen px-2`}>
-        <Navbar />
-        <div className='flex items-start gap-2 w-full h-full'>
-          <div className='lg:flex-4/12 flex-5/12 w-full h-full'>
-            <Sidebar />
-          </div>
-          <div className='lg:flex-8/12 flex-7/12 w-full h-full'>
-            <Content />
+      <section className='bg-black p-2 pt-0 w-full min-h-screen max-h-screen overflow-hidden'>
+        <div className=''>
+          <Navbar />
+          <div className='grid grid-cols-8 2xl:grid-cols-12 gap-2 w-full h-full'>
+            <div className='col-span-2 2xl:col-span-2 w-full h-full'>
+              <Sidebar />
+            </div>
+            <div className='col-span-6 2xl:col-span-10 w-full h-full'>
+              <Content />
+            </div>
           </div>
         </div>
       </section>

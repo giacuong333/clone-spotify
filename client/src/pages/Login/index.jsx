@@ -37,9 +37,14 @@ const Login = () => {
           },
         },
       }}>
-      <div className='w-full min-h-screen bg-black text-white flex flex-col items-center justify-center'>
+      <div
+        className='pt-10 w-full min-h-screen text-white flex flex-col items-center justify-center'
+        style={{
+          background:
+            "linear-gradient(rgba(255, 255, 255, 0.1) 0%, rgb(0, 0, 0) 100%)",
+        }}>
         {/* Container chính */}
-        <div className='bg-[#121212] max-w-3xl w-full mx-auto flex items-center justify-center rounded-lg p-10'>
+        <div className='grow bg-[#121212] h-fit max-w-3xl w-full mx-auto flex items-center justify-center rounded-lg p-10'>
           <div className='w-full max-w-xs'>
             {/* Logo */}
             <div className='flex justify-center mb-4'>
@@ -158,21 +163,23 @@ const Login = () => {
         </div>
 
         {/* Footer */}
-        <div className='mt-10 w-full bg-[#121212] text-gray-400 text-center py-8 text-xs'>
-          This site is protected by reCAPTCHA and the Google{" "}
-          <a
-            href='https://policies.google.com/privacy'
-            className='text-white underline'>
-            Privacy Policy
-          </a>{" "}
-          and{" "}
-          <a
-            href='https://policies.google.com/terms'
-            className='text-white underline'>
-            Terms of Service
-          </a>{" "}
-          apply.
-        </div>
+        <footer className='w-full h-full'>
+          <div className='mt-10 w-full bg-[#121212] text-gray-400 text-center py-8 text-xs'>
+            This site is protected by reCAPTCHA and the Google{" "}
+            <a
+              href='https://policies.google.com/privacy'
+              className='text-white underline'>
+              Privacy Policy
+            </a>{" "}
+            and{" "}
+            <a
+              href='https://policies.google.com/terms'
+              className='text-white underline'>
+              Terms of Service
+            </a>{" "}
+            apply.
+          </div>
+        </footer>
       </div>
     </ConfigProvider>
   );
