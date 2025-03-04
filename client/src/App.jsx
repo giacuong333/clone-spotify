@@ -1,7 +1,9 @@
-import { Button } from "@material-tailwind/react";
+import "./index.css";
+import { lazy } from "react";
+import AppRoutes from "./routes/AppRoutes";
 
 const App = () => {
-  return <Button>Button</Button>;
+  return <AppRoutes />;
 };
 
 export default App;

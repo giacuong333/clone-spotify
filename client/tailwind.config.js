@@ -1,9 +1,7 @@
-import withMT from "@material-tailwind/react/utils/withMT";
-
-export default withMT({
-  content: ["./index.html", "./src/**/*.{vue,js,ts,jsx,tsx}"],
-  theme: {
-    extend: {},
-  },
-  plugins: [],
-});
+export const content = [
+  "./src/**/*.{js,jsx,ts,tsx}", // Đảm bảo bao gồm tất cả file trong src
+];
+export const theme = {
+  extend: {},
+};
+export const plugins = [];
