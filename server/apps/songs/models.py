@@ -1,3 +1,11 @@
 from django.db import models
 
-# Create your models here.
+# class Song(models.Model):
+#     title = models.CharField(max_length=100)
+#     artist = models.CharField(max_length=100)
+#     album = models
+#     genre 
+#     file_url
+#     image_url
+#     release_date
+#     is_proved
