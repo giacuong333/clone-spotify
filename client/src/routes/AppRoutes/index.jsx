@@ -10,8 +10,15 @@ const AppRoutes = () => {
         <Spin spinning tip='Please wait...' fullscreen size='large'></Spin>
       }>
       <Routes>
-        {routes.map(({ path, Page, isPublic, index }) => {
-          return (
+        {routes.map(({ path, Layout, Page, isPublic, index }) => {
+          return Layout ? (
+            <Route
+              key={path}
+              path={path}
+              index={index}
+              element={<Layout>{<Page />}</Layout>}
+            />
+          ) : (
             <Route key={path} path={path} index={index} element={<Page />} />
           );
         })}

@@ -7,7 +7,7 @@ const AlbumAndArtistItem = ({ item, type }) => {
     <li className='w-full h-full group'>
       <div className='w-full flex flex-col items-start justify-center cursor-pointer hover:bg-neutral-800 p-4 rounded-md'>
         {/* Image */}
-        <div className='w-32 h-32 2xl:w-full 2xl:h-44 relative'>
+        <div className='min-h-32 min-w-32 relative'>
           <img
             src={item?.image}
             alt={item?.name}
