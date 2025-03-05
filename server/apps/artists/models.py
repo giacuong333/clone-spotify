@@ -7,5 +7,5 @@ class Artist(models.Model):
     
     # Collection name in MongoDB
     class Meta:
-        db_table = 'artist'
+        db_table = 'artists'
         

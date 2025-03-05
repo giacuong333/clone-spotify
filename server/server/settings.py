@@ -41,7 +41,10 @@ INSTALLED_APPS = [
     # apps
     'apps.albums',
     'apps.artists',
+    'apps.favorites',
+    'apps.histories',
     'apps.playlists',
+    'apps.reports',
     'apps.songs',
     'apps.users'
 ]
