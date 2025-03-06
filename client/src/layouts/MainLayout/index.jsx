@@ -17,7 +17,7 @@ const MainLayout = ({ children }) => {
               <Sidebar />
             </div>
             <div className='col-span-6 2xl:col-span-10 w-full h-full'>
-              <div className='rounded-lg bg-[#121212] overflow-hidden h-full w-full'>
+              <div className='rounded-lg bg-[#121212] overflow-hidden h-full w-full relative'>
                 {children}
               </div>
             </div>

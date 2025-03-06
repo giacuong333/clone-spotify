@@ -41,7 +41,9 @@ const Register = () => {
         {/* Container chính */}
         <div className='w-full max-w-xs'>
           {/* Logo */}
-          <div className='flex justify-center mb-8'>
+          <div
+            className='flex justify-center mb-8 cursor-pointer'
+            onClick={() => navigate(paths.home)}>
             <SpotifyLogo height={40} fillColor='white' />
           </div>
 

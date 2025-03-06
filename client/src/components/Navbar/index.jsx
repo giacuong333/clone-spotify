@@ -44,13 +44,20 @@ const Navbar = () => {
           {/* Left Section */}
           <div className='flex items-center space-x-6 h-full'>
             <div className='px-2 cursor-pointer'>
-              <SpotifyLogo height={32} fillColor='white' />
+              <SpotifyLogo
+                height={32}
+                fillColor='white'
+                onClick={() => navigate(paths.home)}
+              />
             </div>
             <div className='flex items-center space-x-4 h-full'>
               <HomeOutlined
                 style={{ color: "white" }}
                 className='cursor-pointer text-2xl bg-neutral-700 rounded-full p-2.5 hover:bg-neutral-600 transition-all'
+                onClick={() => navigate(paths.home)}
               />
+
+              {/* Search */}
               <Form
                 form={form}
                 layout='vertical'
@@ -70,7 +77,7 @@ const Navbar = () => {
                       <SearchOutlined className='text-gray-400 text-2xl' />
                     }
                     placeholder='What do you want to play?'
-                    className='md:!w-full xl:!w-md !py-2.5 !px-4 !h-full !border-neutral-800 focus-within:!border-white hover:!border-gray-300 !rounded-full transition-all !text-gray-200 !text-lg'
+                    className='md:!w-full xl:!w-md !py-2.5 !px-4 !h-full !border-neutral-800 !border-2 focus-within:!border-white hover:!border-gray-300 !rounded-full transition-all !text-gray-200 !text-lg'
                     style={{
                       backgroundColor: "#242424",
                       color: "#bbb",

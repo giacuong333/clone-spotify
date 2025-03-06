@@ -5,7 +5,7 @@ const AlbumAndArtistList = ({ list, type }) => {
   return (
     <ul className='grid grid-flow-col'>
       {list?.map((item) => {
-        return <AlbumAndArtistItem key={item} item={item} type={type} />;
+        return <AlbumAndArtistItem key={item?.id} item={item} type={type} />;
       })}
     </ul>
   );

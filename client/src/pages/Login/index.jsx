@@ -47,7 +47,9 @@ const Login = () => {
         <div className='grow bg-[#121212] h-fit max-w-3xl w-full mx-auto flex items-center justify-center rounded-lg p-10'>
           <div className='w-full max-w-xs'>
             {/* Logo */}
-            <div className='flex justify-center mb-4'>
+            <div
+              className='flex justify-center mb-4 cursor-pointer'
+              onClick={() => navigate(paths.home)}>
               <SpotifyLogo height={40} fillColor='white' />
             </div>
 

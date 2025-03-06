@@ -1,10 +1,14 @@
-import { Button } from "antd";
 import React from "react";
+import { Button } from "antd";
 import PlayIcon from "../PlayIcon";
+import { useNavigate } from "react-router-dom";
+import paths from "../../constants/paths";
 
 const AlbumAndArtistItem = ({ item, type }) => {
+  const navigate = useNavigate();
+
   return (
-    <li className='w-full h-full group'>
+    <li className='w-full h-full group' onClick={() => navigate(paths.details)}>
       <div className='w-full flex flex-col items-start justify-center cursor-pointer hover:bg-neutral-800 p-4 rounded-md'>
         {/* Image */}
         <div className='min-h-32 min-w-32 relative'>
