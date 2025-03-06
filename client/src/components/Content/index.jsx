@@ -42,7 +42,7 @@ const list = [
 
 const Content = () => {
   return (
-    <div className='2xl:max-w-10/12 w-full mx-auto 2xl:px-0 px-10 p-6 flex flex-col gap-8 min-h-screen max-h-screen overflow-y-scroll'>
+    <div className='2xl:max-w-10/12 w-full mx-auto 2xl:px-0 px-10 p-6 flex flex-col gap-8'>
       <AlbumAndArtistWrap title='Popular artists' list={list} type='artist' />
       <AlbumAndArtistWrap
         title='Popular albums and singles'

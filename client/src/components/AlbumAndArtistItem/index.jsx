@@ -25,10 +25,9 @@ const AlbumAndArtistItem = ({ item, type }) => {
             className='
                 absolute right-2 bottom-2 size-12 bg-[#1ED760] 
                 opacity-0 translate-y-2 
-                group-hover:bg-[#3BE477] group-hover:scale-[1.03] 
-                group-hover:translate-y-0 group-hover:opacity-100
-                shadow-lg rounded-full flex items-center justify-center 
-                transition-all duration-500'>
+                hover:bg-[#3BE477] hover:scale-[1.05] 
+                group-hover:translate-y-0 group-hover:opacity-100 
+                shadow-lg rounded-full flex items-center justify-center'>
             <Button
               type='primary'
               icon={<PlayIcon width='30' height='30' />}

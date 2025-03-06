@@ -98,9 +98,7 @@ const AlbumAndArtistDetails = () => {
       fallback={
         <Spin spinning tip='Please wait...' fullscreen size='large'></Spin>
       }>
-      <div
-        className='overflow-scroll max-h-screen min-h-screen'
-        ref={contentRef}>
+      <div className='' ref={contentRef}>
         <Header name='Dương Domic' contentRef={contentRef} />
         <Cover
           name='Dương Domic'
