@@ -11,6 +11,7 @@ const Register = lazy(() => import("../../pages/Register"));
 const AlbumAndArtistDetails = lazy(() =>
   import("../../components/AlbumAndArtistDetails")
 );
+const Search = lazy(() => import("../../components/Search"));
 
 const routes = [
   {
@@ -26,6 +27,12 @@ const routes = [
     path: paths.details,
     Layout: MainLayout,
     Page: AlbumAndArtistDetails,
+    isPublic: true,
+  },
+  {
+    path: paths.search,
+    Layout: MainLayout,
+    Page: Search,
     isPublic: true,
   },
   //   { path: paths.admin, Page: Register, isPublic: true },

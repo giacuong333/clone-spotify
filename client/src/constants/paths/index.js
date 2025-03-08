@@ -4,6 +4,7 @@ const paths = {
   login: "/login",
   admin: "/admin",
   details: "/details",
+  search: "/search",
 };
 
 export default paths;

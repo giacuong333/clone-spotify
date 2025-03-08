@@ -3,7 +3,7 @@ import PlusCircleIcon from "../PlusCircleIcon";
 import ThreeDotsIcon from "../ThreeDotsIcon";
 import PlayIcon from "../PlayIcon";
 
-const SongItem = ({ item, order }) => {
+const SongItem = ({ item, order, isSearch = false }) => {
   return (
     <li className='group'>
       <div className='px-4 py-2 flex items-center justify-between group-hover:bg-white/25 rounded'>
@@ -21,17 +21,26 @@ const SongItem = ({ item, order }) => {
                 className='w-full h-full object-center object-cover'
               />
             </div>
-            <p className='capitalize text-white hover:underline cursor-pointer truncate md:max-w-3xs lg:max-w-sm 2xl:max-w-fit'>
-              {item?.name}
-            </p>
+            <div className='flex flex-col items-start'>
+              <p className='capitalize text-white font-semibold hover:underline cursor-pointer truncate md:max-w-3xs lg:max-w-sm 2xl:max-w-fit'>
+                {item?.name}
+              </p>
+              {!isSearch && (
+                <p className='capitalize text-white/75 group-hover:text-white font-semibold text-sm hover:underline cursor-pointer truncate md:max-w-3xs lg:max-w-sm 2xl:max-w-fit'>
+                  {item?.artist}
+                </p>
+              )}
+            </div>
           </div>
         </div>
 
-        <div className='grow place-items-end me-40'>
-          <p className='text-white/50 group-hover:text-white'>
-            {item?.listeners}
-          </p>
-        </div>
+        {isSearch && (
+          <div className='grow place-items-end me-40'>
+            <p className='text-white/50 group-hover:text-white'>
+              {item?.listeners}
+            </p>
+          </div>
+        )}
 
         <div className='flex items-center gap-4'>
           <span className='opacity-0 group-hover:opacity-100'>

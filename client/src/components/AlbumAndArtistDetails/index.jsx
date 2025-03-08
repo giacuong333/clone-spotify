@@ -1,4 +1,4 @@
-import React, { lazy, Suspense, useRef } from "react";
+import React, { lazy, Suspense, useEffect, useRef } from "react";
 import { Spin } from "antd";
 import AlbumAndArtistWrap from "../AlbumAndArtistWrap";
 
@@ -91,14 +91,14 @@ const list = [
 ];
 
 const AlbumAndArtistDetails = () => {
-  const contentRef = useRef();
+  const contentRef = useRef(null);
 
   return (
     <Suspense
       fallback={
         <Spin spinning tip='Please wait...' fullscreen size='large'></Spin>
       }>
-      <div className='' ref={contentRef}>
+      <div className='w-full h-full overflow-y-auto' ref={contentRef}>
         <Header name='Dương Domic' contentRef={contentRef} />
         <Cover
           name='Dương Domic'

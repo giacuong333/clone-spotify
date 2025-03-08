@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   HomeOutlined,
   SearchOutlined,
@@ -8,14 +8,17 @@ import SpotifyLogo from "../../components/SpotifyLogo";
 import { ConfigProvider, Form, Input } from "antd";
 import { useNavigate } from "react-router-dom";
 import paths from "../../constants/paths";
+import { useSearch } from "../../contexts/Search";
+import _ from "lodash";
 
 const Navbar = () => {
   const [form] = Form.useForm();
-  const [requiredMark, setRequiredMarkType] = useState("optional");
   const navigate = useNavigate();
+  const { setSearchQuery } = useSearch();
 
-  const onRequiredTypeChange = ({ requiredMarkValue }) => {
-    setRequiredMarkType(requiredMarkValue);
+  const handleSearch = (values) => {
+    (values) => setSearchQuery(values);
+    navigate(_.isEmpty(values) ? paths.home : paths.search);
   };
 
   return (
@@ -60,16 +63,14 @@ const Navbar = () => {
               {/* Search */}
               <Form
                 form={form}
+                onFinish={handleSearch}
+                autoComplete='on'
                 layout='vertical'
-                initialValues={{
-                  requiredMarkValue: requiredMark,
-                }}
-                onValuesChange={onRequiredTypeChange}
                 className='w-full !h-full'>
                 <Form.Item
                   name='search'
-                  required
                   tooltip='This is a required field'
+                  rules={[{ required: false }]}
                   className='!mb-0 !w-full !h-full !flex !items-center' // Loại bỏ margin mặc định
                 >
                   <Input
@@ -125,4 +126,4 @@ const Navbar = () => {
   );
 };
 
-export default Navbar;
+export default React.memo(Navbar);

@@ -1,9 +1,16 @@
+import { BrowserRouter } from "react-router-dom";
 import "./index.css";
-import { lazy } from "react";
 import AppRoutes from "./routes/AppRoutes";
+import Search from "./contexts/Search";
 
 const App = () => {
-  return <AppRoutes />;
+  return (
+    <BrowserRouter>
+      <Search>
+        <AppRoutes />
+      </Search>
+    </BrowserRouter>
+  );
 };
 
 export default App;

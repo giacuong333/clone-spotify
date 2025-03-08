@@ -1,7 +1,7 @@
 import React from "react";
 import SongItem from "../SongItem";
 
-const SongList = ({ songList }) => {
+const SongList = ({ songList, isSearch }) => {
   return (
     <ul className='flex flex-col gap-2'>
       {songList?.map((item, index) => {

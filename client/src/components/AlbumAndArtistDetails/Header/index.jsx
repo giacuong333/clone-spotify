@@ -1,29 +1,29 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button } from "antd";
 import PlayIcon from "../../PlayIcon";
 
 const Header = ({ name, contentRef }) => {
   const [isStickedHeader, setIsStickedHeader] = useState(false);
-  const headerRef = useRef();
 
   useEffect(() => {
     if (!contentRef?.current) return;
 
     const stickHeader = () => {
       const coverHeight = 432;
-      const headerElement = headerRef.current;
 
-      if (!headerElement) return;
-
-      if (contentRef.current.scrollTop > coverHeight) setIsStickedHeader(true);
-      else setIsStickedHeader(false);
+      if (contentRef.current.scrollTop > coverHeight) {
+        setIsStickedHeader(true);
+      } else {
+        setIsStickedHeader(false);
+      }
     };
 
     const currentContentRef = contentRef.current;
     currentContentRef.addEventListener("scroll", stickHeader);
 
     return () => {
-      currentContentRef.removeEventListener("scroll", stickHeader);
+      contentRef &&
+        currentContentRef.removeEventListener("scroll", stickHeader);
     };
   }, [contentRef]);
 
@@ -31,8 +31,7 @@ const Header = ({ name, contentRef }) => {
     <header
       className={`absolute top-0 left-0 w-full h-16 bg-[#253741] z-20 transition-transform duration-500 ${
         isStickedHeader ? "translate-y-0" : "-translate-y-full"
-      }`}
-      ref={headerRef}>
+      }`}>
       <div className='2xl:max-w-10/12 w-full h-full mx-auto 2xl:px-0 px-10'>
         <div className='h-full w-full flex flex-col justify-center'>
           {/* Play button */}
