@@ -5,6 +5,8 @@ const paths = {
   admin: "/admin",
   details: "/details",
   search: "/search",
+  users: "/users",
+  songs: "/songs",
 };
 
 export default paths;

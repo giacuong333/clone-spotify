@@ -3,6 +3,7 @@ import paths from "../../constants/paths";
 
 // Layouts
 const MainLayout = lazy(() => import("../../layouts/MainLayout"));
+const AdminLayout = lazy(() => import("../../layouts/AdminLayout"));
 
 // Pages
 const Home = lazy(() => import("../../pages/Home"));
@@ -12,6 +13,9 @@ const AlbumAndArtistDetails = lazy(() =>
   import("../../components/AlbumAndArtistDetails")
 );
 const Search = lazy(() => import("../../components/Search"));
+const Admin = lazy(() => import("../../pages/Admin"));
+const UserManagement = lazy(() => import("../../components/UserManagement"));
+const SongManagement = lazy(() => import("../../components/SongManagement"));
 
 const routes = [
   {
@@ -35,7 +39,19 @@ const routes = [
     Page: Search,
     isPublic: true,
   },
-  //   { path: paths.admin, Page: Register, isPublic: true },
+  { path: paths.admin, Layout: AdminLayout, Page: Admin, isPublic: true },
+  {
+    path: paths.users,
+    Layout: AdminLayout,
+    Page: UserManagement,
+    isPublic: true,
+  },
+  {
+    path: paths.songs,
+    Layout: AdminLayout,
+    Page: SongManagement,
+    isPublic: true,
+  },
 ];
 
 export default routes;
