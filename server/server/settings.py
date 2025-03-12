@@ -108,10 +108,15 @@ REST_FRAMEWORK = {
 }
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),  # Short-lived access token
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),    # Longer-lived refresh token
-    'ROTATE_REFRESH_TOKENS': False,
-    'BLACKLIST_AFTER_ROTATION': True,
+    'ACCESS_TOKEN_LIFETIME': timedelta(hours=1),  # Thời gian sống của access token
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),  # Thời gian sống của refresh token
+    'ROTATE_REFRESH_TOKENS': True,  # Tạo refresh token mới khi làm mới
+    'BLACKLIST_AFTER_ROTATION': True,  # Blacklist refresh token cũ
+    'ALGORITHM': 'HS256',
+    'SIGNING_KEY': 'opensource-software-development',  # Thay bằng khóa bí mật mạnh
+    'AUTH_HEADER_TYPES': ('Bearer',),
+    'USER_ID_FIELD': 'id',
+    'USER_ID_CLAIM': 'id',
 }
 # END REST AND JWT CONFIG
 

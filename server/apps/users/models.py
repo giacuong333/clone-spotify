@@ -63,6 +63,7 @@ class User:
         with connect_db() as database:
             return database['users'].find_one({'email': email})
         
+        
     @staticmethod
     def get_by_username(username):
         with connect_db() as database:
