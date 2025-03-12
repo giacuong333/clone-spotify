@@ -4,14 +4,14 @@ from bson import ObjectId
 
 class User:
     def __init__(self,
-                username,
+                # username,
                 email,
                 password,
                 playlist=None,
                 favorite=None,
                 history=None,
                 isPremium=False):
-        self.username = username       
+        # self.username = username       
         self.email = email       
         self.password = password       
         self.playlist = playlist if playlist else []       
@@ -22,7 +22,7 @@ class User:
     def create(self):
         with connect_db() as database:
             user_data = {
-                'username': self.username,
+                # 'username': self.username,
                 'email': self.email,
                 'password': hash_password(self.password),
                 'playlist': self.playlist,

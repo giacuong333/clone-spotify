@@ -1,4 +1,3 @@
-import React from "react";
 import { Form, Input, Button, ConfigProvider } from "antd";
 import SpotifyLogo from "../../components/SpotifyLogo";
 import GoogleIcon from "../../components/GoogleIcon";
@@ -6,14 +5,15 @@ import FacebookIcon from "../../components/FacebookIcon";
 import AppleIcon from "../../components/AppleIcon";
 import paths from "../../constants/paths";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../contexts/Auth";
 
 const Register = () => {
   const [form] = Form.useForm();
   const navigate = useNavigate();
+  const { register } = useAuth();
 
-  const onFinish = (values) => {
-    console.log("Received values:", values);
-    // Xử lý submit form
+  const onFinish = async (values) => {
+    await register(values);
   };
 
   return (
@@ -105,7 +105,7 @@ const Register = () => {
                 type='primary'
                 htmlType='submit'
                 className='!w-full !h-12 !bg-[#1ED760] !text-black !rounded-full !font-bold hover:!bg-[hsl(141,65%,71%)]'>
-                Next
+                Sign Up
               </Button>
             </Form.Item>
           </Form>

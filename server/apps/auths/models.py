@@ -17,7 +17,10 @@ class Auth:
                 self.id = str(data['_id'])
                 self.username = data['username']
                 self.email = data['email']
-                self.is_authenticated = True
+                self.playlist = data['playlist']
+                self.favorite = data['favorite']
+                self.history = data['history']
+                self.isPremium = data['isPremium']
 
         user = UserWrapper(user_dict)
         refresh = RefreshToken.for_user(user)
