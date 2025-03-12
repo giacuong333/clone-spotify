@@ -1,16 +1,9 @@
 from auths.models import Auth
-from rest_framework import serializers, viewsets
+from rest_framework import serializers
 
 class AuthSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Auth
-        fields = ['email', 'password']
-    
-    def create(self, validated_data):
-        return
-    
-    def update(self, instance, validated_data):
-        return
+    email = serializers.EmailField()
+    password = serializers.CharField(write_only=True)
     
     def validate(self):
         return

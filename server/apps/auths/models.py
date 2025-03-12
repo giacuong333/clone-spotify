@@ -1,9 +1,13 @@
-from django.db import models
+from utils.connect_db import connect_db
 
-class Auth(models.Model): 
+class Auth: 
+    def __init__(self, email, password):
+        self.email = email
+        self.password = password
     
-    class Meta:
-        abstract = True
-        
-    email = models.CharField(max_length=100)
-    password = models.CharField(max_length=100)
+    @staticmethod
+    def get_by_email(email):
+        with connect_db() as database:
+            return database['users'].find_one({'email': email})
+        return None
+                

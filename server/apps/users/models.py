@@ -56,6 +56,14 @@ class User:
     @staticmethod
     def get_by_id(user_id):
         with connect_db() as database:
-            return database['users'].find_one(
-                {'_id': ObjectId(user_id)},
-            )
+            return database['users'].find_by_id(ObjectId(user_id))
+            
+    @staticmethod
+    def get_by_email(email):
+        with connect_db() as database:
+            return database['users'].find_one({'email': email})
+        
+    @staticmethod
+    def get_by_username(username):
+        with connect_db() as database:
+            return database['users'].find_one({'username': username})
