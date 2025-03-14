@@ -2,6 +2,8 @@ import React, { Suspense } from "react";
 import { Routes, Route } from "react-router-dom";
 import routes from "../routes";
 import { Spin } from "antd";
+import ProtectedRoute from "../ProtectedRoute";
+import PublicRoute from "../PublicRoute";
 
 const AppRoutes = () => {
   return (
@@ -10,16 +12,25 @@ const AppRoutes = () => {
         <Spin spinning tip='Please wait...' fullscreen size='large'></Spin>
       }>
       <Routes>
-        {routes.map(({ path, Layout, Page, isPublic, index }) => {
-          return Layout ? (
+        {routes?.map(({ path, Layout, Page, isPublic, isAuthPage, index }) => {
+          let RenderPage = isPublic ? (
+            <Page />
+          ) : (
+            <ProtectedRoute isPublic={isPublic}>
+              <Page />
+            </ProtectedRoute>
+          );
+
+          if (isAuthPage) {
+            RenderPage = <PublicRoute>{RenderPage}</PublicRoute>;
+          }
+          return (
             <Route
               key={path}
               path={path}
               index={index}
-              element={<Layout>{<Page />}</Layout>}
+              element={Layout ? <Layout>{RenderPage}</Layout> : RenderPage}
             />
-          ) : (
-            <Route key={path} path={path} index={index} element={<Page />} />
           );
         })}
       </Routes>
@@ -27,4 +38,4 @@ const AppRoutes = () => {
   );
 };
 
-export default AppRoutes;
+export default React.memo(AppRoutes);

@@ -3,7 +3,7 @@ import { useAuth } from "../../contexts/Auth";
 import { useNavigate } from "react-router-dom";
 import paths from "../../constants/paths";
 
-const ProtectedRoute = ({ children, isPublic }) => {
+const PublicRoute = ({ children }) => {
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
 
@@ -11,9 +11,9 @@ const ProtectedRoute = ({ children, isPublic }) => {
     if (isAuthenticated) {
       navigate(paths.home, { replace: true });
     }
-  }, [isAuthenticated, navigate, isPublic]);
+  }, [isAuthenticated, navigate]);
 
-  return children;
+  return isAuthenticated ? null : children;
 };
 
-export default ProtectedRoute;
+export default PublicRoute;

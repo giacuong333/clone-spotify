@@ -40,10 +40,12 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    
     # REST
     'rest_framework',
     # JWT
     'rest_framework_simplejwt',
+    'rest_framework_simplejwt.token_blacklist',
     
     # APPS
     'apps.albums',
@@ -70,16 +72,6 @@ MIDDLEWARE = [
     
 ]
 
-# START CORS CONFIG
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173",
-    "http://127.0.0.1:5173",
-]
-
-CORS_ALLOW_CREDENTIALS = True
-CORS_ALLOW_HEADERS = ["*"]
-# END CORS CONFIG
-
 # START REST AND JWT CONFIG
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
@@ -100,10 +92,43 @@ SIMPLE_JWT = {
     'ALGORITHM': 'HS256',
     'SIGNING_KEY': 'opensource-software-development',  # Thay bằng khóa bí mật mạnh
     'AUTH_HEADER_TYPES': ('Bearer',),
-    'USER_ID_FIELD': 'id',
-    'USER_ID_CLAIM': 'id',
+    'USER_ID_FIELD': 'email',
+    'USER_ID_CLAIM': 'email',
+    "AUTH_COOKIE": "access_token",
+    "AUTH_COOKIE_SECURE": False,  # Set to True in production (HTTPS required)
+    "AUTH_COOKIE_HTTP_ONLY": True,
+    "AUTH_COOKIE_PATH": "/",
 }
 # END REST AND JWT CONFIG
+
+
+# START CORS CONFIG
+CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173",  # React Vite frontend
+    "http://127.0.0.1:5173",
+]
+CSRF_TRUSTED_ORIGINS = CORS_ALLOWED_ORIGINS
+CORS_ALLOW_HEADERS = [
+    "content-type",
+    "authorization",
+    "x-requested-with",
+    "accept",
+    "origin",
+    "x-csrftoken",
+    "x-custom-header"
+]
+CSRF_COOKIE_SECURE = True  # Set to True in production (HTTPS required)
+CSRF_COOKIE_HTTPONLY = True
+CSRF_COOKIE_SAMESITE = "None"
+
+SESSION_COOKIE_SECURE = True
+SESSION_COOKIE_HTTPONLY = True
+SESSION_COOKIE_SAMESITE = "None"
+
+JWT_AUTH_COOKIE_SAMESITE = "None"  
+JWT_AUTH_COOKIE_SECURE = True
+# END CORS CONFIG
 
 ROOT_URLCONF = 'server.urls'
 
@@ -129,6 +154,12 @@ WSGI_APPLICATION = 'server.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': 'db.sqlite3',  
+    }
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators

@@ -1,4 +1,4 @@
-import { Form, Input, Button, ConfigProvider } from "antd";
+import { Form, Input, Button, ConfigProvider, Spin } from "antd";
 import SpotifyLogo from "../../components/SpotifyLogo";
 import GoogleIcon from "../../components/GoogleIcon";
 import FacebookIcon from "../../components/FacebookIcon";
@@ -10,7 +10,7 @@ import { useAuth } from "../../contexts/Auth";
 const Register = () => {
   const [form] = Form.useForm();
   const navigate = useNavigate();
-  const { register } = useAuth();
+  const { register, pendingRegister } = useAuth();
 
   const onFinish = async (values) => {
     await register(values);
@@ -59,7 +59,23 @@ const Register = () => {
             onFinish={onFinish}
             layout='vertical'
             className='mb-6'
-            initialValues={{ email: "", password: "" }}>
+            initialValues={{ username: "", email: "", password: "" }}>
+            <Form.Item
+              label='Username'
+              name='username'
+              rules={[
+                {
+                  required: true,
+                  message: "Username is required!",
+                },
+              ]}
+              className='!mb-3'>
+              <Input
+                placeholder='John Doe'
+                className='w-full h-12 !bg-transparent hover:!border-white !text-white placeholder-gray-400 !border-gray-600 rounded-md !focus:outline-none !focus:ring-2 !focus:ring-[#1ED760] hover:bg-[#2A2A2A] transition-all'
+              />
+            </Form.Item>
+
             <Form.Item
               label='Email address'
               name='email'
@@ -176,6 +192,10 @@ const Register = () => {
           </p>
         </div>
       </div>
+
+      {pendingRegister && (
+        <Spin spinning tip='Signing Up...' fullscreen size='large'></Spin>
+      )}
     </ConfigProvider>
   );
 };

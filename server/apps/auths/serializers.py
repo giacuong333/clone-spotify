@@ -8,17 +8,19 @@ class AuthSerializer(serializers.Serializer):
     password = serializers.CharField(write_only=True)
     
     def validate(self, data):
-        authenticator = Auth(data.get('email'), data.get('password'))
+        email = data.get('email')
+        password = data.get('password')
         
-        user = User.get_by_email(authenticator.email)
-        if not user:
+        user_dict = User.get_by_email(email)
+        if not user_dict:
             raise serializers.ValidationError(
                 {'message': 'Account does not exist!'}
             )
             
-        if not verify_password(authenticator.password, user['password']):
+        if not verify_password(password, user_dict['password']):
             raise serializers.ValidationError(
                 {'message': 'Password is incorrect!'}
             )
-            
-        return authenticator.login()
+        
+        tokens = Auth.generate_tokens(user_dict)
+        return tokens

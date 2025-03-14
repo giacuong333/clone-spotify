@@ -27,7 +27,8 @@ const AlbumAndArtistItem = ({ item, type }) => {
                 opacity-0 translate-y-2 
                 hover:bg-[#3BE477] hover:scale-[1.05] 
                 group-hover:translate-y-0 group-hover:opacity-100 
-                shadow-lg rounded-full flex items-center justify-center'>
+                shadow-lg rounded-full flex items-center justify-center
+                transition-all duration-500'>
             <Button
               type='primary'
               icon={<PlayIcon width='30' height='30' />}

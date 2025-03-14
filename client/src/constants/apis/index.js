@@ -1,14 +1,14 @@
 export const apis = {
   auths: {
-    login: () => `auths/login`,
-    logout: () => `auths/logout`,
-    refresh: () => `auths/refresh`,
+    login: () => `/api/auths/login`,
+    logout: () => `/api/auths/logout`,
+    refresh: () => `/api/auths/refresh`,
   },
   users: {
-    create: () => `users/create`,
-    update: () => `users/update`,
-    delete: (param) => `users/delete/${param}`,
-    getAll: () => `users`,
-    getById: (param) => `users/${param}`,
+    create: () => `/api/users/create`,
+    update: () => `/api/users/update`,
+    delete: (param) => `/api/users/delete/${param}`,
+    getAll: () => `/api/users`,
+    getById: (param) => `/api/users/${param}`,
   },
 };

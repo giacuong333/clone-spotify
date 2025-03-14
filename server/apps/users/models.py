@@ -4,14 +4,16 @@ from bson import ObjectId
 
 class User:
     def __init__(self,
-                # username,
+                _id,
+                username,
                 email,
                 password,
                 playlist=None,
                 favorite=None,
                 history=None,
                 isPremium=False):
-        # self.username = username       
+        self._id = _id       
+        self.username = username       
         self.email = email       
         self.password = password       
         self.playlist = playlist if playlist else []       
@@ -22,7 +24,7 @@ class User:
     def create(self):
         with connect_db() as database:
             user_data = {
-                # 'username': self.username,
+                'username': self.username,
                 'email': self.email,
                 'password': hash_password(self.password),
                 'playlist': self.playlist,
@@ -56,7 +58,9 @@ class User:
     @staticmethod
     def get_by_id(user_id):
         with connect_db() as database:
-            return database['users'].find_by_id(ObjectId(user_id))
+            return database['users'].find_one({
+                '_id': ObjectId(user_id)
+            })
             
     @staticmethod
     def get_by_email(email):
@@ -68,3 +72,16 @@ class User:
     def get_by_username(username):
         with connect_db() as database:
             return database['users'].find_one({'username': username})
+        
+    # @classmethod
+    # def from_mongo(cls, mongo_data):
+    #     return cls(
+    #         _id=str(mongo_data['_id']),
+    #         email=mongo_data['email'],
+    #         password=mongo_data['password'],
+    #         username=mongo_data.get('username'),
+    #         playlist=mongo_data.get('playlist', []),
+    #         favorite=mongo_data.get('favorite', []),
+    #         history=mongo_data.get('history', []),
+    #         isPremium=mongo_data.get('isPremium', False)
+    #     )

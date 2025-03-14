@@ -10,20 +10,18 @@ class UserAPIView(APIView):
     def post(self, request):
         try:
             serializer = UserSerializer(data=request.data)
-           
             if serializer.is_valid():
                 user = serializer.save()
                 return Response(user, status=status.HTTP_201_CREATED)
             
             errors = serializer.errors
-             
             if 'message' in errors and errors['message'] == ['Username was registered!']:
-                return Response(errors, status=status.HTTP_409_CONFLICT)
+                return Response(errors['message'][0], status=status.HTTP_409_CONFLICT)
             
             if 'message' in errors and errors['message'] == ['Email was registered!']:
-                return Response(errors, status=status.HTTP_409_CONFLICT)
+                return Response(errors['message'][0], status=status.HTTP_409_CONFLICT)
             
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response(errors, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             print('Internal Server Errors: ', e)
             return Response(

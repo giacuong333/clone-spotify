@@ -25,8 +25,20 @@ const routes = [
     isPublic: true,
     index: true,
   },
-  { path: paths.login, Layout: null, Page: Login, isPublic: true },
-  { path: paths.register, Layout: null, Page: Register, isPublic: true },
+  {
+    path: paths.login,
+    Layout: null,
+    Page: Login,
+    isPublic: true,
+    isAuthPage: true,
+  },
+  {
+    path: paths.register,
+    Layout: null,
+    Page: Register,
+    isPublic: true,
+    isAuthPage: true,
+  },
   {
     path: paths.details,
     Layout: MainLayout,
@@ -39,18 +51,18 @@ const routes = [
     Page: Search,
     isPublic: true,
   },
-  { path: paths.admin, Layout: AdminLayout, Page: Admin, isPublic: true },
+  { path: paths.admin, Layout: AdminLayout, Page: Admin, isPublic: false },
   {
     path: paths.users,
     Layout: AdminLayout,
     Page: UserManagement,
-    isPublic: true,
+    isPublic: false,
   },
   {
     path: paths.songs,
     Layout: AdminLayout,
     Page: SongManagement,
-    isPublic: true,
+    isPublic: false,
   },
 ];
 

@@ -4,16 +4,19 @@ import AppRoutes from "./routes/AppRoutes";
 import Search from "./contexts/Search";
 import Auth from "./contexts/Auth";
 import Toast from "./components/Toast";
+import Axios from "./contexts/Axios";
 
 const App = () => {
   return (
     <BrowserRouter>
-      <Auth>
-        <Search>
-          <AppRoutes />
-          <Toast />
-        </Search>
-      </Auth>
+      <Axios>
+        <Auth>
+          <Search>
+            <AppRoutes />
+            <Toast />
+          </Search>
+        </Auth>
+      </Axios>
     </BrowserRouter>
   );
 };
