@@ -3,17 +3,22 @@ import { useAuth } from "../../contexts/Auth";
 import { useNavigate } from "react-router-dom";
 import paths from "../../constants/paths";
 
-const ProtectedRoute = ({ children, isPublic }) => {
-  const { isAuthenticated } = useAuth();
+const ProtectedRoute = ({ adminOnly, children }) => {
+  const { isAuthenticated, user } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (isAuthenticated) {
-      navigate(paths.home, { replace: true });
+    if (!isAuthenticated) {
+      navigate(paths.login, { replace: true });
+      return;
     }
-  }, [isAuthenticated, navigate, isPublic]);
+    if (adminOnly && user?.role !== "admin") {
+      navigate(paths.home, { replace: true });
+      return;
+    }
+  }, [isAuthenticated, navigate, user?.role, adminOnly, user]);
 
-  return children;
+  return isAuthenticated ? children : null;
 };
 
 export default ProtectedRoute;

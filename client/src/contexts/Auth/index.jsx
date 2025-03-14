@@ -53,9 +53,9 @@ const Auth = ({ children }) => {
       if (response.status === 200) {
         const { access, user } = response.data;
         setAccessToken(access);
-        setUser({ ...user });
         notify("Login successfully");
-        navigate(paths.home);
+        navigate(user?.role === "admin" ? paths.admin : paths.home);
+        setUser({ ...user });
       }
     } finally {
       setPendingLogin(false);
@@ -109,4 +109,4 @@ const Auth = ({ children }) => {
 };
 
 export const useAuth = () => useContext(AuthContext);
-export default Auth;
+export default React.memo(Auth);

@@ -4,14 +4,16 @@ import { useNavigate } from "react-router-dom";
 import paths from "../../constants/paths";
 
 const PublicRoute = ({ children }) => {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
     if (isAuthenticated) {
-      navigate(paths.home, { replace: true });
+      navigate(user?.role === "admin" ? paths.admin : paths.home, {
+        replace: true,
+      });
     }
-  }, [isAuthenticated, navigate]);
+  }, [isAuthenticated, navigate, user?.role]);
 
   return isAuthenticated ? null : children;
 };

@@ -4,22 +4,24 @@ from bson import ObjectId
 
 class User:
     def __init__(self,
-                _id,
+                # _id,
                 username,
                 email,
                 password,
-                playlist=None,
-                favorite=None,
-                history=None,
-                isPremium=False):
-        self._id = _id       
+                bio="",
+                image_url="",
+                role="user",
+                isPremium=False,
+                albums=None):
+        # self._id = _id       
         self.username = username       
         self.email = email       
         self.password = password       
-        self.playlist = playlist if playlist else []       
-        self.favorite = favorite if favorite else []    
-        self.history = history if history else []       
+        self.role = role       
         self.isPremium = isPremium       
+        self.bio = bio
+        self.image_url = image_url       
+        self.albums = albums       
         
     def create(self):
         with connect_db() as database:
@@ -27,10 +29,11 @@ class User:
                 'username': self.username,
                 'email': self.email,
                 'password': hash_password(self.password),
-                'playlist': self.playlist,
-                'favorite': self.favorite,
-                'history': self.history,
-                'isPremium': self.isPremium
+                'bio': self.bio,
+                'image_url': self.image_url,
+                'role': self.role,
+                'isPremium': self.isPremium,
+                'albums': self.albums
             }
             result = database['users'].insert_one(user_data)
             return str(result.inserted_id)
@@ -67,6 +70,10 @@ class User:
         with connect_db() as database:
             return database['users'].find_one({'email': email})
         
+    @staticmethod
+    def get_by_role(role):
+        with connect_db() as database:
+            return database['users'].find_one({'role': role})
         
     @staticmethod
     def get_by_username(username):

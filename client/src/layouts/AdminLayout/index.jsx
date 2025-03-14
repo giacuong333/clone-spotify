@@ -1,8 +1,8 @@
 import React from "react";
-import { Navigate, Outlet } from "react-router-dom";
+// import { Navigate, Outlet } from "react-router-dom";
 import AdminSidebar from "../../components/AdminSidebar";
-import { useAuth } from "../../Contexts/Auth";
-import paths from "../../constants/paths";
+// import { useAuth } from "../../Contexts/Auth";
+// import paths from "../../constants/paths";
 
 const AdminLayout = ({ children }) => {
   // const { isAuthenticated, user } = useAuth();

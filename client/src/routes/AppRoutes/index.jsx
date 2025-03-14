@@ -12,27 +12,38 @@ const AppRoutes = () => {
         <Spin spinning tip='Please wait...' fullscreen size='large'></Spin>
       }>
       <Routes>
-        {routes?.map(({ path, Layout, Page, isPublic, isAuthPage, index }) => {
-          let RenderPage = isPublic ? (
-            <Page />
-          ) : (
-            <ProtectedRoute isPublic={isPublic}>
+        {routes?.map(
+          ({
+            path,
+            Layout,
+            Page,
+            isPublic,
+            isAuthPage,
+            isAdminPage,
+            index,
+          }) => {
+            let RenderPage = isPublic ? (
               <Page />
-            </ProtectedRoute>
-          );
+            ) : (
+              <ProtectedRoute adminOnly={isAdminPage}>
+                <Page />
+              </ProtectedRoute>
+            );
 
-          if (isAuthPage) {
-            RenderPage = <PublicRoute>{RenderPage}</PublicRoute>;
+            if (isAuthPage) {
+              RenderPage = <PublicRoute>{RenderPage}</PublicRoute>;
+            }
+
+            return (
+              <Route
+                key={path}
+                path={path}
+                index={index}
+                element={Layout ? <Layout>{RenderPage}</Layout> : RenderPage}
+              />
+            );
           }
-          return (
-            <Route
-              key={path}
-              path={path}
-              index={index}
-              element={Layout ? <Layout>{RenderPage}</Layout> : RenderPage}
-            />
-          );
-        })}
+        )}
       </Routes>
     </Suspense>
   );

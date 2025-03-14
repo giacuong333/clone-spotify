@@ -51,18 +51,26 @@ const routes = [
     Page: Search,
     isPublic: true,
   },
-  { path: paths.admin, Layout: AdminLayout, Page: Admin, isPublic: false },
+  {
+    path: paths.admin,
+    Layout: AdminLayout,
+    Page: Admin,
+    isPublic: false,
+    isAdminPage: true,
+  },
   {
     path: paths.users,
     Layout: AdminLayout,
     Page: UserManagement,
     isPublic: false,
+    isAdminPage: true,
   },
   {
     path: paths.songs,
     Layout: AdminLayout,
     Page: SongManagement,
     isPublic: false,
+    isAdminPage: true,
   },
 ];
 
