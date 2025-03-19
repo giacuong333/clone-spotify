@@ -1,94 +1,31 @@
-from utils.initialize_collections import connect_db
 from utils.hash_and_verify_password import hash_password
-from bson import ObjectId
+from mongodbmanager.models import MongoDBManager
 
 class User:
-    def __init__(self,
-                # _id,
-                username,
-                email,
-                password,
-                bio="",
-                image_url="",
-                role="user",
-                isPremium=False,
-                albums=None):
-        # self._id = _id       
-        self.username = username       
-        self.email = email       
-        self.password = password       
-        self.role = role       
-        self.isPremium = isPremium       
-        self.bio = bio
-        self.image_url = image_url       
-        self.albums = albums       
-        
-    def create(self):
-        with connect_db() as database:
-            user_data = {
-                'username': self.username,
-                'email': self.email,
-                'password': hash_password(self.password),
-                'bio': self.bio,
-                'image_url': self.image_url,
-                'role': self.role,
-                'isPremium': self.isPremium,
-                'albums': self.albums
-            }
-            result = database['users'].insert_one(user_data)
-            return str(result.inserted_id)
+    collection = MongoDBManager("users")
     
     @staticmethod
-    def update(user_id, update_data):
-        with connect_db() as database:
-            return database['users'].update_one(
-                {'_id': ObjectId(user_id)},
-                {'$set': update_data}
-            )
-    
-    @staticmethod
-    def delete(user_id):
-        with connect_db() as database:
-            return database['users'].delete_one(
-                {'_id': ObjectId(user_id)},
-            )
-    
-    @staticmethod
-    def get_all():
-        with connect_db() as database:
-            return list(database['users'].find())
-    
-    @staticmethod
-    def get_by_id(user_id):
-        with connect_db() as database:
-            return database['users'].find_one({
-                '_id': ObjectId(user_id)
-            })
+    def create(username, email, password, role="user", is_premium=False, bio=None, image_url=None):
+        return User.collection.create({
+            "username": username,
+            "email": email,
+            "password": hash_password(password),
+            "role": role,
+            "isPremium": is_premium,
+            "bio": bio,
+            "image_url": image_url,
+            "follower": [], # List of the follower's ObjectId collection
+            "albums": [] # List of the album's ObjectId collection
+        })
             
     @staticmethod
     def get_by_email(email):
-        with connect_db() as database:
-            return database['users'].find_one({'email': email})
+            return User.collection.find_one({'email': email})
         
     @staticmethod
     def get_by_role(role):
-        with connect_db() as database:
-            return database['users'].find_one({'role': role})
+            return User.collection.find_one({'role': role})
         
     @staticmethod
     def get_by_username(username):
-        with connect_db() as database:
-            return database['users'].find_one({'username': username})
-        
-    # @classmethod
-    # def from_mongo(cls, mongo_data):
-    #     return cls(
-    #         _id=str(mongo_data['_id']),
-    #         email=mongo_data['email'],
-    #         password=mongo_data['password'],
-    #         username=mongo_data.get('username'),
-    #         playlist=mongo_data.get('playlist', []),
-    #         favorite=mongo_data.get('favorite', []),
-    #         history=mongo_data.get('history', []),
-    #         isPremium=mongo_data.get('isPremium', False)
-    #     )
+            return User.collection.find_one({'username': username})

@@ -49,7 +49,6 @@ INSTALLED_APPS = [
     
     # APPS
     'apps.albums',
-    'apps.artists',
     'apps.favorites',
     'apps.histories',
     'apps.playlists',

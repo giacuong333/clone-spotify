@@ -20,9 +20,5 @@ class UserSerializer(serializers.Serializer):
         return data
             
     def create(self, validated_data):
-        user = User(**validated_data)
-        user_id = user.create()
-        return {'_id': user_id, **validated_data}
-    
-    def update(self, instance, validated_data):
-        pass
+        user_id = User.create(**validated_data)
+        return {'_id': str(user_id)}

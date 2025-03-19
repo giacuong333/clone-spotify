@@ -1,22 +1,18 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { useAuth } from "../../contexts/Auth";
-import { useNavigate } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 import paths from "../../constants/paths";
 
 const ProtectedRoute = ({ adminOnly, children }) => {
   const { isAuthenticated, user } = useAuth();
-  const navigate = useNavigate();
 
-  useEffect(() => {
-    if (!isAuthenticated) {
-      navigate(paths.login, { replace: true });
-      return;
-    }
-    if (adminOnly && user?.role !== "admin") {
-      navigate(paths.home, { replace: true });
-      return;
-    }
-  }, [isAuthenticated, navigate, user?.role, adminOnly, user]);
+  if (!isAuthenticated) {
+    return <Navigate to={paths.login} replace />;
+  }
+
+  if (adminOnly && user?.role !== "admin") {
+    return <Navigate to={paths.home} replace />;
+  }
 
   return isAuthenticated ? children : null;
 };
