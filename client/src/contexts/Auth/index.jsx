@@ -1,34 +1,27 @@
-import React, {
-  createContext,
-  useContext,
-  useState,
-  useEffect,
-  useMemo,
-} from "react";
-import { useAxios } from "../../contexts/Axios";
+import React from "react";
+import { useAxios, apiInstance } from "../../contexts/Axios";
 import { apis } from "../../constants/apis";
 import { notify } from "../../components/Toast";
 import { useNavigate } from "react-router-dom";
 import paths from "../../constants/paths";
 
-const AuthContext = createContext();
+const AuthContext = React.createContext();
 
 const Auth = ({ children }) => {
-  const [user, setUser] = useState({});
-  const [pendingLogin, setPendingLogin] = useState(false);
-  const [pendingRegister, setPendingRegister] = useState(false);
-  const [pendingLogout, setPendingLogout] = useState(false);
-  const [pendingRefresh, setPendingRefresh] = useState(false);
+  const [user, setUser] = React.useState({});
+  const [pendingLogin, setPendingLogin] = React.useState(false);
+  const [pendingRegister, setPendingRegister] = React.useState(false);
+  const [pendingLogout, setPendingLogout] = React.useState(false);
+  const [pendingRefresh, setPendingRefresh] = React.useState(false);
   const navigate = useNavigate();
-  const { instance, accessToken, setAccessToken } = useAxios();
+  const { accessToken, setAccessToken } = useAxios();
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (accessToken) return;
-
     const refreshToken = async () => {
       try {
         setPendingRefresh(true);
-        const response = await instance.post(apis.auths.refresh(), {});
+        const response = await apiInstance.post(apis.auths.refresh(), {});
         if (response.status === 200) {
           const { access, user } = response.data;
           setAccessToken(access);
@@ -44,12 +37,12 @@ const Auth = ({ children }) => {
     } else {
       setPendingRefresh(false);
     }
-  }, [instance, accessToken, setAccessToken]);
+  }, [accessToken, setAccessToken]);
 
   const login = async (payload) => {
     try {
       setPendingLogin(true);
-      const response = await instance.post(apis.auths.login(), payload);
+      const response = await apiInstance.post(apis.auths.login(), payload);
       if (response.status === 200) {
         const { access, user } = response.data;
         setAccessToken(access);
@@ -65,7 +58,7 @@ const Auth = ({ children }) => {
   const register = async (payload) => {
     try {
       setPendingRegister(true);
-      const response = await instance.post(apis.users.create(), payload);
+      const response = await apiInstance.post(apis.users.create(), payload);
       if (response.status === 201) {
         notify("Account registered successfully");
         navigate(paths.login);
@@ -78,7 +71,7 @@ const Auth = ({ children }) => {
   const logout = async () => {
     try {
       setPendingLogout(true);
-      await instance.post(apis.auths.logout(), {});
+      await apiInstance.post(apis.auths.logout(), {});
       setAccessToken(null);
       setUser({});
       notify("Logged out successfully");
@@ -88,7 +81,7 @@ const Auth = ({ children }) => {
     }
   };
 
-  const isAuthenticated = useMemo(() => !!accessToken, [accessToken]);
+  const isAuthenticated = React.useMemo(() => !!accessToken, [accessToken]);
 
   return (
     <AuthContext.Provider
@@ -108,5 +101,5 @@ const Auth = ({ children }) => {
   );
 };
 
-export const useAuth = () => useContext(AuthContext);
+export const useAuth = () => React.useContext(AuthContext);
 export default React.memo(Auth);

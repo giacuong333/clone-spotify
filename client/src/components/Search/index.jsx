@@ -1,9 +1,9 @@
-import React, { Suspense, useState } from "react";
+import React from "react";
 import { useSearch } from "../../contexts/Search";
 import { Button, Spin } from "antd";
 import PlayIcon from "../PlayIcon";
 import SongList from "../SongList";
-import AlbumAndArtistWrap from "../AlbumAndArtistWrap";
+import { types } from "../../contexts/Search";
 
 const songList = [
   {
@@ -56,16 +56,6 @@ const songList = [
   },
 ];
 
-const types = {
-  All: "All",
-  Artists: "Artists",
-  Playlists: "Playlists",
-  Songs: "Songs",
-  Albums: "Albums",
-  PodcastsAndShows: "Podcasts & Shows",
-  Profiles: "Profiles",
-};
-
 const list = [
   {
     id: 1,
@@ -106,11 +96,10 @@ const list = [
 ];
 
 const Search = () => {
-  const [seletedCategory, setSelectedCategory] = useState(types.All);
-  const { searchQuery } = useSearch();
+  const { searchCategory, setSearchCategory } = useSearch();
 
   return (
-    <Suspense
+    <React.Suspense
       fallback={
         <Spin spinning tip='Please wait...' fullscreen size='large'></Spin>
       }>
@@ -123,10 +112,10 @@ const Search = () => {
                 <li
                   key={type}
                   className='w-fit'
-                  onClick={() => setSelectedCategory(type)}>
+                  onClick={() => setSearchCategory(type)}>
                   <p
                     className={`text-white px-4 py-1 cursor-pointer bg-white/10 hover:bg-white/20 rounded-full w-fit truncate text-sm ${
-                      type === seletedCategory ? "!bg-white !text-black" : ""
+                      type === searchCategory ? "!bg-white !text-black" : ""
                     }`}>
                     {type}
                   </p>
@@ -186,7 +175,7 @@ const Search = () => {
         {/* Featured artists, songs */}
         <div></div>
       </section>
-    </Suspense>
+    </React.Suspense>
   );
 };
 

@@ -1,30 +1,25 @@
-import React, {
-  createContext,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import React from "react";
 import { notify } from "../../components/Toast";
 import axios from "axios";
 import { apis } from "../../constants/apis";
 
-const AxiosContext = createContext();
+const AxiosContext = React.createContext();
+
+const instance = () =>
+  axios.create({
+    baseURL: import.meta.env.VITE_BASE_URL,
+    timeout: 10000,
+    withCredentials: true,
+    headers: { "X-Custom-Header": "foobar" },
+  });
+
+export const apiInstance = instance();
 
 const Axios = ({ children }) => {
-  const [accessToken, setAccessToken] = useState(null);
+  const [accessToken, setAccessToken] = React.useState(null);
 
-  const instance = useMemo(() => {
-    return axios.create({
-      baseURL: import.meta.env.VITE_BASE_URL,
-      timeout: 10000,
-      withCredentials: true,
-      headers: { "X-Custom-Header": "foobar" },
-    });
-  }, []);
-
-  useEffect(() => {
-    const requestInterceptor = instance.interceptors.request.use(
+  React.useEffect(() => {
+    const requestInterceptor = apiInstance.interceptors.request.use(
       (config) => {
         if (accessToken && config.url !== apis.auths.logout()) {
           config.headers["Authorization"] = `Bearer ${accessToken}`;
@@ -37,7 +32,7 @@ const Axios = ({ children }) => {
       }
     );
 
-    const responseInterceptor = instance.interceptors.response.use(
+    const responseInterceptor = apiInstance.interceptors.response.use(
       (response) => {
         console.log("Response:", response);
         return response;
@@ -51,7 +46,7 @@ const Axios = ({ children }) => {
         ) {
           originalRequest._retry = true;
           try {
-            const response = await instance.post(apis.auths.refresh(), {});
+            const response = await apiInstance.post(apis.auths.refresh(), {});
             const accessToken = response.data?.access;
             setAccessToken(accessToken);
             originalRequest.headers["Authorization"] = `Bearer ${accessToken}`;
@@ -69,17 +64,17 @@ const Axios = ({ children }) => {
     );
 
     return () => {
-      instance.interceptors.request.eject(requestInterceptor);
-      instance.interceptors.response.eject(responseInterceptor);
+      apiInstance.interceptors.request.eject(requestInterceptor);
+      apiInstance.interceptors.response.eject(responseInterceptor);
     };
-  }, [accessToken, instance]);
+  }, [accessToken]);
 
   return (
-    <AxiosContext.Provider value={{ instance, accessToken, setAccessToken }}>
+    <AxiosContext.Provider value={{ accessToken, setAccessToken }}>
       {children}
     </AxiosContext.Provider>
   );
 };
 
-export const useAxios = () => useContext(AxiosContext);
+export const useAxios = () => React.useContext(AxiosContext);
 export default Axios;

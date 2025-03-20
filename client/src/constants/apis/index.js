@@ -11,4 +11,7 @@ export const apis = {
     getAll: () => `/api/users`,
     getById: (param) => `/api/users/${param}`,
   },
+  songs: {
+    search: () => `/api/songs/search`,
+  },
 };

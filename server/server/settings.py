@@ -54,7 +54,8 @@ INSTALLED_APPS = [
     'apps.playlists',
     'apps.reports',
     'apps.songs',
-    'apps.users'
+    'apps.users',
+    'apps.search',
 ]
 
 MIDDLEWARE = [

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import {
   HomeOutlined,
   SearchOutlined,
@@ -43,7 +43,7 @@ const popoverItems = [
 const Navbar = () => {
   const [form] = Form.useForm();
   const navigate = useNavigate();
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = React.useState(false);
   const { setSearchQuery } = useSearch();
   const { isAuthenticated, user, logout } = useAuth();
 
@@ -56,12 +56,8 @@ const Navbar = () => {
   };
 
   const handleSearch = (values) => {
-    (values) => setSearchQuery(values);
+    setSearchQuery(values["search"]);
     navigate(_.isEmpty(values) ? paths.home : paths.search);
-  };
-
-  const handleLogout = async () => {
-    await logout();
   };
 
   return (
@@ -89,12 +85,10 @@ const Navbar = () => {
         <div className='flex items-center justify-between w-full h-full'>
           {/* Left Section */}
           <div className='flex items-center space-x-6 h-full'>
-            <div className='px-2 cursor-pointer'>
-              <SpotifyLogo
-                height={32}
-                fillColor='white'
-                onClick={() => navigate(paths.home)}
-              />
+            <div
+              className='px-2 cursor-pointer'
+              onClick={() => navigate(paths.home)}>
+              <SpotifyLogo height={32} fillColor='white' />
             </div>
             <div className='flex items-center space-x-4 h-full'>
               <HomeOutlined
@@ -167,7 +161,7 @@ const Navbar = () => {
                               <div
                                 className='flex items-center justify-between gap-6 px-3 py-2.5 cursor-pointer group-hover:!bg-white/20'
                                 onClick={() =>
-                                  item?.action && item?.action(handleLogout)
+                                  item?.action && item?.action(logout)
                                 }>
                                 <p className='group-hover:underline text-white'>
                                   {item?.content}

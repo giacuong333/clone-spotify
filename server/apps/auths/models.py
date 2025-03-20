@@ -1,6 +1,6 @@
 from apps.users.models import User
-from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
-
+from rest_framework_simplejwt.tokens import RefreshToken
+from utils.convert_objectids_to_str import convert_objectids_to_str
 class Auth: 
     def __init__(self, email, password):
         self.email = email
@@ -15,9 +15,8 @@ class Auth:
     def refresh(refresh_token):
         refresh = RefreshToken(refresh_token)
         access = str(refresh.access_token)
-        user = User.get_by_email(refresh.payload['email'])
-        
-        user['_id'] = str(user['_id'])
+        cursor = User.get_by_email(refresh.payload['email'])
+        user = convert_objectids_to_str(cursor)
         return {
             'access': access,
             'user': user
@@ -26,17 +25,14 @@ class Auth:
     @staticmethod
     def generate_tokens(user_dict):      
         try:
+            user = convert_objectids_to_str(user_dict)
             refresh = RefreshToken()
-            access = AccessToken()
-            
-            refresh.payload['email'] = str(user_dict['email'])
-            access.payload['email'] = str(user_dict['email'])
-            user_dict['_id'] = str(user_dict['_id'])
-            
+            refresh['email'] = user['email']
+            refresh['user_id'] = user['_id']
             return {
                 'refresh': str(refresh),
                 'access': str(refresh.access_token),
-                'user': user_dict
+                'user': user
             }
         except Exception as e:
             raise ValueError(f"Token generation failed: {str(e)}")

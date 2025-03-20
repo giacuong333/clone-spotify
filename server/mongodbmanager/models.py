@@ -19,7 +19,7 @@ class MongoDBManager:
         return self._db_collection.find_one(query)
 
     def filter(self, query):
-        return list(self._db_collection.find(query))
+        return self._db_collection.find(query)
 
     def update(self, _id, data):
         return self._db_collection.update_one(
@@ -29,3 +29,6 @@ class MongoDBManager:
 
     def delete(self, _id):
         return self._db_collection.delete_one({"_id": ObjectId(_id)})
+    
+    def aggregate(self, pipline):
+        return self._db_collection.aggregate(pipline)

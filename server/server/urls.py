@@ -21,4 +21,11 @@ urlpatterns = [
     # path('admin/', admin.site.urls),
     path("api/auths/", include("apps.auths.urls")),
     path("api/users/", include("apps.users.urls")),
+    path("api/songs/", include("apps.songs.urls")),
+    path("api/albums/", include("apps.albums.urls")),
+    path("api/favorites/", include("apps.favorites.urls")),
+    path("api/histories/", include("apps.histories.urls")),
+    path("api/playlists/", include("apps.playlists.urls")),
+    path("api/reports/", include("apps.reports.urls")),
+    path("api/search/", include("apps.search.urls")),
 ]
