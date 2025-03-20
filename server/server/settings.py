@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
+from datetime import timedelta
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -31,6 +32,8 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    # CORS
+    'corsheaders',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -38,18 +41,27 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     
-    # apps
+    # REST
+    'rest_framework',
+    # JWT
+    'rest_framework_simplejwt',
+    'rest_framework_simplejwt.token_blacklist',
+    
+    # APPS
     'apps.albums',
-    'apps.artists',
     'apps.favorites',
     'apps.histories',
     'apps.playlists',
     'apps.reports',
     'apps.songs',
-    'apps.users'
+    'apps.users',
+    'apps.search',
 ]
 
 MIDDLEWARE = [
+    # CORS
+    "corsheaders.middleware.CorsMiddleware",
+    "django.middleware.common.CommonMiddleware",
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -57,7 +69,66 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    
 ]
+
+# START REST AND JWT CONFIG
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 10
+}
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(hours=1),  # Thời gian sống của access token
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),  # Thời gian sống của refresh token
+    'ROTATE_REFRESH_TOKENS': True,  # Tạo refresh token mới khi làm mới
+    'BLACKLIST_AFTER_ROTATION': True,  # Blacklist refresh token cũ
+    'ALGORITHM': 'HS256',
+    'SIGNING_KEY': 'opensource-software-development',  # Thay bằng khóa bí mật mạnh
+    'AUTH_HEADER_TYPES': ('Bearer',),
+    'USER_ID_FIELD': 'email',
+    'USER_ID_CLAIM': 'email',
+    "AUTH_COOKIE": "access_token",
+    "AUTH_COOKIE_SECURE": False,  # Set to True in production (HTTPS required)
+    "AUTH_COOKIE_HTTP_ONLY": True,
+    "AUTH_COOKIE_PATH": "/",
+}
+# END REST AND JWT CONFIG
+
+
+# START CORS CONFIG
+CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173",  # React Vite frontend
+    "http://127.0.0.1:5173",
+]
+CSRF_TRUSTED_ORIGINS = CORS_ALLOWED_ORIGINS
+CORS_ALLOW_HEADERS = [
+    "content-type",
+    "authorization",
+    "x-requested-with",
+    "accept",
+    "origin",
+    "x-csrftoken",
+    "x-custom-header"
+]
+CSRF_COOKIE_SECURE = True  # Set to True in production (HTTPS required)
+CSRF_COOKIE_HTTPONLY = True
+CSRF_COOKIE_SAMESITE = "None"
+
+SESSION_COOKIE_SECURE = True
+SESSION_COOKIE_HTTPONLY = True
+SESSION_COOKIE_SAMESITE = "None"
+
+JWT_AUTH_COOKIE_SAMESITE = "None"  
+JWT_AUTH_COOKIE_SECURE = True
+# END CORS CONFIG
 
 ROOT_URLCONF = 'server.urls'
 
@@ -85,22 +156,10 @@ WSGI_APPLICATION = 'server.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'djongo',
-        'NAME': 'clone_spotify',
-        'HOST': 'localhost',
-        'PORT': 27017,
-    },
-    'LOGGING': {
-        'version': 1,
-        'loggers': {
-            'djongo': {
-                'level': 'DEBUG',
-                'propagate': False,                        
-            }
-        },
-    },
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': 'db.sqlite3',  
+    }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators

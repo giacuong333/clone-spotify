@@ -1,14 +1,17 @@
-from django.db import models
-from apps.users.models import User
-from apps.songs.models import Song
+from mongodbmanager.models import MongoDBManager
+from bson import ObjectId
+from datetime import datetime
 
-class Report(models.Model):
-    # user = models.ForeignKey(User, on_delete=models.CASCADE)
-    song = models.ForeignKey(Song, on_delete=models.CASCADE)
-    reason = models.TextField()
-    description = models.TextField()
-    status =  models.CharField(max_length=50)
-    reviewd_by = models.ForeignKey(User, on_delete=models.CASCADE)
-    
-    class Meta:
-        db_table = 'reports'
+class Report:
+    collection = MongoDBManager("reports")
+
+    @staticmethod
+    def create(user_id, song_id, reason, description, status="pending", reviewed_by=None):
+        return Report.collection.create({
+            "user": ObjectId(user_id),
+            "song": ObjectId(song_id),
+            "reason": reason,
+            "description": description,
+            "status": status,
+            "reviewed_by": ObjectId(reviewed_by) if reviewed_by else None
+        })

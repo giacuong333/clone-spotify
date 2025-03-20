@@ -1,12 +1,15 @@
-from django.db import models
-from apps.artists.models import Artist
+from mongodbmanager.models import MongoDBManager
+from bson import ObjectId
 
-class Album(models.Model):
-    name = models.CharField(max_length=100)
-    cover_url = models.TextField()
-    artist = models.ForeignKey(Artist, on_delete=models.CASCADE)
-    songs = models.JSONField(default=list)
-    release_date = models.DateTimeField(auto_now_add=True)
-    
-    class Meta:
-        db_table = 'albums'
+class Album:
+    collection = MongoDBManager("albums")
+
+    @staticmethod
+    def create(name, artist_id, released_date, cover_url, songs=[]):
+        return Album.collection.create({
+            "name": name,
+            "artist": ObjectId(artist_id),
+            "released_date": released_date,
+            "cover_url": cover_url,
+            "songs": [ObjectId(song) for song in songs]
+        })

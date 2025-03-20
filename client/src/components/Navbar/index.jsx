@@ -1,23 +1,62 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import {
   HomeOutlined,
   SearchOutlined,
   DownloadOutlined,
+  BellOutlined,
+  ExportOutlined,
 } from "@ant-design/icons";
 import SpotifyLogo from "../../components/SpotifyLogo";
-import { ConfigProvider, Form, Input } from "antd";
+import { ConfigProvider, Form, Input, Popover } from "antd";
 import { useNavigate } from "react-router-dom";
 import paths from "../../constants/paths";
 import { useSearch } from "../../contexts/Search";
 import _ from "lodash";
+import { useAuth } from "../../contexts/Auth";
+
+const popoverItems = [
+  {
+    id: 1,
+    content: "Account",
+    Icon: ExportOutlined,
+  },
+  { id: 2, content: "Profile" },
+  {
+    id: 3,
+    content: "Upgrade to Premium",
+    Icon: ExportOutlined,
+  },
+  {
+    id: 4,
+    content: "Support",
+    Icon: ExportOutlined,
+  },
+  {
+    id: 5,
+    content: "Download",
+    Icon: ExportOutlined,
+  },
+  { id: 6, content: "Settings" },
+  { id: 7, content: "Logout", action: (callback) => callback() },
+];
 
 const Navbar = () => {
   const [form] = Form.useForm();
   const navigate = useNavigate();
+  const [open, setOpen] = React.useState(false);
   const { setSearchQuery } = useSearch();
+  const { isAuthenticated, user, logout } = useAuth();
+
+  const hide = () => {
+    setOpen(false);
+  };
+
+  const handleOpenChange = (newOpen) => {
+    setOpen(newOpen);
+  };
 
   const handleSearch = (values) => {
-    (values) => setSearchQuery(values);
+    setSearchQuery(values["search"]);
     navigate(_.isEmpty(values) ? paths.home : paths.search);
   };
 
@@ -46,12 +85,10 @@ const Navbar = () => {
         <div className='flex items-center justify-between w-full h-full'>
           {/* Left Section */}
           <div className='flex items-center space-x-6 h-full'>
-            <div className='px-2 cursor-pointer'>
-              <SpotifyLogo
-                height={32}
-                fillColor='white'
-                onClick={() => navigate(paths.home)}
-              />
+            <div
+              className='px-2 cursor-pointer'
+              onClick={() => navigate(paths.home)}>
+              <SpotifyLogo height={32} fillColor='white' />
             </div>
             <div className='flex items-center space-x-4 h-full'>
               <HomeOutlined
@@ -91,33 +128,79 @@ const Navbar = () => {
 
           {/* Right Section */}
           <div className='flex items-center space-x-6 h-full'>
-            <div className='flex items-center gap-4 text-white text-sm'>
-              <p className='cursor-pointer text-gray-400 font-bold hover:text-white hover:scale-[1.05] transition-all'>
-                Premium
-              </p>
-              <p className='cursor-pointer text-gray-400 font-bold hover:text-white hover:scale-[1.05] transition-all'>
-                Support
-              </p>
-              <p className='cursor-pointer text-gray-400 font-bold hover:text-white hover:scale-[1.05] transition-all'>
-                Download
-              </p>
-            </div>
-            <div className='w-[1px] h-7 bg-white mr-8'></div>
+            {!isAuthenticated && (
+              <>
+                <div className='flex items-center gap-4 text-white text-sm'>
+                  <p className='cursor-pointer text-gray-400 font-bold hover:text-white hover:scale-[1.05] transition-all'>
+                    Premium
+                  </p>
+                  <p className='cursor-pointer text-gray-400 font-bold hover:text-white hover:scale-[1.05] transition-all'>
+                    Support
+                  </p>
+                  <p className='cursor-pointer text-gray-400 font-bold hover:text-white hover:scale-[1.05] transition-all'>
+                    Download
+                  </p>
+                </div>
+                <div className='w-[1px] h-7 bg-white mr-8'></div>
+              </>
+            )}
             <div className='flex items-center gap-6 text-white text-sm h-full'>
               <span className='flex items-center gap-2 cursor-pointer text-gray-400 font-bold hover:text-white hover:scale-[1.05] transition-all'>
                 <DownloadOutlined />
                 <p>Install App</p>
               </span>
-              <p
-                className='cursor-pointer text-gray-400 font-bold hover:text-white hover:scale-[1.05] transition-all'
-                onClick={() => navigate(paths.register)}>
-                Sign up
-              </p>
-              <p
-                className='text-center flex items-center bg-white h-full px-8 rounded-full cursor-pointer text-black font-bold hover:bg-gray-200 hover:scale-[1.05] transition-all'
-                onClick={() => navigate(paths.login)}>
-                Log in
-              </p>
+              {isAuthenticated ? (
+                <>
+                  <BellOutlined className='!text-white/70 text-xl cursor-pointer hover:!text-white' />
+                  <Popover
+                    content={
+                      <ul>
+                        {popoverItems?.map((item) => {
+                          return (
+                            <li key={item?.id} className='group'>
+                              <div
+                                className='flex items-center justify-between gap-6 px-3 py-2.5 cursor-pointer group-hover:!bg-white/20'
+                                onClick={() =>
+                                  item?.action && item?.action(logout)
+                                }>
+                                <p className='group-hover:underline text-white'>
+                                  {item?.content}
+                                </p>
+                                {item?.Icon && (
+                                  <item.Icon className='!text-white' />
+                                )}
+                              </div>
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    }
+                    trigger='click'
+                    arrow={false}
+                    open={open}
+                    color='black'
+                    onOpenChange={handleOpenChange}>
+                    <div className='flex items-center justify-center p-2 rounded-full bg-[#1F1F1F] cursor-pointer group'>
+                      <p className='text-black font-bold bg-[#F573A0] w-8 h-8 flex items-center justify-center rounded-full group-hover:scale-[1.04]'>
+                        {user?.username[0]}
+                      </p>
+                    </div>
+                  </Popover>
+                </>
+              ) : (
+                <>
+                  <p
+                    className='cursor-pointer text-gray-400 font-bold hover:text-white hover:scale-[1.05] transition-all'
+                    onClick={() => navigate(paths.register)}>
+                    Sign up
+                  </p>
+                  <p
+                    className='text-center flex items-center bg-white h-full px-8 rounded-full cursor-pointer text-black font-bold hover:bg-gray-200 hover:scale-[1.05] transition-all'
+                    onClick={() => navigate(paths.login)}>
+                    Log in
+                  </p>
+                </>
+              )}
             </div>
           </div>
         </div>

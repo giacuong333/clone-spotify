@@ -1,19 +1,46 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { searchItems } from "../../redux/song/reducer";
 
-const SearchContext = createContext();
+export const types = {
+  ALL: "All",
+  ARTISTS: "Artists",
+  PLAYLISTS: "Playlists",
+  SONGS: "Songs",
+  ALBUMS: "Albums",
+  PODCASTS_SHOWS: "Podcasts & Shows",
+  PROFILES: "Profiles",
+};
+
+const SearchContext = React.createContext();
 
 const Search = ({ children }) => {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [searchResults, setSearchResults] = useState([]);
+  const [searchQuery, setSearchQuery] = React.useState("");
+  const [searchCategory, setSearchCategory] = React.useState(types.ALL);
+  const dispatch = useDispatch();
+  const { results, loading, error } = useSelector((state) => state.song);
+
+  React.useEffect(() => {
+    if (searchQuery.trim() && searchCategory) {
+      dispatch(searchItems({ query: searchQuery, category: searchCategory }));
+    }
+  }, [searchQuery, searchCategory, dispatch]);
 
   return (
     <SearchContext.Provider
-      value={{ searchQuery, setSearchQuery, searchResults, setSearchResults }}>
+      value={{
+        searchQuery,
+        setSearchQuery,
+        searchCategory,
+        setSearchCategory,
+        results,
+        loading,
+        error,
+      }}>
       {children}
     </SearchContext.Provider>
   );
 };
 
-export const useSearch = () => useContext(SearchContext);
+export const useSearch = () => React.useContext(SearchContext);
 export default Search;

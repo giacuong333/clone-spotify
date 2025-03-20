@@ -1,19 +1,20 @@
 import React from "react";
-import { Form, Input, Button, ConfigProvider } from "antd";
+import { Form, Input, Button, ConfigProvider, Spin } from "antd";
 import SpotifyLogo from "../../components/SpotifyLogo";
 import GoogleIcon from "../../components/GoogleIcon";
 import FacebookIcon from "../../components/FacebookIcon";
 import AppleIcon from "../../components/AppleIcon";
 import paths from "../../constants/paths";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../contexts/Auth";
 
 const Login = () => {
   const [form] = Form.useForm();
   const navigate = useNavigate();
+  const { login, pendingLogin } = useAuth();
 
-  const onFinish = (values) => {
-    console.log("Received values:", values);
-    // Xử lý submit form
+  const onFinish = async (values) => {
+    await login(values);
   };
 
   return (
@@ -144,7 +145,7 @@ const Login = () => {
                   type='primary'
                   htmlType='submit'
                   className='!w-full !h-12 !bg-[#1ED760] !text-black !rounded-full !font-bold hover:!bg-[hsl(141,65%,71%)]'>
-                  Next
+                  <p>Log In</p>
                 </Button>
               </Form.Item>
             </Form>
@@ -183,6 +184,10 @@ const Login = () => {
           </div>
         </footer>
       </div>
+
+      {pendingLogin && (
+        <Spin spinning tip='Loging In...' fullscreen size='large'></Spin>
+      )}
     </ConfigProvider>
   );
 };

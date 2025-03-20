@@ -1,11 +1,15 @@
-from django.db import models
-# from apps.users.models import User
-from apps.songs.models import Song
+from mongodbmanager.models import MongoDBManager
+from bson import ObjectId
+from datetime import datetime
 
-class History(models.Model):
-    # user = models.ForeignKey(User, on_delete=models.SET_NULL)
-    song = models.ForeignKey(Song, on_delete=models.CASCADE)
-    played_at = models.DateTimeField()
+class History:
+    collection = MongoDBManager("histories")
 
-    class Meta:
-        db_table = 'histories'
+    @staticmethod
+    def create(user_id, song_id):
+        return History.collection.create({
+            "user": ObjectId(user_id),
+            "song": ObjectId(song_id),
+            "played_at": datetime.now()
+        })
+

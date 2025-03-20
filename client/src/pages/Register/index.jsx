@@ -1,19 +1,19 @@
-import React from "react";
-import { Form, Input, Button, ConfigProvider } from "antd";
+import { Form, Input, Button, ConfigProvider, Spin } from "antd";
 import SpotifyLogo from "../../components/SpotifyLogo";
 import GoogleIcon from "../../components/GoogleIcon";
 import FacebookIcon from "../../components/FacebookIcon";
 import AppleIcon from "../../components/AppleIcon";
 import paths from "../../constants/paths";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../contexts/Auth";
 
 const Register = () => {
   const [form] = Form.useForm();
   const navigate = useNavigate();
+  const { register, pendingRegister } = useAuth();
 
-  const onFinish = (values) => {
-    console.log("Received values:", values);
-    // Xử lý submit form
+  const onFinish = async (values) => {
+    await register(values);
   };
 
   return (
@@ -59,7 +59,23 @@ const Register = () => {
             onFinish={onFinish}
             layout='vertical'
             className='mb-6'
-            initialValues={{ email: "", password: "" }}>
+            initialValues={{ username: "", email: "", password: "" }}>
+            <Form.Item
+              label='Username'
+              name='username'
+              rules={[
+                {
+                  required: true,
+                  message: "Username is required!",
+                },
+              ]}
+              className='!mb-3'>
+              <Input
+                placeholder='John Doe'
+                className='w-full h-12 !bg-transparent hover:!border-white !text-white placeholder-gray-400 !border-gray-600 rounded-md !focus:outline-none !focus:ring-2 !focus:ring-[#1ED760] hover:bg-[#2A2A2A] transition-all'
+              />
+            </Form.Item>
+
             <Form.Item
               label='Email address'
               name='email'
@@ -105,7 +121,7 @@ const Register = () => {
                 type='primary'
                 htmlType='submit'
                 className='!w-full !h-12 !bg-[#1ED760] !text-black !rounded-full !font-bold hover:!bg-[hsl(141,65%,71%)]'>
-                Next
+                Sign Up
               </Button>
             </Form.Item>
           </Form>
@@ -176,6 +192,10 @@ const Register = () => {
           </p>
         </div>
       </div>
+
+      {pendingRegister && (
+        <Spin spinning tip='Signing Up...' fullscreen size='large'></Spin>
+      )}
     </ConfigProvider>
   );
 };
