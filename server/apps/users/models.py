@@ -20,12 +20,12 @@ class User:
             
     @staticmethod
     def get_by_email(email):
-            return User.collection.find_one({'email': email})
+        return User.collection.find_one({'email': email})
         
     @staticmethod
     def get_by_role(role):
-            return User.collection.find_one({'role': role})
+        return User.collection.find_one({'role': role})
         
     @staticmethod
     def get_by_username(username):
-            return User.collection.find_one({'username': username})
+        return User.collection.find_one({'username': username})

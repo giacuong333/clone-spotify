@@ -7,22 +7,25 @@ import Toast from "./components/Toast";
 import Axios from "./contexts/Axios";
 import { Provider } from "react-redux";
 import store from "./redux/store";
+import PlayerProvider from "./contexts/Player";
 
 const App = () => {
-  return (
-    <Provider store={store}>
-      <BrowserRouter>
-        <Axios>
-          <Auth>
-            <Search>
-              <AppRoutes />
-              <Toast />
-            </Search>
-          </Auth>
-        </Axios>
-      </BrowserRouter>
-    </Provider>
-  );
+	return (
+		<Provider store={store}>
+			<BrowserRouter>
+				<Axios>
+					<Auth>
+						<PlayerProvider>
+							<Search>
+								<AppRoutes />
+								<Toast />
+							</Search>
+						</PlayerProvider>
+					</Auth>
+				</Axios>
+			</BrowserRouter>
+		</Provider>
+	);
 };
 
 export default App;

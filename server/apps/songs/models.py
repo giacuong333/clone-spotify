@@ -16,3 +16,4 @@ class Song:
             "released_date": released_date,
             "is_proved": is_proved
         })
+        

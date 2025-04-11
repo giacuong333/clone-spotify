@@ -22,7 +22,7 @@ const Search = ({ children }) => {
 
   React.useEffect(() => {
     if (searchQuery.trim() && searchCategory) {
-      dispatch(searchItems({ query: searchQuery, category: searchCategory }));
+      dispatch(searchItems({ q: searchQuery, category: searchCategory }));
     }
   }, [searchQuery, searchCategory, dispatch]);
 

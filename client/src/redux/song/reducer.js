@@ -5,11 +5,11 @@ import { apis } from "../../constants/apis";
 
 export const searchItems = createAsyncThunk(
   "search/searchItems",
-  async ({ query, category }, { rejectWithValue }) => {
+  async ({ q, category }, { rejectWithValue }) => {
     try {
       if (!searchItems.trim()) return { data: [] };
       return await apiInstance.get(apis.songs.search(), {
-        params: { q: query, category },
+        params: { q, category },
       });
     } catch (error) {
       return rejectWithValue(error.message);
