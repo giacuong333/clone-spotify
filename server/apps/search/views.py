@@ -5,7 +5,6 @@ from rest_framework.permissions import AllowAny
 from utils.convert_objectids_to_str import convert_objectids_to_str
 from apps.users.models import User
 from apps.songs.models import Song
-from apps.albums.models import Album
 from apps.playlists.models import Playlist
 
 class SearchAPIView(APIView):
@@ -70,18 +69,10 @@ class SearchAPIView(APIView):
                 continue
             
             artist = User.collection.find_one({"_id": song.get("artist")})
-            album = Album.collection.find_one({"_id": song.get("album")})
             song["artist"] = convert_objectids_to_str(artist) if artist else None
-            song["album"] = convert_objectids_to_str(album) if album else None
             songs.append(song)
             
         return sorted(songs, key=lambda s: s.get("title", "").lower())
-    
-    def _search_albums(self, search_pattern): 
-        cursor = Album.collection.filter({"name": search_pattern})
-        albums = [convert_objectids_to_str(doc) for doc in cursor]
-        
-        return sorted(albums, key=lambda a: a["name"].lower())
     
     def _search_playlists(self, search_pattern): 
         cursor = Playlist.collection.filter({"name": search_pattern})

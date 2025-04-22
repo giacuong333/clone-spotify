@@ -5,17 +5,14 @@ class User:
     collection = MongoDBManager("users")
     
     @staticmethod
-    def create(username, email, password, role="user", is_premium=False, bio=None, image_url=None):
+    def create(name, email, password, bio=None, image_url=None, role="user"):
         return User.collection.create({
-            "username": username,
+            "name": name,
             "email": email,
             "password": hash_password(password),
-            "role": role,
-            "isPremium": is_premium,
             "bio": bio,
             "image_url": image_url,
-            "follower": [], # List of the follower's ObjectId collection
-            "albums": [] # List of the album's ObjectId collection
+            "role": role, # admin, user
         })
             
     @staticmethod
@@ -25,7 +22,3 @@ class User:
     @staticmethod
     def get_by_role(role):
         return User.collection.find_one({'role': role})
-        
-    @staticmethod
-    def get_by_username(username):
-        return User.collection.find_one({'username': username})

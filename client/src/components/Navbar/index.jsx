@@ -15,11 +15,6 @@ import _ from "lodash";
 import { useAuth } from "../../contexts/Auth";
 
 const popoverItems = [
-	{
-		id: 1,
-		content: "Account",
-		Icon: ExportOutlined,
-	},
 	{ id: 2, content: "Profile" },
 	{
 		id: 3,
@@ -181,8 +176,8 @@ const Navbar = () => {
 										color='black'
 										onOpenChange={handleOpenChange}>
 										<div className='flex items-center justify-center p-2 rounded-full bg-[#1F1F1F] cursor-pointer group'>
-											<p className='text-black font-bold bg-[#F573A0] w-8 h-8 flex items-center justify-center rounded-full group-hover:scale-[1.04]'>
-												{user?.username[0]}
+											<p className='capitalize text-black font-bold bg-[#F573A0] w-8 h-8 flex items-center justify-center rounded-full group-hover:scale-[1.04]'>
+												{user?.name[0]}
 											</p>
 										</div>
 									</Popover>

@@ -9,15 +9,14 @@ class CreateUserAPIView(APIView):
     
     def post(self, request):
         try:
+            print("Payload:", request.data)
             serializer = UserSerializer(data=request.data)
             if serializer.is_valid():
                 user = serializer.save()
+                print("Created user:", user)
                 return Response(user, status=status.HTTP_201_CREATED)
             
             errors = serializer.errors
-            if 'message' in errors and errors['message'] == ['Username was registered!']:
-                return Response(errors['message'][0], status=status.HTTP_409_CONFLICT)
-            
             if 'message' in errors and errors['message'] == ['Email was registered!']:
                 return Response(errors['message'][0], status=status.HTTP_409_CONFLICT)
             

@@ -48,11 +48,9 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt.token_blacklist',
     
     # APPS
-    'apps.albums',
-    'apps.favorites',
-    'apps.histories',
+    'apps.listenedAt',
+    'apps.downloadedAt',
     'apps.playlists',
-    'apps.reports',
     'apps.songs',
     'apps.users',
     'apps.search',

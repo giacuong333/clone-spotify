@@ -6,10 +6,14 @@ class Playlist:
     collection = MongoDBManager("playlists")
 
     @staticmethod
-    def create(name, user_id, created_at=None, songs=[]):
+    def create(name, cover_url, is_favorite, desc, user_id, songs):
         return Playlist.collection.create({
             "name": name,
+            "cover_url": cover_url,
+            "is_favorite": is_favorite,
+            "desc": desc,
             "user": ObjectId(user_id),
-            "created_at": created_at or datetime.now(),
-            "songs": [{"song": ObjectId(song), "added_at": datetime.now()} for song in songs]
+            "songs": [{"song": ObjectId(song), "added_at": datetime.now()} for song in songs],
+            "created_at": datetime.now(),
+            "updated_at": datetime.now()
         })

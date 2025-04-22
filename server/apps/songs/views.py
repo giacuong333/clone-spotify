@@ -3,7 +3,6 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 from .models import Song
-from ..albums.models import Album
 from ..playlists.models import Playlist
 from utils.convert_objectids_to_str import convert_objectids_to_str
 

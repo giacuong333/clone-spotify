@@ -2,6 +2,7 @@
 """Django's command-line utility for administrative tasks."""
 import os
 import sys
+from utils.seed_data import SampleData
 
 def main():
     """Run administrative tasks."""
@@ -18,4 +19,5 @@ def main():
 
 
 if __name__ == '__main__':
+    SampleData.seed_data()
     main()
