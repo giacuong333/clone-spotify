@@ -1,10 +1,5 @@
-from mongodbmanager.models import MongoDBManager
+from mongoengine import Document, StringField
 
-class Genre:
-    collection = MongoDBManager("genres")
 
-    @staticmethod
-    def create(name):
-        return Genre.collection.create({
-            "name": name
-        })
+class Genre(Document):
+    name = StringField(required=True, unique=True)

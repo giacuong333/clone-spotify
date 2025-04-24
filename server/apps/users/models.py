@@ -1,24 +1,14 @@
-from utils.hash_and_verify_password import hash_password
-from mongodbmanager.models import MongoDBManager
+from mongoengine import Document, StringField, DateTimeField
+import datetime
 
-class User:
-    collection = MongoDBManager("users")
-    
-    @staticmethod
-    def create(name, email, password, bio=None, image_url=None, role="user"):
-        return User.collection.create({
-            "name": name,
-            "email": email,
-            "password": hash_password(password),
-            "bio": bio,
-            "image_url": image_url,
-            "role": role, # admin, user
-        })
-            
-    @staticmethod
-    def get_by_email(email):
-        return User.collection.find_one({'email': email})
-        
-    @staticmethod
-    def get_by_role(role):
-        return User.collection.find_one({'role': role})
+
+class User(Document):
+    name = StringField(required=True)
+    email = StringField(required=True, unique=True)
+    password = StringField(required=True)
+    bio = StringField()
+    image_url = StringField()
+    role = StringField(choices=["admin", "user"], default="user")
+    created_at = DateTimeField(default=datetime.datetime.now)
+    updated_at = DateTimeField(default=datetime.datetime.now)
+    deleted_at = DateTimeField()

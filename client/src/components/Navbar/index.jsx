@@ -10,7 +10,6 @@ import SpotifyLogo from "../../components/SpotifyLogo";
 import { ConfigProvider, Form, Input, Popover } from "antd";
 import { useNavigate } from "react-router-dom";
 import paths from "../../constants/paths";
-import { useSearch } from "../../contexts/Search";
 import _ from "lodash";
 import { useAuth } from "../../contexts/Auth";
 
@@ -39,7 +38,6 @@ const Navbar = () => {
 	const [form] = Form.useForm();
 	const navigate = useNavigate();
 	const [open, setOpen] = React.useState(false);
-	const { setSearchQuery } = useSearch();
 	const { isAuthenticated, user, logout } = useAuth();
 
 	const hide = () => {

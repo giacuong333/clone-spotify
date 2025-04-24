@@ -1,19 +1,12 @@
-from mongodbmanager.models import MongoDBManager
-from bson import ObjectId
+from mongoengine import Document, StringField, ListField, ReferenceField, DateTimeField
+from apps.genre.models import Genre
 
-class Song:
-    collection = MongoDBManager("songs")
 
-    @staticmethod
-    def create(title, genre, file_url, image_url, released_at, approved_at, deleted_at, user_id, duration):
-        return Song.collection.create({
-            "title": title,
-            "genre": [ObjectId(genre)],
-            "file_url": file_url,
-            "cover_url": image_url,
-            "released_at": released_at,
-            "approved_at": approved_at,
-            "deleted_at": deleted_at,
-            "user": ObjectId(user_id),
-            "duration": duration
-        })
+class Song(Document):
+    title = StringField(required=True)
+    genre = ListField(ReferenceField(Genre))
+    file_url = StringField()
+    cover_url = StringField()
+    released_at = DateTimeField()
+    approved_at = DateTimeField()
+    deleted_at = DateTimeField()

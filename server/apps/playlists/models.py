@@ -1,19 +1,28 @@
-from mongodbmanager.models import MongoDBManager
-from bson import ObjectId
-from datetime import datetime
+from mongoengine import (
+    Document,
+    StringField,
+    ReferenceField,
+    ListField,
+    EmbeddedDocument,
+    EmbeddedDocumentField,
+    DateTimeField,
+)
+from apps.users.models import User
+from apps.songs.models import Song
+import datetime
 
-class Playlist:
-    collection = MongoDBManager("playlists")
 
-    @staticmethod
-    def create(name, cover_url, is_favorite, desc, user_id, songs):
-        return Playlist.collection.create({
-            "name": name,
-            "cover_url": cover_url,
-            "is_favorite": is_favorite,
-            "desc": desc,
-            "user": ObjectId(user_id),
-            "songs": [{"song": ObjectId(song), "added_at": datetime.now()} for song in songs],
-            "created_at": datetime.now(),
-            "updated_at": datetime.now()
-        })
+class PlaylistSong(EmbeddedDocument):
+    song = ReferenceField(Song)
+    added_at = DateTimeField(default=datetime.datetime.utcnow)
+
+
+class Playlist(Document):
+    user = ReferenceField(User)
+    name = StringField(required=True)
+    cover_url = StringField()
+    is_favorite = StringField()
+    desc = StringField()
+    songs = ListField(EmbeddedDocumentField(PlaylistSong))
+    created_at = DateTimeField(default=datetime.datetime.utcnow)
+    updated_at = DateTimeField(default=datetime.datetime.utcnow)

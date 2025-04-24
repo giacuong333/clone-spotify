@@ -1,14 +1,9 @@
-from mongodbmanager.models import MongoDBManager
-from bson import ObjectId
-from datetime import datetime
+from mongoengine import Document, ReferenceField, DateTimeField
+from apps.users.models import User
+from apps.songs.models import Song
 
-class ListenedAt:
-    collection = MongoDBManager("listened_at")
 
-    @staticmethod
-    def create(user_id, song_id):
-        return ListenedAt.collection.create({
-            "user": ObjectId(user_id),
-            "song": ObjectId(song_id),
-            "listened_at": datetime.now()
-        })
+class ListenedAt(Document):
+    user = ReferenceField(User)
+    song = ReferenceField(Song)
+    listened_at = DateTimeField()
