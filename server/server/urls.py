@@ -26,5 +26,4 @@ urlpatterns = [
     path("api/downloadedAt/", include("apps.downloadedAt.urls")),
     path("api/listenedAt/", include("apps.listenedAt.urls")),
     path("api/playlists/", include("apps.playlists.urls")),
-    path("api/search/", include("apps.search.urls")),
 ]

@@ -25,7 +25,6 @@ INSTALLED_APPS = [
     "apps.playlists",
     "apps.songs",
     "apps.users",
-    "apps.search",
     "apps.auths",
     "apps.genre",
 ]
@@ -151,6 +150,4 @@ DATABASES = {
 STATIC_URL = "static/"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-MONGO_DATABASE_NAME = "clone_spotify"
-
-connect(db=MONGO_DATABASE_NAME, host="localhost", port=27017, alias="default")
+connect(db="clone_spotify", host="127.0.0.1", port=27017, alias="default")

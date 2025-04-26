@@ -16,30 +16,30 @@ const Auth = ({ children }) => {
 	const navigate = useNavigate();
 	const { accessToken, setAccessToken } = useAxios();
 
-	React.useEffect(() => {
-		if (accessToken) {
-			return;
-		}
+	// React.useEffect(() => {
+	// 	if (accessToken) {
+	// 		return;
+	// 	}
 
-		const refreshToken = async () => {
-			try {
-				setPendingRefresh(true);
-				const response = await instance.post(apis.auths.refresh(), {});
-				if (response.status === 200) {
-					const { access, user } = response.data;
-					setAccessToken(access);
-					setUser(user);
-				}
-			} catch (error) {
-				setAccessToken(null);
-				setUser(null);
-			} finally {
-				setPendingRefresh(false);
-			}
-		};
+	// 	const refreshToken = async () => {
+	// 		try {
+	// 			setPendingRefresh(true);
+	// 			const response = await instance.post(apis.auths.refresh(), {});
+	// 			if (response.status === 200) {
+	// 				const { access, user } = response.data;
+	// 				setAccessToken(access);
+	// 				setUser(user);
+	// 			}
+	// 		} catch (error) {
+	// 			setAccessToken(null);
+	// 			setUser(null);
+	// 		} finally {
+	// 			setPendingRefresh(false);
+	// 		}
+	// 	};
 
-		refreshToken();
-	}, [accessToken, setAccessToken]);
+	// 	refreshToken();
+	// }, [accessToken, setAccessToken]);
 
 	const login = async (payload) => {
 		try {

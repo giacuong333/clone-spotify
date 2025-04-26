@@ -4,17 +4,18 @@ import { Navigate } from "react-router-dom";
 import paths from "../../constants/paths";
 
 const ProtectedRoute = ({ adminOnly, children }) => {
-  const { isAuthenticated, user } = useAuth();
+	const { isAuthenticated, user } = useAuth();
 
-  if (!isAuthenticated) {
-    return <Navigate to={paths.login} replace />;
-  }
+	// if (!isAuthenticated) {
+	// 	return <Navigate to={paths.login} replace />;
+	// }
 
-  if (adminOnly && user?.role !== "admin") {
-    return <Navigate to={paths.home} replace />;
-  }
+	// if (adminOnly && user?.role !== "admin") {
+	// 	return <Navigate to={paths.home} replace />;
+	// }
 
-  return isAuthenticated ? children : null;
+	// return isAuthenticated ? children : null;
+	return children;
 };
 
 export default ProtectedRoute;

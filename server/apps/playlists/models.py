@@ -14,7 +14,7 @@ import datetime
 
 class PlaylistSong(EmbeddedDocument):
     song = ReferenceField(Song)
-    added_at = DateTimeField(default=datetime.datetime.utcnow)
+    added_at = DateTimeField(default=datetime.datetime.now)
 
 
 class Playlist(Document):
@@ -24,5 +24,5 @@ class Playlist(Document):
     is_favorite = StringField()
     desc = StringField()
     songs = ListField(EmbeddedDocumentField(PlaylistSong))
-    created_at = DateTimeField(default=datetime.datetime.utcnow)
-    updated_at = DateTimeField(default=datetime.datetime.utcnow)
+    created_at = DateTimeField(default=datetime.datetime.now)
+    updated_at = DateTimeField(default=datetime.datetime.now)

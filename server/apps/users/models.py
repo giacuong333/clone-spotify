@@ -12,3 +12,5 @@ class User(Document):
     created_at = DateTimeField(default=datetime.datetime.now)
     updated_at = DateTimeField(default=datetime.datetime.now)
     deleted_at = DateTimeField()
+
+    meta = {"collection": "users"}

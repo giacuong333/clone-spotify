@@ -12,7 +12,9 @@ export const apis = {
 		getById: (param) => `/api/users/${param}`,
 	},
 	songs: {
-		search: () => `/api/songs/search`,
-		get: () => `/api/songs/get`,
+		getAll: () => `/api/songs/`,
+		getById: (id) => `/api/songs/${id}/`,
+		delete: (id) => `/api/songs/${id}/`,
+		create: () => `/api/songs/`,
 	},
 };

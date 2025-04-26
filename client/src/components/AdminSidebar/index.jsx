@@ -57,9 +57,9 @@ const AdminSidebar = () => {
 				)}
 			</div>
 
-			<div className='bg-white p-2 cursor-pointer mb-10 flex items-center justify-center gap-4'>
-				<LogoutOutlined size={20} className='text-black' />
-				<p className='text-center text-black' onClick={handleLogout}>
+			<div className='py-2 px-3 my-0.5 mx-4 cursor-pointer mb-10 flex items-center justify-start gap-4'>
+				<LogoutOutlined size={20} className='!text-white' />
+				<p className='text-center text-white' onClick={handleLogout}>
 					Sign out
 				</p>
 			</div>
