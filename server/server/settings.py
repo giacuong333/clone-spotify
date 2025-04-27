@@ -1,6 +1,10 @@
 from datetime import timedelta
 from pathlib import Path
 from mongoengine import connect
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -150,4 +154,7 @@ DATABASES = {
 STATIC_URL = "static/"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-connect(db="clone_spotify", host="127.0.0.1", port=27017, alias="default")
+MONGODB_PASSWORD = os.environ.get("MONGODB_PASSWORD")
+if not MONGODB_PASSWORD:
+    raise ValueError("Biến môi trường MONGODB_PASSWORD không được thiết lập!")
+connect(host=f"mongodb+srv://koongchanphong0712:{MONGODB_PASSWORD}@spotifymusic.gxe9jfl.mongodb.net/spotily?retryWrites=true&w=majority", alias="default")
