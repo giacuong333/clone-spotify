@@ -23,6 +23,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "rest_framework",
     "rest_framework_simplejwt.token_blacklist",
+    "channels",
     # apps
     "apps.listenedAt",
     "apps.downloadedAt",
@@ -31,6 +32,7 @@ INSTALLED_APPS = [
     "apps.users",
     "apps.auths",
     "apps.genre",
+    "apps.chat",
 ]
 
 MIDDLEWARE = [
@@ -44,6 +46,15 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
+
+# Socket config
+ASGI_APPLICATION = "server.asgi.application"
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels.layers.InMemoryChannelLayer',
+    },
+}
+    
 
 # REST AND JWT CONFIG
 REST_FRAMEWORK = {

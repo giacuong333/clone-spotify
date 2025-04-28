@@ -10,3 +10,4 @@ ENV/
 vsocket/
 .vscode/
 *.vscode
+chat_test.html

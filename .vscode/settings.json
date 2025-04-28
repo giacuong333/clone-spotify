@@ -1,5 +1,5 @@
 {
     "python.analysis.extraPaths": [
-        "E:\\PTPMNM\\Spotify-Mongo\\clone-spotify\\server\\vsocket\\Lib\\site-packages",
+        "E:\\PTPMNM\\Spotify-Mongo\\clone-spotify\\server\\venv\\Lib\\site-packages",
     ]
 }
