@@ -1,17 +1,13 @@
-from rest_framework.serializers import (
-    Serializer,
-    CharField,
-    EmailField,
-    ValidationError,
-)
+from rest_framework import serializers
+from rest_framework.exceptions import ValidationError
 from .models import User
 
 
-class UserSerializer(Serializer):
-    id = CharField(read_only=True)
-    name = CharField(required=True)
-    email = EmailField(required=True)
-    password = CharField(required=True, write_only=True)
+class UserSerializer(serializers.Serializer):
+    id = serializers.CharField(read_only=True)
+    name = serializers.CharField(required=True)
+    email = serializers.EmailField(required=True)
+    password = serializers.CharField(required=True, write_only=True)
 
     def validate(self, data):
         if User.get_by_email(data["email"]):
@@ -24,3 +20,8 @@ class UserSerializer(Serializer):
             print(f"Key: {key} - Value: {value}")
         user_id = User.create(**validated_data)
         return {"_id": str(user_id)}
+
+
+class UserListSerializer(serializers.Serializer):
+    id = serializers.CharField(read_only=True, source="pk")
+    name = serializers.CharField(read_only=True)

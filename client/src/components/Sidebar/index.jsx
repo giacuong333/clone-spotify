@@ -1,6 +1,6 @@
 import React from "react";
 import { BarsOutlined, PlusOutlined } from "@ant-design/icons";
-import { Button, Col, Row } from "antd";
+import { Button, Col, Row, Tooltip } from "antd";
 
 const items = [
 	{
@@ -28,7 +28,9 @@ const Sidebar = () => {
 						<p className='text-lg font-semibold text-gray-200'>Your Library</p>
 					</div>
 					<div>
-						<PlusOutlined className='text-lg font-semibold !text-gray-200 cursor-pointer transition-all hover:text-white hover:bg-gray-600 p-2 rounded-full' />
+						<Tooltip title='Create playlist'>
+							<PlusOutlined className='text-lg font-semibold !text-gray-200 cursor-pointer transition-all hover:text-white hover:bg-gray-600 p-2 rounded-full' />
+						</Tooltip>
 					</div>
 				</div>
 

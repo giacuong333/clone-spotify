@@ -44,9 +44,12 @@ MIDDLEWARE = [
 # REST AND JWT CONFIG
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
-        "rest_framework_simplejwt.authentication.JWTAuthentication"
+        # "rest_framework_simplejwt.authentication.JWTAuthentication" # For testing
     ],
-    "DEFAULT_PERMISSION_CLASSES": ["rest_framework.permissions.IsAuthenticated"],
+    "DEFAULT_PERMISSION_CLASSES": [
+        # "rest_framework.permissions.IsAuthenticated"
+        'rest_framework.permissions.AllowAny', # For testing
+    ],
 }
 
 SIMPLE_JWT = {

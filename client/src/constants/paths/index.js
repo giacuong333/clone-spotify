@@ -2,12 +2,14 @@ const paths = {
 	home: "/",
 	register: "/register",
 	login: "/login",
-	admin: "/admin",
-	details: "/details",
+	details: "/details/:id",
 	search: "/search",
-	users: "/users",
-	songs: "/songs",
-	genres: "/genres",
+	admin: "/admin",
+	users: "/admin/users",
+	songs: "/admin/songs",
+	genres: "/admin/genres",
+	analytics: "/admin/analytics",
+	settings: "/admin/settings",
 };
 
 export default paths;

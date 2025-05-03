@@ -1,8 +1,8 @@
 import { Form, Input, Button, ConfigProvider, Spin } from "antd";
-import SpotifyLogo from "../../components/SpotifyLogo";
-import GoogleIcon from "../../components/GoogleIcon";
-import FacebookIcon from "../../components/FacebookIcon";
-import AppleIcon from "../../components/AppleIcon";
+import SpotifyLogo from "../../components/Icons/SpotifyLogo";
+import GoogleIcon from "../../components/Icons/GoogleIcon";
+import FacebookIcon from "../../components/Icons/FacebookIcon";
+import AppleIcon from "../../components/Icons/AppleIcon";
 import paths from "../../constants/paths";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/Auth";

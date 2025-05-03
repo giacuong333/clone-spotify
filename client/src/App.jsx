@@ -6,6 +6,7 @@ import Toast from "./components/Toast";
 import Axios from "./contexts/Axios";
 import PlayerProvider from "./contexts/Player";
 import SongProvider from "./contexts/Song";
+import UserProvider from "./contexts/User";
 
 const App = () => {
 	return (
@@ -13,10 +14,12 @@ const App = () => {
 			<Axios>
 				<Auth>
 					<PlayerProvider>
-						<SongProvider>
-							<AppRoutes />
-							<Toast />
-						</SongProvider>
+						<UserProvider>
+							<SongProvider>
+								<AppRoutes />
+								<Toast />
+							</SongProvider>
+						</UserProvider>
 					</PlayerProvider>
 				</Auth>
 			</Axios>

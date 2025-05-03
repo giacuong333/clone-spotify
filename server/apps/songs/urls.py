@@ -1,10 +1,11 @@
 from django.urls import path
-from .views import Find, Create, Update, Delete
+from .views import SongListView, SongDetailView, SongCreateView, SongDeleteView, SongFileView, SongCoverView
 
 urlpatterns = [
-    path("", Find.as_view(), name="find_all"),
-    path("<str:song_id>/", Find.as_view(), name="find_by_id"),
-    path("create/", Create.as_view(), name="create"),
-    path("<str:song_id>/update/", Update.as_view(), name="update"),
-    path("<str:song_id>/delete/", Delete.as_view(), name="delete"),
+    path("create/", SongCreateView.as_view(), name="song-create"),
+    path("", SongListView.as_view(), name="song-list"),
+    path("<str:song_id>/", SongDetailView.as_view(), name="song-detail"),
+    path("delete/", SongDeleteView.as_view(), name="song-delete"),
+    path("<str:song_id>/audio", SongFileView.as_view(), name="song-audio"),
+    path("<str:song_id>/cover", SongCoverView.as_view(), name="song-cover"),
 ]

@@ -5,6 +5,7 @@ export const apis = {
 		refresh: () => `/api/auths/refresh`,
 	},
 	users: {
+		getAllByRoleUser: () => `/api/users`,
 		create: () => `/api/users/create`,
 		update: () => `/api/users/update`,
 		delete: (param) => `/api/users/delete/${param}`,
@@ -14,7 +15,7 @@ export const apis = {
 	songs: {
 		getAll: () => `/api/songs/`,
 		getById: (id) => `/api/songs/${id}/`,
-		delete: (id) => `/api/songs/${id}/`,
-		create: () => `/api/songs/`,
+		delete: () => `/api/songs/delete/`,
+		create: () => `/api/songs/create/`,
 	},
 };

@@ -1,6 +1,6 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useState } from "react";
 import { apis } from "../../constants/apis";
-import { useAxios, instance } from "../Axios";
+import { instance } from "../Axios";
 import { notify } from "../../components/Toast";
 
 const SongContext = React.createContext();
@@ -10,6 +10,7 @@ const Song = ({ children }) => {
 	const [songDetails, setSongDetails] = useState(null);
 	const [loadingFetchSongList, setLoadingFetchSongList] = useState(false);
 	const [loadingFetchDetails, setLoadingFetchDetails] = useState(false);
+	const [searchInput, setSearchInput] = useState("");
 	// const { accessToken } = useAxios();
 
 	const fetchSongList = useCallback(async () => {
@@ -40,30 +41,62 @@ const Song = ({ children }) => {
 		}
 	}, []);
 
-	const handleDeleteSong = useCallback(async (payload) => {
+	const handleDeleteSongs = async (songIds) => {
+		console.log("Song ids: ", songIds);
 		try {
 			setLoadingFetchSongList(true);
-			const response = await instance.delete(apis.songs.delete(), payload);
+			const response = await instance.post(
+				apis.songs.delete(),
+				{
+					song_ids: songIds,
+				},
+				{
+					headers: {
+						"Content-Type": "application/json",
+					},
+				}
+			);
 			if (response.status === 200) {
 				notify("Delete successfully");
+				await fetchSongList();
 			}
 		} catch (error) {
-			notify("Delete failed");
+			notify("Delete failed", "error");
 			console.log("Error occurs: ", error);
 		} finally {
 			setLoadingFetchSongList(false);
 		}
-	});
+	};
+
+	const create = useCallback(async (formData) => {
+		try {
+			const response = await instance.post(apis.songs.create(), formData, {
+				headers: {
+					"Content-Type": "multipart/form-data",
+				},
+			});
+			if (response.status === 201) {
+				//
+			} else {
+				throw new Error("Failed to upload song");
+			}
+		} catch (error) {
+			console.log("Error creating song:", error);
+			throw error;
+		}
+	}, []);
 
 	return (
 		<SongContext.Provider
 			value={{
 				songList,
 				fetchSongList,
+				loadingFetchSongList,
 				songDetails,
 				fetchSongDetails,
-				loadingFetchSongList,
 				loadingFetchDetails,
+				create,
+				handleDeleteSongs,
 			}}>
 			{children}
 		</SongContext.Provider>
