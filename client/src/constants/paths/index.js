@@ -8,6 +8,7 @@ const paths = {
 	users: "/users",
 	songs: "/songs",
 	genres: "/genres",
+	myStats: "/my-stats",
 };
 
 export default paths;

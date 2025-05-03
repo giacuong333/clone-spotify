@@ -14,8 +14,10 @@ import _ from "lodash";
 import { useAuth } from "../../contexts/Auth";
 
 const popoverItems = [
-	{ id: 2, content: "Profile" },
+	{ id: 2, content: "Profile"  },
+	{ id: 2.5, content: "My Statistics", action: () => navigate(paths.myStats) }, 
 	{
+		
 		id: 3,
 		content: "Upgrade to Premium",
 		Icon: ExportOutlined,
@@ -39,6 +41,7 @@ const Navbar = () => {
 	const navigate = useNavigate();
 	const [open, setOpen] = React.useState(false);
 	const { isAuthenticated, user, logout } = useAuth();
+	
 
 	const hide = () => {
 		setOpen(false);
@@ -148,25 +151,32 @@ const Navbar = () => {
 									<Popover
 										content={
 											<ul>
-												{popoverItems?.map((item) => {
-													return (
-														<li key={item?.id} className='group'>
-															<div
-																className='flex items-center justify-between gap-6 px-3 py-2.5 cursor-pointer group-hover:!bg-white/20'
-																onClick={() =>
-																	item?.action && item?.action(logout)
-																}>
-																<p className='group-hover:underline text-white'>
-																	{item?.content}
-																</p>
-																{item?.Icon && (
-																	<item.Icon className='!text-white' />
-																)}
-															</div>
-														</li>
-													);
-												})}
-											</ul>
+											{popoverItems?.map((item) => {
+												return (
+													<li key={item?.id} className='group'>
+														<div
+															className='flex items-center justify-between gap-6 px-3 py-2.5 cursor-pointer group-hover:!bg-white/20'
+															onClick={() => {
+																if (item.action && typeof item.action === 'function') {
+																	if (item.content === "Logout") {
+																		item.action(logout); 
+																	} else {
+																		item.action();
+																	}
+																}
+															}}
+														>
+															<p className='group-hover:underline text-white'>
+																{item?.content}
+															</p>
+															{item?.Icon && (
+																<item.Icon className='!text-white' />
+															)}
+														</div>
+													</li>
+												);
+											})}
+										</ul>
 										}
 										trigger='click'
 										arrow={false}
