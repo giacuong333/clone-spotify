@@ -11,7 +11,7 @@ import { usePlayer } from "../../contexts/Player";
 import formatTime from "../../utils/formatTime";
 import { Tooltip } from "antd";
 import { DownloadOutlined } from "@ant-design/icons";
-import { notify } from "../Toast";
+import { useSong } from "../../contexts/Song";
 
 const NowPlayingBar = () => {
 	const [progressPercentage, setProgressPercentage] = useState(0);
@@ -21,14 +21,9 @@ const NowPlayingBar = () => {
 	const [doesRepeat, setDoesRepeat] = useState(false);
 	const [isShuffled, setIsShuffled] = useState(false);
 
-	const {
-		currentSong,
-		isPlaying,
-		togglePlay,
-		playNext,
-		playPrevious,
-		handleDownload,
-	} = usePlayer();
+	const { handleDownload } = useSong();
+	const { currentSong, isPlaying, togglePlay, playNext, playPrevious } =
+		usePlayer();
 
 	const audioRef = useRef(null);
 	const progressBarRef = useRef(null);

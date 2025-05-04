@@ -1,9 +1,9 @@
-import React, { lazy } from "react";
+import { lazy } from "react";
 
 const Content = lazy(() => import("../../components/Content"));
 
 const Home = () => {
-  return <Content />;
+	return <Content />;
 };
 
 export default Home;

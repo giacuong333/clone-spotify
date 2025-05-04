@@ -16,6 +16,7 @@ import SongUploadForm from "../SongUploadForm";
 
 const popoverItems = [
 	{ id: 2, content: "Profile" },
+	{ id: 2.5, content: "My Statistics", action: () => navigate(paths.myStats) },
 	{
 		id: 3,
 		content: "Upgrade to Premium",
@@ -138,6 +139,50 @@ const Navbar = () => {
 										</p>
 									</div>
 									<div className='w-[1px] h-7 bg-white mr-8'></div>
+									<BellOutlined className='!text-white/70 text-xl cursor-pointer hover:!text-white' />
+									<Popover
+										content={
+											<ul>
+												{popoverItems?.map((item) => {
+													return (
+														<li key={item?.id} className='group'>
+															<div
+																className='flex items-center justify-between gap-6 px-3 py-2.5 cursor-pointer group-hover:!bg-white/20'
+																onClick={() => {
+																	if (
+																		item.action &&
+																		typeof item.action === "function"
+																	) {
+																		if (item.content === "Logout") {
+																			item.action(logout);
+																		} else {
+																			item.action();
+																		}
+																	}
+																}}>
+																<p className='group-hover:underline text-white'>
+																	{item?.content}
+																</p>
+																{item?.Icon && (
+																	<item.Icon className='!text-white' />
+																)}
+															</div>
+														</li>
+													);
+												})}
+											</ul>
+										}
+										trigger='click'
+										arrow={false}
+										open={open}
+										color='black'
+										onOpenChange={handleOpenChange}>
+										<div className='flex items-center justify-center p-2 rounded-full bg-[#1F1F1F] cursor-pointer group'>
+											<p className='capitalize text-black font-bold bg-[#F573A0] w-8 h-8 flex items-center justify-center rounded-full group-hover:scale-[1.04]'>
+												{user?.name[0]}
+											</p>
+										</div>
+									</Popover>
 								</>
 							) : (
 								<>
