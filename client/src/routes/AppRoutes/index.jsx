@@ -36,7 +36,7 @@ const AppRoutes = () => {
 
 						return (
 							<Route
-								key={path}
+								key={path || index}
 								path={path}
 								index={index}
 								element={Layout ? <Layout>{RenderPage}</Layout> : RenderPage}
