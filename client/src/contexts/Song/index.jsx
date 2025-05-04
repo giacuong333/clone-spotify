@@ -86,6 +86,37 @@ const Song = ({ children }) => {
 		}
 	}, []);
 
+	const handleDownload = useCallback((event, audio_url, title, userName) => {
+		event.stopPropagation();
+		event.preventDefault();
+
+		if (audio_url) {
+			const downloadLink = document.createElement("a");
+
+			fetch(audio_url)
+				.then((response) => response.blob())
+				.then((blob) => {
+					const blobUrl = URL.createObjectURL(blob);
+
+					downloadLink.href = blobUrl;
+					const fileName = `${title || "song"}-${userName}.mp3`;
+					downloadLink.setAttribute("download", fileName);
+
+					document.body.appendChild(downloadLink);
+					downloadLink.click();
+
+					setTimeout(() => {
+						document.body.removeChild(downloadLink);
+						URL.revokeObjectURL(blobUrl);
+					}, 100);
+				})
+				.catch((error) => {
+					console.error("Error downloading the file:", error);
+					notify("Failed to download the song", "error");
+				});
+		}
+	}, []);
+
 	return (
 		<SongContext.Provider
 			value={{
@@ -97,6 +128,7 @@ const Song = ({ children }) => {
 				loadingFetchDetails,
 				create,
 				handleDeleteSongs,
+				handleDownload,
 			}}>
 			{children}
 		</SongContext.Provider>

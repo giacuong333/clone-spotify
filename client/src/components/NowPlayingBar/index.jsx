@@ -1,5 +1,4 @@
 import { useRef, useState, useEffect } from "react";
-
 import PlusCircleIcon from "../Icons/PlusCircleIcon";
 import NextIcon from "../Icons/NextIcon";
 import PrevIcon from "../Icons/PrevIcon";
@@ -11,6 +10,8 @@ import PauseIcon from "../Icons/PauseIcon";
 import { usePlayer } from "../../contexts/Player";
 import formatTime from "../../utils/formatTime";
 import { Tooltip } from "antd";
+import { DownloadOutlined } from "@ant-design/icons";
+import { notify } from "../Toast";
 
 const NowPlayingBar = () => {
 	const [progressPercentage, setProgressPercentage] = useState(0);
@@ -22,11 +23,11 @@ const NowPlayingBar = () => {
 
 	const {
 		currentSong,
-		songList,
 		isPlaying,
 		togglePlay,
 		playNext,
 		playPrevious,
+		handleDownload,
 	} = usePlayer();
 
 	const audioRef = useRef(null);
@@ -192,12 +193,21 @@ const NowPlayingBar = () => {
 		}
 	};
 
+	const handleDownloadSong = (event) => {
+		handleDownload(
+			event,
+			currentSong?.audio_url,
+			currentSong?.title,
+			currentSong?.user?.name
+		);
+	};
+
 	// Get song info from current song or use placeholder
 	const songThumbnail =
 		currentSong?.cover_url ||
 		"https://i.scdn.co/image/ab67616d00004851e1379f9837c5cf0a33365ffb";
 	const songTitle = currentSong?.title || "UH VEI VEI";
-	const artistName = currentSong?.artist || "KREZUS";
+	const artistName = currentSong?.user?.name || "KREZUS";
 
 	return (
 		<section className='bg-black h-20 w-full'>
@@ -222,9 +232,18 @@ const NowPlayingBar = () => {
 							{artistName}
 						</p>
 					</div>
-					<div>
+					<div className='flex items-center gap-6'>
 						<Tooltip title='Add to playlist'>
 							<PlusCircleIcon className='w-4 h-4 text-white/75 cursor-pointer hover:text-white' />
+						</Tooltip>
+						{/* Download Icon*/}
+
+						<Tooltip title='Download song'>
+							<DownloadOutlined
+								className='text-lg !text-white/75 hover:!text-white cursor-pointer'
+								onClick={handleDownloadSong}
+								disabled={currentSong?.audio_url}
+							/>
 						</Tooltip>
 					</div>
 				</div>

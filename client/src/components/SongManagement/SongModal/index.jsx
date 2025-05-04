@@ -13,6 +13,7 @@ import VolumeIcon from "../../Icons/VolumnIcon";
 import { Spin } from "antd";
 import formatDate from "../../../utils/formatDate";
 import formatTime from "../../../utils/formatTime";
+import { useSong } from "../../../contexts/Song";
 
 const SongModal = ({
 	toggle,
@@ -25,10 +26,12 @@ const SongModal = ({
 	const [duration, setDuration] = useState(0);
 	const [volume, setVolume] = useState(0.5);
 	const [showVolume, setShowVolume] = useState(false);
+
 	const previousVolumeRef = useRef(0.5);
 	const audioRef = useRef(null);
 	const progressBarRef = useRef(null);
 	const volumeTimerRef = useRef(null);
+	const { handleDownload } = useSong();
 
 	// Handle play/pause
 	const togglePlay = () => {
@@ -123,6 +126,15 @@ const SongModal = ({
 			}
 		};
 	}, []);
+
+	const handleDownloadSong = (event) => {
+		handleDownload(
+			event,
+			songDetails?.audio_url,
+			songDetails?.title,
+			songDetails?.user?.name
+		);
+	};
 
 	return (
 		<>
@@ -336,13 +348,11 @@ const SongModal = ({
 											<span className='text-sm font-medium text-gray-500'>
 												File URL:
 											</span>
-											<a
-												href={songDetails.audio_url}
-												download={songDetails.audio_url}
-												rel='noopener noreferrer'
-												className='text-black hover:text-blue-800 text-sm underline truncate max-w-[70%]'>
+											<button
+												className='cursor-pointer hover:underline'
+												onClick={handleDownloadSong}>
 												Download
-											</a>
+											</button>
 										</div>
 									)}
 								</div>
