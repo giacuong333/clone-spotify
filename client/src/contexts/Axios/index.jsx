@@ -1,7 +1,5 @@
 import React from "react";
-import { notify } from "../../components/Toast";
 import axios from "axios";
-import { apis } from "../../constants/apis";
 
 const AxiosContext = React.createContext();
 

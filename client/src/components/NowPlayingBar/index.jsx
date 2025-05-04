@@ -117,6 +117,8 @@ const NowPlayingBar = () => {
 		}
 	}, [doesRepeat, isShuffled]);
 
+	console.log("Audio ref:", audioRef);
+
 	// Function to update progress bar using requestAnimationFrame
 	const updateProgress = () => {
 		if (audioRef.current) {
@@ -274,8 +276,13 @@ const NowPlayingBar = () => {
 								<PlayIcon
 									width='32'
 									height='32'
-									className='bg-white rounded-full p-1.5 hover:scale-[1.05] text-black hover:bg-white/90 cursor-pointer'
+									className={`bg-white rounded-full p-1.5 hover:scale-[1.05] text-black hover:bg-white/90 cursor-pointer ${
+										currentSong?.audio_url
+											? "pointer-events-auto opacity-100"
+											: "pointer-events-none opacity-70"
+									}`}
 									onClick={togglePlay}
+									disabled={!currentSong?.audio_url}
 								/>
 							</Tooltip>
 						) : (
@@ -283,8 +290,13 @@ const NowPlayingBar = () => {
 								<PauseIcon
 									width='32'
 									height='32'
-									className='bg-white rounded-full p-1.5 hover:scale-[1.05] text-black hover:bg-white/90 cursor-pointer'
+									className={`bg-white rounded-full p-1.5 hover:scale-[1.05] text-black hover:bg-white/90 cursor-pointer ${
+										currentSong?.audio_url
+											? "pointer-events-auto opacity-100"
+											: "pointer-events-none opacity-70"
+									}`}
 									onClick={togglePlay}
+									disabled={!currentSong?.audio_url}
 								/>
 							</Tooltip>
 						)}

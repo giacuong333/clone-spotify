@@ -42,20 +42,11 @@ const Song = ({ children }) => {
 	}, []);
 
 	const handleDeleteSongs = async (songIds) => {
-		console.log("Song ids: ", songIds);
 		try {
 			setLoadingFetchSongList(true);
-			const response = await instance.post(
-				apis.songs.delete(),
-				{
-					song_ids: songIds,
-				},
-				{
-					headers: {
-						"Content-Type": "application/json",
-					},
-				}
-			);
+			const response = await instance.post(apis.songs.delete(), {
+				song_ids: songIds,
+			});
 			if (response.status === 200) {
 				notify("Delete successfully");
 				await fetchSongList();
