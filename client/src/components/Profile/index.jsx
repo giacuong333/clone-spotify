@@ -52,7 +52,7 @@ const songList = [
   },
 ];
 
-const list = [
+const albumList = [
   {
     id: 1,
     name: "Duong Domic",
@@ -91,6 +91,27 @@ const list = [
   },
 ];
 
+const followingList = [
+  {
+    id: 1,
+    name: "Duong Domic",
+    type: "Artist",
+    image: "https://i.scdn.co/image/ab67616100005174352d5672d70464e67c3ae963",
+  },
+  {
+    id: 2,
+    name: "HIEUTHUHAI",
+    type: "Artist",
+    image: "https://i.scdn.co/image/ab67616100005174352d5672d70464e67c3ae963",
+  },
+  {
+    id: 3,
+    name: "Sơn Tùng M-TP",
+    type: "Artist",
+    image: "https://i.scdn.co/image/ab67616100005174352d5672d70464e67c3ae963",
+  },
+]
+
 const Profile = () => {
   const contentRef = useRef(null);
   const { userDetail, fetchUserDetail } = useUser();
@@ -114,14 +135,14 @@ const Profile = () => {
         <MainContent songList={songList} user = {userDetail}/>
         <div className='mt-10 flex flex-col gap-10'>
           <AlbumAndArtistWrap
-            title='Popular artists'
-            list={list}
-            type='artist'
+            title='Public Playlists'
+            list={albumList}
+            type='album'
           />
-          <AlbumAndArtistWrap title='Discography' list={list} type='artist' />
+
           <AlbumAndArtistWrap
-            title='Featuring Dương Domic'
-            list={list}
+            title='Following'
+            list={followingList}
             type='artist'
           />
         </div>
