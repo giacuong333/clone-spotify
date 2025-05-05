@@ -14,3 +14,11 @@ class User(Document):
     deleted_at = DateTimeField()
 
     meta = {"collection": "users"}
+
+    @property
+    def is_authenticated(self):
+        return True
+
+    @property
+    def is_active(self):
+        return self.deleted_at is None
