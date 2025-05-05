@@ -1,5 +1,4 @@
-import { lazy, Suspense, useRef, useEffect } from "react";
-import { useUser } from "../../contexts/User";
+import { lazy, Suspense, useRef } from "react";
 import { Spin } from "antd";
 import AlbumAndArtistWrap from "../AlbumAndArtistWrap";
 
@@ -91,13 +90,8 @@ const list = [
   },
 ];
 
-const Profile = () => {
+const AlbumAndArtistDetails = () => {
   const contentRef = useRef(null);
-  const { userDetail, fetchUserDetail } = useUser();
-
-  useEffect(() => {
-    fetchUserDetail("680756213e4af1765d235d7d");
-  }, []);
 
   return (
     <Suspense
@@ -105,13 +99,14 @@ const Profile = () => {
         <Spin spinning tip='Please wait...' fullscreen size='large'></Spin>
       }>
       <div className='w-full h-full overflow-y-auto' ref={contentRef}>
-        <Header name={userDetail?.name || "Demo"} contentRef={contentRef} />
+        <Header name='Trung' contentRef={contentRef} />
         <Cover
-          user={userDetail}
-          followingCount={10}
-          playlistCount={5}
+          name='test'
+          isVerified={true}
+          monthlyListeners='1,897,666'
+          imageUrl='https://image-cdn-ak.spotifycdn.com/image/ab6761860000eab17344b5f36a6a602d3e6eb362'
         />
-        <MainContent songList={songList} user = {userDetail}/>
+        <MainContent songList={songList} />
         <div className='mt-10 flex flex-col gap-10'>
           <AlbumAndArtistWrap
             title='Popular artists'
@@ -130,4 +125,4 @@ const Profile = () => {
   );
 };
 
-export default Profile;
+export default AlbumAndArtistDetails;

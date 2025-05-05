@@ -4,6 +4,7 @@ import PlayIcon from "../../Icons/PlayIcon";
 import ThreeDotsIcon from "../../Icons/ThreeDotsIcon";
 import SongListWrap from "../../SongListWrap";
 import ProfileDropdownMenu from "../ProfileDropdownMenu.jsx";
+import PlaylistCard from "../../PlaylistCard";
 
 const MainContent = ({ songList, user, setUser }) => {
 	return (
@@ -21,6 +22,9 @@ const MainContent = ({ songList, user, setUser }) => {
 
 					<div>
 						<SongListWrap songList={songList} title='Popular' />
+						<PlaylistCard/>
+						<PlaylistCard/>
+						<PlaylistCard/>
 					</div>
 				</div>
 			</div>

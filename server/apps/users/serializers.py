@@ -4,6 +4,7 @@ from .models import User
 from apps.songs.models import Song
 import datetime
 from bson import ObjectId
+import base64
 
 
 class UserSerializer(serializers.Serializer):
@@ -36,10 +37,21 @@ class UserDetailSerializer(serializers.Serializer):
     email = serializers.EmailField(read_only=True)
     bio = serializers.CharField(allow_blank=True, read_only=True)
     role = serializers.ChoiceField(choices=["admin", "user"], read_only=True)
-    image = serializers.FileField(allow_null=True, read_only=True)
+    image = serializers.SerializerMethodField(allow_null=True, read_only=True)
     created_at = serializers.DateTimeField(read_only=True)
     updated_at = serializers.DateTimeField(read_only=True)
     deleted_at = serializers.DateTimeField(allow_null=True, read_only=True)
+
+    def get_image(self, obj):
+        try:
+            if obj.image and hasattr(obj.image, "grid_id"):
+                grid_file = obj.image.grid_id
+                content = obj.image.read()
+                base64_data = base64.b64encode(content).decode("utf-8")
+                return f"data:image/jpeg;base64,{base64_data}"
+        except Exception as e:
+            print("Error reading image from GridFS:", e)
+        return None
 
     # songs = serializers.SerializerMethodField()
 
@@ -56,8 +68,9 @@ class UserUpdateSerializer(serializers.Serializer):
     image = serializers.FileField(required=False, allow_null=True)
 
     def update(self, instance, validated_data):
-        if "image" in validated_data:
-            setattr(instance, "image", validated_data["image"])
+        image = validated_data.get("image", None)
+        if image is not None:
+            instance.image = image
 
         for field in ["name", "bio"]:
             if field in validated_data:

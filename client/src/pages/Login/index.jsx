@@ -1,4 +1,3 @@
-import React from "react";
 import { Form, Input, Button, ConfigProvider, Spin } from "antd";
 import SpotifyLogo from "../../components/Icons/SpotifyLogo";
 import GoogleIcon from "../../components/Icons/GoogleIcon";

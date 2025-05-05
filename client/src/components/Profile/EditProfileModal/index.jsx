@@ -53,7 +53,7 @@ const EditProfileModal = ({ open, onClose, user}) => {
             src={
               image
                 ? URL.createObjectURL(image)
-                : user?.image || "/default-avatar.png"
+                : user?.image || "https://i.pinimg.com/236x/a4/05/f3/a405f3c682a0138184424e0c9b791b3b.jpg"
             }
             alt="avatar"
             className="w-40 h-40 rounded-full object-cover border"
