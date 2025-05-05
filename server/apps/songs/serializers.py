@@ -1,7 +1,6 @@
 from rest_framework import serializers
 from .models import Song
 from apps.genre.serializers import GenreSerializer
-from apps.users.serializers import UserSerializer
 from bson import ObjectId
 from mongoengine.errors import DoesNotExist
 from datetime import datetime
@@ -28,6 +27,8 @@ class SongSerializer(serializers.Serializer):
 
     def get_user(self, obj):
         """Get serialized user data"""
+        from apps.users.serializers import UserSerializer
+
         if not obj.user:
             return None
         return UserSerializer(obj.user).data
