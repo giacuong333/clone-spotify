@@ -6,7 +6,8 @@ import { notify } from "../../components/Toast";
 const AxiosContext = React.createContext();
 
 const instance = axios.create({
-	baseURL: import.meta.env.VITE_BASE_URL,
+	// baseURL: import.meta.env.VITE_BASE_URL,
+	baseURL: "http://localhost:8000",
 	timeout: 10000,
 	headers: { "Content-Type": "application/json" },
 });
