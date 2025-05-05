@@ -13,6 +13,7 @@ const AlbumAndArtistDetails = lazy(() =>
 	import("../../components/AlbumAndArtistDetails")
 );
 const ChatInterface = lazy(() => import("../../components/Chat/ChatInterface"));
+const Profile = lazy(() => import("../../components/Profile"));
 const Search = lazy(() => import("../../components/Search"));
 const UserManagement = lazy(() => import("../../components/UserManagement"));
 const SongManagement = lazy(() => import("../../components/SongManagement"));
@@ -50,6 +51,13 @@ const routes = [
 		Layout: MainLayout,
 		Page: AlbumAndArtistDetails,
 		isPublic: true,
+	},
+	{
+		path: paths.profile,
+		Layout: MainLayout,
+		Page: Profile,
+		isPublic: true,
+		isAuthPage: true,
 	},
 	{
 		path: paths.search,

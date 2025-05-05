@@ -14,7 +14,6 @@ export const apis = {
 		getById: (id) => `/api/users/${id}`,
 		getProfile: () => `/api/users/profile/`,
 		updateProfile: () => `/api/users/profile/`,
-
 		getStats: () => `/api/users/stats/`,
 		getStatsById: (id) => `/api/users/${id}/stats/`,
 		getAdminStats: () => "/api/users/admin/stats/",

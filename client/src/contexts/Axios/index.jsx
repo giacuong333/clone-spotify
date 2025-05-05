@@ -6,8 +6,7 @@ import { notify } from "../../components/Toast";
 const AxiosContext = React.createContext();
 
 const instance = axios.create({
-	// baseURL: import.meta.env.VITE_BASE_URL,
-	baseURL: "http://localhost:8000",
+	baseURL: import.meta.env.VITE_BASE_URL,
 	timeout: 10000,
 	headers: { "Content-Type": "application/json" },
 });
@@ -125,6 +124,7 @@ const Axios = ({ children }) => {
 				} else {
 					notify("Something went wrong!", "error");
 				}
+				notify(error.response.data || "Something went wrong!");
 				return Promise.reject(error);
 			}
 		);

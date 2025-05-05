@@ -1,5 +1,6 @@
 import { Spin } from "antd";
 import React from "react";
+import PropTypes from "prop-types";
 
 const Navbar = React.lazy(() => import("../../components/Navbar"));
 const Sidebar = React.lazy(() => import("../../components/Sidebar"));
@@ -35,6 +36,9 @@ const MainLayout = ({ children }) => {
 			</section>
 		</React.Suspense>
 	);
+};
+MainLayout.propTypes = {
+	children: PropTypes.node.isRequired,
 };
 
 export default MainLayout;

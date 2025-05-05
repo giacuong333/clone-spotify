@@ -27,10 +27,13 @@ class SongSerializer(serializers.Serializer):
         return GenreSerializer(obj.genre, many=True).data
 
     def get_user(self, obj):
-        """Get serialized user data"""
-        if not obj.user:
-            return None
-        return UserListSerializer(obj.user).data
+        """Get serialized user data, handle missing/invalid user reference"""
+        try:
+            if not obj.user:
+                return None
+            return UserListSerializer(obj.user).data
+        except DoesNotExist:
+            return None  # Return None if user reference is invalid
 
 
 class EnhancedSongSerializer(SongSerializer):
@@ -42,7 +45,6 @@ class EnhancedSongSerializer(SongSerializer):
     def get_audio_url(self, obj):
         """Generate URL for streaming the audio file"""
         request = self.context.get("request")
-        # Check if audio exists and has grid_id (important for GridFS)
         if request and obj.audio and hasattr(obj.audio, "grid_id"):
             base_url = request.build_absolute_uri("/").rstrip("/")
             return f"{base_url}/api/songs/{obj.id}/audio"
@@ -51,15 +53,10 @@ class EnhancedSongSerializer(SongSerializer):
     def get_cover_url(self, obj):
         """Generate URL for retrieving the cover image"""
         request = self.context.get("request")
-        # Check if cover exists and has grid_id (important for GridFS)
         if request and obj.cover and hasattr(obj.cover, "grid_id"):
             base_url = request.build_absolute_uri("/").rstrip("/")
             return f"{base_url}/api/songs/{obj.id}/cover"
         return None
-
-
-# If you want to also handle file uploads in this serializer, you'd need to add create/update methods
-# Here's a sketch of how that might look:
 
 
 class SongCreateSerializer(serializers.Serializer):
@@ -96,7 +93,6 @@ class SongCreateSerializer(serializers.Serializer):
         genres = []
         for genre_id in genre_ids:
             try:
-                # Validate ObjectId
                 ObjectId(genre_id)  # Raises InvalidId if invalid
                 genre = Genre.objects.get(id=genre_id)
                 genres.append(genre)
@@ -116,8 +112,9 @@ class SongCreateSerializer(serializers.Serializer):
         request = self.context.get("request")
         if request and request.user and request.user.is_authenticated:
             validated_data["user"] = request.user
-        else:  # This line for testing
-            validated_data["user"] = ObjectId("6807559e081908b550ef9a3d")
+        else:
+            # Instead of hardcoding a user ID, set to None for anonymous uploads
+            validated_data["user"] = None
 
         # Create the song
         return Song.create(validated_data)

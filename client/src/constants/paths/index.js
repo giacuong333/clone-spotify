@@ -4,6 +4,7 @@ const paths = {
 	login: "/login",
 	details: "/details/:id",
 	chats: "/chats",
+	profile: "/profile",
 	search: "/search",
 	admin: "/admin",
 	users: "/admin/users",

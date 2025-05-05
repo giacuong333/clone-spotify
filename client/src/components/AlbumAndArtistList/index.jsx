@@ -2,7 +2,7 @@ import AlbumAndArtistItem from "../AlbumAndArtistItem";
 
 const AlbumAndArtistList = ({ list, type }) => {
 	return (
-		<ul className='grid grid-flow-col'>
+		<ul className='flex flex-row flex-wrap gap-0 justify-start'>
 			{list?.map((item, index) => {
 				return (
 					<AlbumAndArtistItem
