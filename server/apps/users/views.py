@@ -40,10 +40,20 @@ class UserListView(ListCreateAPIView):
 
 
 class UserDetailView(RetrieveAPIView):
-    queryset = User.objects(deleted_at=None)
     serializer_class = UserDetailSerializer
     permission_classes = [AllowAny]
     lookup_field = "id"
+
+    def get_queryset(self):
+        return User.objects()
+
+    def get_object(self):
+        lookup_value = self.kwargs.get(self.lookup_field)
+        try:
+            object_id = ObjectId(lookup_value)
+            return self.get_queryset().get(id=object_id)
+        except Exception:
+            raise NotFound("User not found or invalid ID format.")
 
 
 class UserUpdateView(UpdateAPIView):
@@ -52,7 +62,7 @@ class UserUpdateView(UpdateAPIView):
     lookup_field = "id"
 
     def get_queryset(self):
-        return User.objects(deleted_at=None)
+        return User.objects
 
     def get_object(self):
         lookup_value = self.kwargs.get(self.lookup_field)

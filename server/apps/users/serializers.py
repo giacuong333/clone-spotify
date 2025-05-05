@@ -1,8 +1,9 @@
 from rest_framework import serializers
-from rest_framework.exceptions import ValidationError
+from rest_framework.exceptions import ValidationError, NotFound
 from .models import User
 from apps.songs.models import Song
 import datetime
+from bson import ObjectId
 
 
 class UserSerializer(serializers.Serializer):
@@ -39,6 +40,7 @@ class UserDetailSerializer(serializers.Serializer):
     created_at = serializers.DateTimeField(read_only=True)
     updated_at = serializers.DateTimeField(read_only=True)
     deleted_at = serializers.DateTimeField(allow_null=True, read_only=True)
+
     # songs = serializers.SerializerMethodField()
 
     # def get_songs(self, obj):

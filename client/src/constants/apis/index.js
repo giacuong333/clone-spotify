@@ -7,11 +7,11 @@ export const apis = {
 	users: {
 		getAllByRoleUser: () => `/api/users`,
 		create: () => `/api/users/create`,
-		update: () => `/api/users/update`,
+		update: (param) => `/api/users/${param}/update`,
 		delete: (param) => `/api/users/delete/${param}`,
 		getAll: () => `/api/users/`,
 		getById: (param) => `/api/users/${param}`,
-		getProfile: () => `/api/users/profile/`,
+		getProfile: () => `/api/users/profile`,
 		updateProfile: () => `/api/users/profile/`,
 		getStats: () => `/api/users/stats/`,
 		getAdminStats: () => `/api/users/admin/stats/`,
