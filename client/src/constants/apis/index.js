@@ -11,11 +11,13 @@ export const apis = {
 		update: () => `/api/users/update`,
 		delete: (param) => `/api/users/delete/${param}`,
 		getAll: () => `/api/users/`,
-		getById: (param) => `/api/users/${param}`,
+		getById: (id) => `/api/users/${id}`,
 		getProfile: () => `/api/users/profile/`,
 		updateProfile: () => `/api/users/profile/`,
+
 		getStats: () => `/api/users/stats/`,
-		getAdminStats: () => `/api/users/admin/stats/`,
+		getStatsById: (id) => `/api/users/${id}/stats/`,
+		getAdminStats: () => "/api/users/admin/stats/",
 	},
 	songs: {
 		getAll: () => `/api/songs/`,
