@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from .models import Song
 from apps.genre.serializers import GenreSerializer
-from apps.users.serializers import UserSerializer
+from apps.users.serializers import UserListSerializer
 from bson import ObjectId
 from mongoengine.errors import DoesNotExist
 from datetime import datetime
@@ -30,7 +30,7 @@ class SongSerializer(serializers.Serializer):
         """Get serialized user data"""
         if not obj.user:
             return None
-        return UserSerializer(obj.user).data
+        return UserListSerializer(obj.user).data
 
 
 class EnhancedSongSerializer(SongSerializer):

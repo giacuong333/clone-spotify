@@ -5,7 +5,7 @@ export const apis = {
 		refresh: () => `/api/auths/refresh/`,
 	},
 	users: {
-		getAllByRoleUser: () => `/api/users`,
+		getAllByRoleUser: () => `/api/users/render/`,
 		create: () => `/api/users/create`,
 		register: () => `/api/users/register/`,
 		update: () => `/api/users/update`,

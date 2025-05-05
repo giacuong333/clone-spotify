@@ -10,18 +10,18 @@ from .views import (
     UserStatsByIdView,
     UserDeleteView,
     AdminStatsView,
+    UserRenderView,
 )
 
 urlpatterns = [
-    path('register/', RegisterUserView.as_view(), name='user_register'),
-    path('profile/', UserProfileView.as_view(), name='user_profile'),
-    path('stats/', UserStatsView.as_view(), name='user_stats'),
-
+    path("register/", RegisterUserView.as_view(), name="user_register"),
+    path("profile/", UserProfileView.as_view(), name="user_profile"),
+    path("stats/", UserStatsView.as_view(), name="user_stats"),
     # C admin
-    path('', UserListView.as_view(), name='admin_user_list'),
-    path('<str:user_id>/', UserDetailView.as_view(), name='admin_user_detail'), 
-    path('<str:user_id>/stats/', UserStatsByIdView.as_view(), name='admin_user_stats'),
-    path('<str:user_id>/delete/', UserDeleteView.as_view(), name='admin_user_delete'), 
-    path('admin/stats/', AdminStatsView.as_view(), name='admin_overall_stats'), 
-
+    path("render/", UserRenderView.as_view(), name="admin_user_list"),
+    path("", UserListView.as_view(), name="admin_user_list"),
+    path("<str:user_id>/", UserDetailView.as_view(), name="admin_user_detail"),
+    path("<str:user_id>/stats/", UserStatsByIdView.as_view(), name="admin_user_stats"),
+    path("<str:user_id>/delete/", UserDeleteView.as_view(), name="admin_user_delete"),
+    path("admin/stats/", AdminStatsView.as_view(), name="admin_overall_stats"),
 ]

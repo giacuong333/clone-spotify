@@ -1,8 +1,6 @@
-from rest_framework.generics import ListCreateAPIView, GenericAPIView
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework import status
-from .serializers import UserSerializer, UserRegisterSerializer
 from .models import User
 from utils.hash_and_verify_password import hash_password
 from rest_framework.permissions import IsAuthenticated, AllowAny
@@ -23,7 +21,22 @@ from .serializers import (
     UserDisplaySerializer,
     UserProfileUpdateSerializer,
     UserCreationSerializer,
+    UserListSerializer
 )
+
+class UserRenderView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        try:
+            users = User.objects(deleted_at=None)
+            serializer = UserListSerializer(users, many=True)
+            return Response(serializer.data)
+        except Exception as e:
+            return Response(
+                {"error": "An error occurred while fetching users."},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
 
 
 # --- Custom Permission Class ---
