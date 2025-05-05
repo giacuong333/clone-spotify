@@ -1,4 +1,3 @@
-import React from "react";
 import { Form, Input, Button, ConfigProvider, Spin } from "antd";
 import SpotifyLogo from "../../components/Icons/SpotifyLogo";
 import GoogleIcon from "../../components/Icons/GoogleIcon";
@@ -14,6 +13,7 @@ const Login = () => {
 	const { login, pendingLogin } = useAuth();
 
 	const onFinish = async (values) => {
+		console.log("Payload: ", values);
 		await login(values);
 	};
 

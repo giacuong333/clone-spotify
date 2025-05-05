@@ -9,6 +9,7 @@ from gridfs import GridFS
 from mongoengine.connection import get_db
 from .models import Song
 from .serializers import EnhancedSongSerializer, SongCreateSerializer
+from rest_framework.permissions import IsAuthenticated, AllowAny
 
 # Use the existing MongoDB connection from MongoEngine
 db = get_db()
@@ -18,8 +19,8 @@ fs = GridFS(db)
 class SongListView(ListCreateAPIView):
     """List all songs with complete information including URLs"""
 
-    serializer_class = EnhancedSongSerializer
     permission_classes = [AllowAny]
+    serializer_class = EnhancedSongSerializer
 
     def get_queryset(self):
         return Song.findAll()

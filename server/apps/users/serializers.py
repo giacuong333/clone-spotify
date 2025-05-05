@@ -25,3 +25,15 @@ class UserSerializer(serializers.Serializer):
 class UserListSerializer(serializers.Serializer):
     id = serializers.CharField(read_only=True, source="pk")
     name = serializers.CharField(read_only=True)
+
+
+class UserRegisterSerializer(serializers.Serializer):
+    name = serializers.CharField(write_only=True, required=True)
+    email = serializers.EmailField(write_only=True, required=True)
+    password = serializers.CharField(write_only=True, required=True)
+
+    def create(self, validated_data):
+        user = User.create(validated_data)
+        if isinstance(user, ValueError):
+            raise serializers.ValidationError({"message": str(user)})
+        return {"_id": str(user.id)}

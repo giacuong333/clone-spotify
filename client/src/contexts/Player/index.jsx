@@ -1,4 +1,5 @@
 import { createContext, useContext, useState } from "react";
+import { useAuth } from "../Auth";
 
 const PlayerContext = createContext();
 
@@ -7,6 +8,9 @@ const PlayerProvider = ({ children }) => {
 	const [currentSongIndex, setCurrentSongIndex] = useState(0);
 	const [songList, setSongList] = useState([]);
 	const [isPlaying, setIsPlaying] = useState(false);
+	const { user } = useAuth();
+
+	console.log("User", user);
 
 	const playSong = (song, songs, index = null) => {
 		setCurrentSong(song);

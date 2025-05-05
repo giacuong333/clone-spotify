@@ -125,7 +125,7 @@ const Navbar = () => {
 
 						{/* Right Section */}
 						<div className='flex items-center space-x-6 h-full'>
-							{isAuthenticated ? (
+							{!isAuthenticated ? (
 								<>
 									<div className='flex items-center gap-4 text-white text-sm'>
 										<p className='cursor-pointer text-gray-400 font-bold hover:text-white hover:scale-[1.05] transition-all'>
@@ -136,6 +136,34 @@ const Navbar = () => {
 										</p>
 										<p className='cursor-pointer text-gray-400 font-bold hover:text-white hover:scale-[1.05] transition-all'>
 											Download
+										</p>
+									</div>
+									<div className='w-[1px] h-7 bg-white mr-8'></div>
+									<p
+										className='cursor-pointer text-gray-400 font-bold hover:text-white hover:scale-[1.05] transition-all'
+										onClick={() => navigate(paths.register)}>
+										Sign up
+									</p>
+									<p
+										className='text-center flex items-center bg-white h-full px-8 rounded-full cursor-pointer text-black font-bold hover:bg-gray-200 hover:scale-[1.05] transition-all'
+										onClick={() => navigate(paths.login)}>
+										Log in
+									</p>
+								</>
+							) : (
+								<>
+									<div className='flex items-center gap-4 text-white text-sm'>
+										<p
+											className='capitalize cursor-pointer text-gray-400 font-bold hover:text-white hover:scale-[1.05] transition-all'
+											onClick={() => navigate(paths.chats)}>
+											Chat
+										</p>
+									</div>
+									<div className='flex items-center gap-4 text-white text-sm'>
+										<p
+											className='capitalize cursor-pointer text-gray-400 font-bold hover:text-white hover:scale-[1.05] transition-all'
+											onClick={() => setShowSongUploadForm(true)}>
+											Upload Song
 										</p>
 									</div>
 									<div className='w-[1px] h-7 bg-white mr-8'></div>
@@ -184,19 +212,8 @@ const Navbar = () => {
 										</div>
 									</Popover>
 								</>
-							) : (
-								<>
-									<div className='flex items-center gap-4 text-white text-sm'>
-										<p
-											className='capitalize cursor-pointer text-gray-400 font-bold hover:text-white hover:scale-[1.05] transition-all'
-											onClick={() => setShowSongUploadForm(true)}>
-											Upload song
-										</p>
-									</div>
-									<div className='w-[1px] h-7 bg-white mr-8'></div>
-								</>
 							)}
-							<div className='flex items-center gap-6 text-white text-sm h-full'>
+							{/* <div className='flex items-center gap-6 text-white text-sm h-full'>
 								<span className='flex items-center gap-2 cursor-pointer text-gray-400 font-bold hover:text-white hover:scale-[1.05] transition-all'>
 									<DownloadOutlined />
 									<p>Install App</p>
@@ -241,19 +258,10 @@ const Navbar = () => {
 									</>
 								) : (
 									<>
-										<p
-											className='cursor-pointer text-gray-400 font-bold hover:text-white hover:scale-[1.05] transition-all'
-											onClick={() => navigate(paths.register)}>
-											Sign up
-										</p>
-										<p
-											className='text-center flex items-center bg-white h-full px-8 rounded-full cursor-pointer text-black font-bold hover:bg-gray-200 hover:scale-[1.05] transition-all'
-											onClick={() => navigate(paths.login)}>
-											Log in
-										</p>
+										
 									</>
 								)}
-							</div>
+							</div> */}
 						</div>
 					</div>
 				</nav>

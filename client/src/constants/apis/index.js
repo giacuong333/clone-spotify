@@ -7,6 +7,7 @@ export const apis = {
 	users: {
 		getAllByRoleUser: () => `/api/users`,
 		create: () => `/api/users/create`,
+		register: () => `/api/users/register/`,
 		update: () => `/api/users/update`,
 		delete: (param) => `/api/users/delete/${param}`,
 		getAll: () => `/api/users/`,
@@ -21,5 +22,8 @@ export const apis = {
 		getById: (id) => `/api/songs/${id}/`,
 		delete: () => `/api/songs/delete/`,
 		create: () => `/api/songs/create/`,
+	},
+	chats: {
+		getConversations: () => `/conversations`,
 	},
 };

@@ -3,6 +3,7 @@ const paths = {
 	register: "/register",
 	login: "/login",
 	details: "/details/:id",
+	chats: "/chats",
 	search: "/search",
 	admin: "/admin",
 	users: "/admin/users",

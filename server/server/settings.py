@@ -18,7 +18,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "rest_framework",
-    "rest_framework_simplejwt.token_blacklist",
+    # "rest_framework_simplejwt.token_blacklist",
     # apps
     "apps.listenedAt",
     "apps.downloadedAt",
@@ -44,11 +44,10 @@ MIDDLEWARE = [
 # REST AND JWT CONFIG
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
-        # "rest_framework_simplejwt.authentication.JWTAuthentication" # For testing
+        "rest_framework_simplejwt.authentication.JWTAuthentication"
     ],
     "DEFAULT_PERMISSION_CLASSES": [
-        # "rest_framework.permissions.IsAuthenticated"
-        "rest_framework.permissions.AllowAny",  # For testing
+        "rest_framework.permissions.IsAuthenticated"
     ],
 }
 

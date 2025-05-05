@@ -1,7 +1,15 @@
 from django.db import models
 from apps.users.models import User
 from datetime import datetime
-from mongoengine import Document, StringField, DateTimeField, ReferenceField, ListField, DictField
+from mongoengine import (
+    Document,
+    StringField,
+    DateTimeField,
+    ReferenceField,
+    ListField,
+    DictField,
+)
+
 
 # Create your models here.
 class Conversation(Document):
@@ -9,7 +17,7 @@ class Conversation(Document):
     created_at = DateTimeField(default=datetime.now)
     updated_at = DateTimeField(default=datetime.now)
 
-    meta = {'collection': 'conversations'}
+    meta = {"collection": "conversations"}
 
     @classmethod
     def get_or_create(cls, user1_id, user2_id):
@@ -21,7 +29,8 @@ class Conversation(Document):
             conversation = cls(participants=[user1, user2])
             conversation.save()
         return conversation
-    
+
+
 class Message(Document):
     conversation = ReferenceField(Conversation)
     sender = ReferenceField(User)
@@ -29,4 +38,4 @@ class Message(Document):
     timestamp = DateTimeField(default=datetime.now)
     is_read = models.BooleanField(default=False)
 
-    meta = {'collection': 'messages'}
+    meta = {"collection": "messages"}
