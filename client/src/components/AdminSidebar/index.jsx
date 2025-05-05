@@ -11,6 +11,7 @@ import {
 	BarChartOutlined,
 	LeftOutlined,
 	RightOutlined,
+	TagsOutlined, 
 } from "@ant-design/icons";
 import { useAuth } from "../../contexts/Auth";
 import paths from "../../constants/paths";
@@ -24,6 +25,7 @@ const items = [
 		icon: <PlayCircleOutlined />,
 	},
 	{ name: "User Management", path: paths.users, icon: <UserOutlined /> },
+	{ name: "Genre Management", path: paths.genres, icon: <TagsOutlined /> },
 	{ name: "Analytics", path: paths.analytics, icon: <BarChartOutlined /> },
 	{ name: "Settings", path: paths.settings, icon: <SettingOutlined /> },
 ];

@@ -22,4 +22,11 @@ export const apis = {
 		delete: () => `/api/songs/delete/`,
 		create: () => `/api/songs/create/`,
 	},
+	genres: {
+		getAll: () => `/api/genres/`,
+		getById: (id) => `/api/genres/${id}/`,
+		delete: () => `/api/genres/delete/`,
+		create: () => `/api/genres/create/`,
+		update: (id) => `/api/genres/${id}/update/`,
+	},
 };
