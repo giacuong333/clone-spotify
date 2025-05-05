@@ -25,12 +25,12 @@ export const apis = {
 	},
 	chats: {
 		getConversations: () => `/conversations`,
-		genres: {
-			getAll: () => `/api/genres/`,
-			getById: (id) => `/api/genres/${id}/`,
-			delete: () => `/api/genres/delete/`,
-			create: () => `/api/genres/create/`,
-			update: (id) => `/api/genres/${id}/update/`,
-		},
+	},
+	genres: {
+		getAll: () => `/api/genres/`,
+		getById: (id) => `/api/genres/${id}/`,
+		delete: () => `/api/genres/delete/`,
+		create: () => `/api/genres/create/`,
+		update: (id) => `/api/genres/${id}/update/`,
 	},
 };
