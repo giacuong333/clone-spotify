@@ -11,7 +11,6 @@ const Song = ({ children }) => {
 	const [loadingFetchSongList, setLoadingFetchSongList] = useState(false);
 	const [loadingFetchDetails, setLoadingFetchDetails] = useState(false);
 	const [searchInput, setSearchInput] = useState("");
-	// const { accessToken } = useAxios();
 
 	const fetchSongList = useCallback(async () => {
 		try {
@@ -44,10 +43,10 @@ const Song = ({ children }) => {
 	const handleDeleteSongs = async (songIds) => {
 		try {
 			setLoadingFetchSongList(true);
-			const response = await instance.post(apis.songs.delete(), {
-				song_ids: songIds,
+			const response = await instance.delete(apis.songs.delete(), {
+				data: { song_ids: songIds },
 			});
-			if (response.status === 200) {
+			if (response.status === 204) {
 				notify("Delete successfully");
 				await fetchSongList();
 			}

@@ -34,22 +34,11 @@ const Axios = ({ children }) => {
 	React.useEffect(() => {
 		const requestInterceptor = instance.interceptors.request.use(
 			(config) => {
-				console.log("Request URL:", config.url);
-				console.log(
-					"Current access token state: ",
-					accessToken ? "exists" : "missing"
-				);
-
 				if (accessToken) {
 					config.headers.Authorization = `Bearer ${accessToken}`;
-					console.log(
-						"Applied authorization header:",
-						config.headers.Authorization
-					);
 				} else {
 					console.log("No authorization header applied");
 				}
-				console.log("Request headers: ", { ...config.headers });
 				return config;
 			},
 			(error) => {
@@ -88,7 +77,6 @@ const Axios = ({ children }) => {
 
 						if (response.status === 200) {
 							const { access, refresh } = response.data;
-							console.log("New access token: ", access);
 
 							localStorage.setItem("accessToken", access);
 							if (refresh) {
@@ -119,18 +107,11 @@ const Axios = ({ children }) => {
 					}
 				}
 				console.error("Response error: ", error);
-				if (error.response?.data?.error) {
-					notify(error.response.data.error, "error");
-				} else {
-					notify("Something went wrong!", "error");
-				}
-				notify(error.response.data || "Something went wrong!");
 				return Promise.reject(error);
 			}
 		);
 
 		return () => {
-			console.log("Cleaning up Axios interceptors");
 			instance.interceptors.request.eject(requestInterceptor);
 			instance.interceptors.response.eject(responseInterceptor);
 		};

@@ -2,6 +2,7 @@ from datetime import timedelta
 from pathlib import Path
 from mongoengine import connect
 
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = "django-insecure-c@i^7drg7&s)-y73ai08l(@wmhe==8(tk2k(29$av+@yrrvuq-"
@@ -18,7 +19,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "rest_framework",
-    # "rest_framework_simplejwt.token_blacklist",
+    # "channels",
     # apps
     "apps.listenedAt",
     "apps.downloadedAt",
@@ -27,6 +28,8 @@ INSTALLED_APPS = [
     "apps.users",
     "apps.auths",
     "apps.genre",
+    "apps.chat",
+    'rest_framework_simplejwt',
 ]
 
 MIDDLEWARE = [
@@ -35,28 +38,35 @@ MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
-    # "django.middleware.csrf.CsrfViewMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
+# Socket config
+ASGI_APPLICATION = "server.asgi.application"
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels.layers.InMemoryChannelLayer',
+    },
+}
+    
+
 # REST AND JWT CONFIG
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
-        "rest_framework_simplejwt.authentication.JWTAuthentication"
+        "apps.auths.authenMongo.MongoJWTAuthentication",
     ],
-    "DEFAULT_PERMISSION_CLASSES": [
-        "rest_framework.permissions.IsAuthenticated"
-    ],
+    "DEFAULT_PERMISSION_CLASSES": ["rest_framework.permissions.IsAuthenticated"],
 }
 
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=60),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
     "ROTATE_REFRESH_TOKENS": False,
-    "BLACKLIST_AFTER_ROTATION": True,
-    "UPDATE_LAST_LOGIN": True,
+    "BLACKLIST_AFTER_ROTATION": False,
+    "UPDATE_LAST_LOGIN": False,
     "ALGORITHM": "HS256",
     "SIGNING_KEY": SECRET_KEY,
     "VERIFYING_KEY": None,
@@ -82,18 +92,9 @@ SIMPLE_JWT = {
 
 # CORS CONFIG
 CORS_ALLOW_ALL_ORIGINS = False
-CORS_ALLOWED_ORIGINS = ["http://localhost:5173", "http://127.0.0.1:5173"]
+CORS_ALLOWED_ORIGINS = ["http://localhost:5173", "http://127.0.0.1:5173", "http://127.0.0.1:8000"]
 CSRF_TRUSTED_ORIGINS = CORS_ALLOWED_ORIGINS
 CORS_ALLOW_CREDENTIALS = True
-
-CORS_ALLOW_METHODS = [
-    "DELETE",
-    "GET",
-    "OPTIONS",
-    "PATCH",
-    "POST",
-    "PUT",
-]
 
 CORS_ALLOW_HEADERS = [
     "content-type",
@@ -102,7 +103,6 @@ CORS_ALLOW_HEADERS = [
     "accept",
     "origin",
     "x-csrftoken",
-    "access-control-allow-methods",
 ]
 
 CORS_EXPOSE_HEADERS = ["Set-Cookie"]

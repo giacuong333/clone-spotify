@@ -56,7 +56,7 @@ const songList = [
 	},
 ];
 
-const types = ["albums", "songs", "playlists"];
+const types = ["users", "songs", "playlists"];
 
 const list = [
 	{

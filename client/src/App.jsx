@@ -22,7 +22,6 @@ const App = () => {
 									<ChatProvider>
 										<Toast />
 										<AppRoutes />
-										<Toast />
 									</ChatProvider>
 								</GenreProvider>
 							</SongProvider>

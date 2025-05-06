@@ -13,15 +13,10 @@ const AppRoutes = () => {
 			}>
 			<Routes>
 				{routes?.map(
-					({
-						path,
-						Layout,
-						Page,
-						isPublic,
-						isAuthPage,
-						isAdminPage,
-						index,
-					}) => {
+					(
+						{ path, Layout, Page, isPublic, isAuthPage, isAdminPage, index },
+						idx // Use array index as fallback
+					) => {
 						let RenderPage = isPublic ? (
 							<Page />
 						) : (
@@ -34,9 +29,12 @@ const AppRoutes = () => {
 							RenderPage = <PublicRoute>{RenderPage}</PublicRoute>;
 						}
 
+						// Use path if defined, otherwise use index or array index
+						const key = path || (index ? `index-${idx}` : `route-${idx}`);
+
 						return (
 							<Route
-								key={path || index}
+								key={key}
 								path={path}
 								index={index}
 								element={Layout ? <Layout>{RenderPage}</Layout> : RenderPage}

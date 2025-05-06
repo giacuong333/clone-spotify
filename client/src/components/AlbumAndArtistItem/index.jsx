@@ -10,7 +10,7 @@ const AlbumAndArtistItem = ({ item, type, index, list }) => {
 
 	const handleClickItem = (event, path) => {
 		event.stopPropagation();
-		navigate(path.replace(":id", item?.id));
+		navigate(`${path}?detailsId=${item?.id}&type=${type}`);
 	};
 
 	const handlePlay = (event) => {

@@ -50,11 +50,11 @@ class Song(Document):
             return ValueError(f"Invalid data: {str(e)}")
 
     @staticmethod
-    def delete(song_id):
+    def delete_many(song_ids):
         try:
-            song = Song.objects.get(id=song_id, deleted_at=None)
-            song.deleted_at = datetime.now()
-            song.save()
-            return True
+            result = Song.objects.filter(id__in=song_ids, deleted_at=None).update(
+                deleted_at=datetime.now()
+            )
+            return result > 0
         except DoesNotExist:
             return False

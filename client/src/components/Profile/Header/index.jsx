@@ -1,6 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { Button } from "antd";
-import PlayIcon from "../../Icons/PlayIcon";
 
 const Header = ({ name, contentRef }) => {
 	const [isStickedHeader, setIsStickedHeader] = useState(false);

@@ -3,8 +3,8 @@ from rest_framework.views import APIView
 from rest_framework.generics import ListCreateAPIView, RetrieveAPIView, DestroyAPIView
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
-from rest_framework.permissions import AllowAny
+from rest_framework.parsers import MultiPartParser, FormParser
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from gridfs import GridFS
 from mongoengine.connection import get_db
 from .models import Song
@@ -16,8 +16,6 @@ fs = GridFS(db)
 
 
 class SongListView(ListCreateAPIView):
-    """List all songs with complete information including URLs"""
-
     serializer_class = EnhancedSongSerializer
     permission_classes = [AllowAny]
 
@@ -25,14 +23,11 @@ class SongListView(ListCreateAPIView):
         return Song.findAll()
 
     def get_serializer_context(self):
-        """Include request in serializer context so URLs can be generated"""
         context = super().get_serializer_context()
         return context
 
 
 class SongDetailView(RetrieveAPIView):
-    """Get details for a specific song including URLs"""
-
     serializer_class = EnhancedSongSerializer
     permission_classes = [AllowAny]
 
@@ -41,14 +36,11 @@ class SongDetailView(RetrieveAPIView):
         return Song.findById(song_id)
 
     def get_serializer_context(self):
-        """Include request in serializer context so URLs can be generated"""
         context = super().get_serializer_context()
         return context
 
 
 class SongFileView(APIView):
-    """Retrieve the actual audio file for streaming"""
-
     permission_classes = [AllowAny]
 
     def get(self, request, song_id):
@@ -89,8 +81,6 @@ class SongFileView(APIView):
 
 
 class SongCoverView(APIView):
-    """Retrieve the cover image for a song"""
-
     permission_classes = [AllowAny]
 
     def get(self, request, song_id):
@@ -130,7 +120,7 @@ class SongCreateView(APIView):
     """Create a new song with file uploads"""
 
     parser_classes = [MultiPartParser, FormParser]
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
 
     def post(self, request):
         serializer = SongCreateSerializer(
@@ -151,52 +141,31 @@ class SongCreateView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class SongDeleteView(APIView):
-    """Soft delete a song"""
+class SongBulkDestroyView(APIView):
+    permission_classes = [IsAuthenticated]
 
-    parser_classes = [JSONParser]
-    permission_classes = [AllowAny]
+    def delete(self, request):
+        song_ids = request.data.get("song_ids", [])
 
-    def post(self, request):
-        print("Data request: ", request.data)
-        try:
-            song_ids = request.data.get("song_ids", [])
-
-            if not song_ids:
-                return Response(
-                    {"error": "No song ids provided"},
-                    status=status.HTTP_400_BAD_REQUEST,
-                )
-
-            deleted_count = 0
-            failed_ids = []
-
-            for song_id in song_ids:
-                result = Song.delete(song_id)
-                if result:
-                    deleted_count += 1
-                else:
-                    failed_ids.append(song_id)
-
-            if deleted_count == len(song_ids):
-                return Response(
-                    {"message": f"Successfully deleted {deleted_count} songs"},
-                    status=status.HTTP_200_OK,
-                )
-            elif deleted_count > 0:
-                return Response(
-                    {
-                        "message": f"Partially successful. Deleted {deleted_count} songs.",
-                        "failed_ids": failed_ids,
-                    },
-                    status=status.HTTP_207_MULTI_STATUS,
-                )
-            else:
-                return Response(
-                    {"error": "Failed to delete any songs. Songs may not exist."},
-                    status=status.HTTP_404_NOT_FOUND,
-                )
-        except Exception as e:
+        if not isinstance(song_ids, list):
             return Response(
-                {"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                {"error": "Invalid data format. 'song_ids' must be a list."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        if not song_ids:
+            return Response(
+                {"error": "No song IDs provided"}, status=status.HTTP_400_BAD_REQUEST
+            )
+
+        success = Song.delete_many(song_ids)
+        if success:
+            return Response(
+                {"message": "Songs deleted successfully"},
+                status=status.HTTP_204_NO_CONTENT,
+            )
+        else:
+            return Response(
+                {"error": "No songs found or already deleted"},
+                status=status.HTTP_404_NOT_FOUND,
             )

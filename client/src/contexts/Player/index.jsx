@@ -1,5 +1,6 @@
 import { createContext, useContext, useState } from "react";
 import { useAuth } from "../Auth";
+import { notify } from "../../components/Toast";
 
 const PlayerContext = createContext();
 
@@ -8,11 +9,14 @@ const PlayerProvider = ({ children }) => {
 	const [currentSongIndex, setCurrentSongIndex] = useState(0);
 	const [songList, setSongList] = useState([]);
 	const [isPlaying, setIsPlaying] = useState(false);
-	const { user } = useAuth();
-
-	console.log("User", user);
+	const { user, isAuthenticated } = useAuth();
 
 	const playSong = (song, songs, index = null) => {
+		if (!isAuthenticated) {
+			notify("Log in to listen", "error");
+			return;
+		}
+
 		setCurrentSong(song);
 		setSongList(songs);
 		if (index !== null) {

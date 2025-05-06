@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import {
 	HomeOutlined,
 	SearchOutlined,
@@ -14,34 +14,40 @@ import _ from "lodash";
 import { useAuth } from "../../contexts/Auth";
 import SongUploadForm from "../SongUploadForm";
 
-const popoverItems = [
-	{ id: 2, content: "Profile" },
-	{ id: 2.5, content: "My Statistics", action: () => navigate(paths.myStats) },
-	{
-		id: 3,
-		content: "Upgrade to Premium",
-		Icon: ExportOutlined,
-	},
-	{
-		id: 4,
-		content: "Support",
-		Icon: ExportOutlined,
-	},
-	{
-		id: 5,
-		content: "Download",
-		Icon: ExportOutlined,
-	},
-	{ id: 6, content: "Settings" },
-	{ id: 7, content: "Logout", action: (callback) => callback() },
-];
-
 const Navbar = () => {
 	const [form] = Form.useForm();
 	const navigate = useNavigate();
 	const [open, setOpen] = React.useState(false);
 	const { isAuthenticated, user, logout } = useAuth();
 	const [showSongUploadForm, setShowSongUploadForm] = useState(false);
+
+	const popoverItems = useMemo(() => {
+		return [
+			{ id: 2, content: "Profile", action: () => navigate(paths.profile) },
+			{
+				id: 2.5,
+				content: "My Statistics",
+				action: () => navigate(paths.myStats),
+			},
+			{
+				id: 3,
+				content: "Upgrade to Premium",
+				Icon: ExportOutlined,
+			},
+			{
+				id: 4,
+				content: "Support",
+				Icon: ExportOutlined,
+			},
+			{
+				id: 5,
+				content: "Download",
+				Icon: ExportOutlined,
+			},
+			{ id: 6, content: "Settings" },
+			{ id: 7, content: "Logout", action: (callback) => callback() },
+		];
+	}, []);
 
 	const hide = () => {
 		setOpen(false);
@@ -134,8 +140,9 @@ const Navbar = () => {
 										<p className='cursor-pointer text-gray-400 font-bold hover:text-white hover:scale-[1.05] transition-all'>
 											Support
 										</p>
-										<p className='cursor-pointer text-gray-400 font-bold hover:text-white hover:scale-[1.05] transition-all'>
-											Download
+										<p className='flex items-center gap-2 cursor-pointer text-gray-400 font-bold hover:text-white hover:scale-[1.05] transition-all'>
+											<DownloadOutlined />
+											<span>Download</span>
 										</p>
 									</div>
 									<div className='w-[1px] h-7 bg-white mr-8'></div>

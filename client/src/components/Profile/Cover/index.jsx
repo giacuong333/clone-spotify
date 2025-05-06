@@ -1,27 +1,29 @@
-import React from "react";
-
-const Cover = ({user, playlistCount = 0, followingCount = 0}) => {
+const Cover = ({ user, playlistCount = 0, followingCount = 0 }) => {
 	return (
-		<div className="flex items-center p-6 bg-gradient-to-b from-[#2a6e7f] to-[#0f2a2e] rounded-xl text-white">
-      {/* Avatar */}
-      <img
-        src={user?.image || "https://sonphuoc.com/wp-content/uploads/2022/01/born-to-die-lana-del-rey-feature-480x384.webp"}
-        alt={`${name}'s avatar`}
-        className="w-50 h-50 rounded-full object-cover shadow-lg"
-      />
+		<div className='flex items-center p-6 bg-gradient-to-b from-[#2a6e7f] to-[#0f2a2e] rounded-xl text-white'>
+			{/* Avatar */}
+			<img
+				src={
+					user?.image ||
+					"https://sonphuoc.com/wp-content/uploads/2022/01/born-to-die-lana-del-rey-feature-480x384.webp"
+				}
+				alt={`${name}'s avatar`}
+				className='w-50 h-50 rounded-full object-cover shadow-lg'
+			/>
 
-      {/* Info */}
-      <div className="ml-6">
-        <p className="text-sm text-white/80 mb-1">Profile</p>
-        <h1 className="text-8xl font-bold">{user?.name || "Demo"}</h1>
-        <p className="mt-5 text-white/90 text-sm">
-          {playlistCount} Public Playlist &bull; {followingCount} Following
-        </p>
-		<p className="mt-2 text-white/100 text-md">
-          {user?.bio || "This is a demo user. Please log in to see your profile."}
-        </p>
-      </div>
-    </div>
+			{/* Info */}
+			<div className='ml-6'>
+				<p className='text-sm text-white/80 mb-1'>Profile</p>
+				<h1 className='text-8xl font-bold'>{user?.name || "Demo"}</h1>
+				<p className='mt-5 text-white/90 text-sm'>
+					{playlistCount} Public Playlist &bull; {followingCount} Following
+				</p>
+				<p className='mt-2 text-white/100 text-md'>
+					{user?.bio ||
+						"This is a demo user. Please log in to see your profile."}
+				</p>
+			</div>
+		</div>
 	);
 };
 

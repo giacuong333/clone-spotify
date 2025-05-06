@@ -12,6 +12,7 @@ import {
 import Overlay from "../Overlay";
 import formatTime from "../../utils/formatTime";
 import { useSong } from "../../contexts/Song";
+import { useGenre } from "../../contexts/genre";
 
 export default function SongUploadForm({ onComplete, show, onShow }) {
 	const [title, setTitle] = useState("");
@@ -27,6 +28,11 @@ export default function SongUploadForm({ onComplete, show, onShow }) {
 	const [success, setSuccess] = useState(false);
 	const [activeStep, setActiveStep] = useState(1);
 	const { create } = useSong();
+	const { genreList, fetchGenreList, loadingFetchGenreList } = useGenre();
+
+	useEffect(() => {
+		fetchGenreList();
+	}, [fetchGenreList]);
 
 	// Mock genres - in a real app, these would come from your API
 	const availableGenres = [
@@ -378,17 +384,16 @@ export default function SongUploadForm({ onComplete, show, onShow }) {
 										Select genres that match your song
 									</label>
 									<div className='grid grid-cols-2 sm:grid-cols-4 gap-3'>
-										{availableGenres.map((genre) => (
+										{genreList.map((genre) => (
 											<button
 												key={genre.id}
 												type='button'
 												onClick={() => handleGenreToggle(genre.id)}
-												className={`relative py-3 px-4 rounded-lg text-white font-medium transition-all duration-200
-                      ${
-												selectedGenres.includes(genre.id)
-													? `${genre.color} shadow-md scale-105`
-													: "bg-gray-800 hover:bg-gray-700"
-											}`}>
+												className={`relative py-3 px-4 rounded-lg text-white font-medium transition-all duration-200 ${
+													selectedGenres.includes(genre.id)
+														? `bg-green-600 shadow-md scale-105`
+														: "bg-gray-800 hover:bg-gray-700"
+												}`}>
 												{genre.name}
 												{selectedGenres.includes(genre.id) && (
 													<span className='absolute top-1 right-1'>

@@ -25,41 +25,41 @@ const ChatProvider = ({ children }) => {
 	const messageEndRef = useRef(null);
 	const { user } = useUser();
 
-	useEffect(() => {
-		const newSocket = new WebSocket(
-			`ws://${window.location.host}/ws/chat/6818411a5386cc4d0d43be88/680755a0081908b550ef9a45/`
-		);
-		// Xử lý khi kết nối mở
-		newSocket.onopen = () => {
-			console.log("WebSocket connected");
-		};
+	// useEffect(() => {
+	// 	const newSocket = new WebSocket(
+	// 		`ws://${window.location.host}/ws/chat/6818411a5386cc4d0d43be88/680755a0081908b550ef9a45/`
+	// 	);
+	// 	// Xử lý khi kết nối mở
+	// 	newSocket.onopen = () => {
+	// 		console.log("WebSocket connected");
+	// 	};
 
-		// Xử lý khi nhận tin nhắn
-		newSocket.onmessage = (event) => {
-			const data = JSON.parse(event.data);
-			setMessages((prev) => [
-				...prev,
-				{
-					id: data.messageId,
-					text: data.message,
-					sender: data.senderId,
-					timestamp: data.timestamp,
-				},
-			]);
-		};
+	// 	// Xử lý khi nhận tin nhắn
+	// 	newSocket.onmessage = (event) => {
+	// 		const data = JSON.parse(event.data);
+	// 		setMessages((prev) => [
+	// 			...prev,
+	// 			{
+	// 				id: data.messageId,
+	// 				text: data.message,
+	// 				sender: data.senderId,
+	// 				timestamp: data.timestamp,
+	// 			},
+	// 		]);
+	// 	};
 
-		// Xử lý khi kết nối đóng
-		newSocket.onclose = () => {
-			console.log("WebSocket disconnected");
-		};
+	// 	// Xử lý khi kết nối đóng
+	// 	newSocket.onclose = () => {
+	// 		console.log("WebSocket disconnected");
+	// 	};
 
-		setSocket(newSocket);
+	// 	setSocket(newSocket);
 
-		// Cleanup khi component unmount
-		return () => {
-			if (newSocket) newSocket.close();
-		};
-	}, []);
+	// 	// Cleanup khi component unmount
+	// 	return () => {
+	// 		if (newSocket) newSocket.close();
+	// 	};
+	// }, []);
 
 	const fetchConversations = useCallback(async () => {
 		try {
@@ -122,34 +122,34 @@ const ChatProvider = ({ children }) => {
 		}
 	}, []);
 
-	const fetchMessages = useCallback(async (conversationId) => {
-		if (!conversationId) {
-			return;
-		}
+	// const fetchMessages = useCallback(async (conversationId) => {
+	// 	if (!conversationId) {
+	// 		return;
+	// 	}
 
-		try {
-			setLoadingMessages(true);
-		} catch (error) {
-			console.log("Error occurs while fetching conversations:", error);
-		} finally {
-			setLoadingMessages(false);
-		}
-	}, []);
+	// 	try {
+	// 		setLoadingMessages(true);
+	// 	} catch (error) {
+	// 		console.log("Error occurs while fetching conversations:", error);
+	// 	} finally {
+	// 		setLoadingMessages(false);
+	// 	}
+	// }, []);
 
-	const sendMessage = async (event) => {
-		event.preventDefault();
+	// const sendMessage = async (event) => {
+	// 	event.preventDefault();
 
-		if (!inputMessage.trim() || !socket) return;
+	// 	if (!inputMessage.trim() || !socket) return;
 
-		const messageData = {
-			message: inputMessage,
-			senderId: "6818411a5386cc4d0d43be88",
-			receiverId: "680755a0081908b550ef9a45",
-		};
+	// 	const messageData = {
+	// 		message: inputMessage,
+	// 		senderId: "6818411a5386cc4d0d43be88",
+	// 		receiverId: "680755a0081908b550ef9a45",
+	// 	};
 
-		socket.send(JSON.stringify(messageData));
-		setInputMessage("Hello world");
-	};
+	// 	socket.send(JSON.stringify(messageData));
+	// 	setInputMessage("Hello world");
+	// };
 
 	return <ChatContext.Provider value={{}}>{children}</ChatContext.Provider>;
 };

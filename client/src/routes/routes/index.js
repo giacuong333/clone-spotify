@@ -57,7 +57,7 @@ const routes = [
 		Layout: MainLayout,
 		Page: Profile,
 		isPublic: true,
-		isAuthPage: true,
+		isAuthPage: false,
 	},
 	{
 		path: paths.search,
