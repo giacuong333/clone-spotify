@@ -10,4 +10,8 @@ urlpatterns = [
     path('profile/', views.ProfileView.as_view(), name='profile'),
     path('change-password/', views.ChangePasswordView.as_view(), name='change_password'),
     path('logout/', views.LogoutView.as_view(), name='logout'),
+
+    # Oauth2.0 Google login
+    path('google/auth-url/', views.GoogleAuthURLView.as_view(), name='google_auth_url'),
+    path('google/callback/', views.GoogleCallbackView.as_view(), name='google_callback'),
 ]

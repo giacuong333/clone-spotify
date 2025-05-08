@@ -11,3 +11,4 @@ vsocket/
 .vscode/
 *.vscode
 chat_test.html
+oauth_test.html

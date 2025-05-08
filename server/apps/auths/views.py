@@ -13,6 +13,7 @@ from apps.users.models import User
 from rest_framework_simplejwt.views import TokenObtainPairView
 import bcrypt
 from rest_framework.permissions import AllowAny
+from apps.auths.utils import generate_google_auth_url, get_google_tokens, get_google_user_info, get_or_create_user, create_tokens
 
 class CustomTokenObtainPairView(TokenObtainPairView):
     permission_classes = [AllowAny]
@@ -136,3 +137,44 @@ class ChangePasswordView(APIView):
             return Response({"message": "Đổi mật khẩu thành công"})
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+class GoogleAuthURLView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        auth_url = generate_google_auth_url()
+        return Response({"auth_url": auth_url})
+    
+class GoogleCallbackView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        code = request.GET.get('code')
+        error = request.GET.get('error')
+
+        print(f"Vào được callback r")
+
+        if error or not code:
+            return Response({"error": "Lỗi xác thực Google"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        token_data = get_google_tokens(code)
+        if not token_data:
+            return Response({"error": "Lỗi xác thực Google"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        user_info = get_google_user_info(token_data['access_token'])
+        if not user_info:
+            return Response({"error": "Lỗi xác thực Google"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        user = get_or_create_user(user_info)
+        tokens = create_tokens(user)
+
+        print("Trả về token và user")
+        print(f"User: {user.name}")
+
+        return Response({
+            'success': True,
+            'message': 'Đăng nhập Google thành công',
+            'access_token': tokens['access'],
+            'refresh_token': tokens['refresh'],
+            'user': tokens['user']
+        }, status=status.HTTP_200_OK)

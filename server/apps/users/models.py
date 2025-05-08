@@ -1,4 +1,4 @@
-from mongoengine import Document, StringField, DateTimeField
+from mongoengine import Document, StringField, DateTimeField, BooleanField
 import datetime
 
 
@@ -12,6 +12,8 @@ class User(Document):
     created_at = DateTimeField(default=datetime.datetime.now)
     updated_at = DateTimeField(default=datetime.datetime.now)
     deleted_at = DateTimeField()
+    google_id = StringField()
+    is_oauth_user = BooleanField(default=False)
 
     meta = {"collection": "users"}
 
