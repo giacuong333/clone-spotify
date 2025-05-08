@@ -8,7 +8,7 @@ import {
 	CalendarOutlined,
 	CheckCircleOutlined,
 } from "@ant-design/icons";
-import Overlay from "../../Overlay";
+import Overlay from "../../Components/Overlay";
 import VolumeIcon from "../../Icons/VolumnIcon";
 import { Spin } from "antd";
 import formatDate from "../../../utils/formatDate";

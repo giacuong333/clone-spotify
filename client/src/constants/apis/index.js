@@ -29,4 +29,11 @@ export const apis = {
 		create: () => `/api/genres/create/`,
 		update: (id) => `/api/genres/${id}/update/`,
 	},
+	playlists: {
+		getAll: () => "/api/playlists/",
+        create: () => "/api/playlists/create/", // Đảm bảo endpoint này đúng
+        update: (id) => `/api/playlists/${id}/update/`,
+        delete: (id) => `/api/playlists/${id}/delete/`,
+        addSong: (id) => `/api/playlists/${id}/add-song/`,
+	},
 };

@@ -4,6 +4,7 @@ const paths = {
 	login: "/login",
 	details: "/details/:id",
 	search: "/search",
+	playlist: "/playlist",
 	admin: "/admin",
 	users: "/admin/users",
 	songs: "/admin/songs",
