@@ -215,11 +215,27 @@ const Navbar = () => {
 										open={open}
 										color='black'
 										onOpenChange={handleOpenChange}>
-										<div className='flex items-center justify-center p-2 rounded-full bg-[#1F1F1F] cursor-pointer group'>
-											<p className='capitalize text-black font-bold bg-[#F573A0] w-8 h-8 flex items-center justify-center rounded-full group-hover:scale-[1.04]'>
-												{user?.name[0]}
-											</p>
-										</div>
+										{
+											user?.image ?
+											(
+												<div className='flex items-center justify-center p-2 rounded-full bg-[#1F1F1F] cursor-pointer group'>
+													<img
+														src={
+															user?.image 
+														}
+														alt={`${name}'s avatar`}
+														className='w-8 h-8 rounded-full object-cover shadow-lg'
+													/>
+												</div>
+											) :
+											(
+												<div className='flex items-center justify-center p-2 rounded-full bg-[#1F1F1F] cursor-pointer group'>
+													<p className='capitalize text-black font-bold bg-[#F573A0] w-8 h-8 flex items-center justify-center rounded-full group-hover:scale-[1.04]'>
+														{user?.name[0]}
+													</p>
+												</div>
+											)
+										}
 									</Popover>
 								</>
 							)}

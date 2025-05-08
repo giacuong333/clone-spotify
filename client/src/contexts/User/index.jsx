@@ -9,9 +9,6 @@ const UserProvider = ({ children }) => {
 	const [userList, setUserList] = useState([]);
 	const [loadingFetchUserList, setLoadingFetchUserList] = useState(false);
 
-	const [userDetail, setUserDetail] = useState(null);
-	const [loadingFetchUserDetail, setLoadingFetchUserDetail] = useState(false);
-
 	const [searchUserResult, setSearchUserResult] = useState([]);
 	const [loadingSearchUserResult, setLoadingSearchUserResult] = useState(false);
 
@@ -33,16 +30,14 @@ const UserProvider = ({ children }) => {
 
 	const fetchUserDetail = useCallback(async (id) => {
 		try {
-			setLoadingFetchUserDetail(true);
 			const response = await instance.get(apis.users.getById(id));
 			if (response.status === 200) {
-				setUserDetail(response.data);
+				console.log("User detail response:", response.data);
+				return response.data;
 			}
 		} catch (error) {
 			console.log("Errors occur while fetching user", error);
-		} finally {
-			setLoadingFetchUserDetail(false);
-		}
+		} 
 	}, []);
 
 	const fetchUserList = useCallback(async () => {
@@ -66,9 +61,7 @@ const UserProvider = ({ children }) => {
 				fetchUserList,
 				loadingFetchUserList,
 
-				userDetail,
 				fetchUserDetail,
-				loadingFetchUserDetail,
 
 				searchUserResult,
 				queryUser,

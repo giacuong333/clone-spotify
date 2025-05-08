@@ -95,6 +95,7 @@ const Auth = ({ children }) => {
 		<AuthContext.Provider
 			value={{
 				user,
+				setUser,
 				pendingLogin,
 				pendingRegister,
 				pendingLogout,
