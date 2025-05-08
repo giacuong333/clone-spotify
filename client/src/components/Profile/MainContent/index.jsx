@@ -16,7 +16,7 @@ const MainContent = ({ songList, user, setUser }) => {
 					</div>
 
 					<div>
-						<SongListWrap songList={songList} title='Top tracks this month' />
+						<SongListWrap songList={songList} title='Top tracks listened this month' />
 					</div>
 				</div>
 			</div>
