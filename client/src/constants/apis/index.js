@@ -27,8 +27,9 @@ export const apis = {
 		create: () => `/api/songs/create/`,
 	},
 	chats: {
-		getConversations: () => "/conversations/",
-		getMessages: (otherUserId) => `/conversations/${otherUserId}/messages/`,
+		getConversations: () => "/api/chat/conversations/",
+		getMessages: (otherUserId) =>
+			`/api/chat/conversations/${otherUserId}/messages/`,
 	},
 	genres: {
 		getAll: () => `/api/genres/`,

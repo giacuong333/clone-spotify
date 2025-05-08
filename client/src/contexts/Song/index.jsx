@@ -91,11 +91,6 @@ const Song = ({ children }) => {
 		event.stopPropagation();
 		event.preventDefault();
 
-		if (!isAuthenticated) {
-			notify("Login to download the song", "error");
-			return;
-		}
-
 		if (audio_url) {
 			const downloadLink = document.createElement("a");
 

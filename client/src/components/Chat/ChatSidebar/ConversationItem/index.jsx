@@ -1,9 +1,10 @@
 import { useMemo } from "react";
+import { useAuth } from "../../../../contexts/Auth";
 
 const ConversationItem = ({ conversation, isActive, onClick }) => {
 	const avatar = useMemo(() => {
 		if (!conversation?.image) {
-			return (conversation?.name || conversation?.username || "?").charAt(0);
+			return (conversation?.name || "?").charAt(0);
 		} else {
 			return conversation?.image;
 		}
@@ -24,7 +25,7 @@ const ConversationItem = ({ conversation, isActive, onClick }) => {
 			<div className='ml-3 flex-1 overflow-hidden'>
 				<div className='flex justify-between'>
 					<h3 className='font-medium truncate'>
-						{conversation.name || conversation.username || "Unknown"}
+						{conversation?.name || "Unknown"}
 					</h3>
 					{!isSearchResult && (
 						<span className='text-xs text-gray-400'>{conversation.time}</span>

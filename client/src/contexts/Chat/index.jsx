@@ -35,15 +35,10 @@ const ChatProvider = ({ children }) => {
 			socket.close();
 		}
 
-		console.table({
-			"activeConversation: ": activeConversation,
-			"user: ": user?.id,
-		});
-
 		// Only create a new socket if we have an active conversation and user
 		if (activeConversation && user?.id) {
 			const newSocket = new WebSocket(
-				`ws://${import.meta.env.VITE_BASE_URL}/chat/${
+				`ws://${import.meta.env.VITE_SOCKET_URL}/ws/chat/${
 					user?.id
 				}/${activeConversation}/`
 			);
@@ -114,24 +109,24 @@ const ChatProvider = ({ children }) => {
 			setError("");
 
 			const response = await instance.get(apis.chats.getConversations());
-			console.log("Conversations response:", response);
 
-			if (response.data) {
+			if (response.status === 200 && response.data) {
 				// Format the conversations data properly
-				const formattedConversations = response.data.map((conv) => ({
-					id: conv.id,
-					name:
-						conv.participants?.find((p) => p.id !== user?.id)?.username ||
-						"Unknown",
-					avatar:
-						conv.participants
-							?.find((p) => p.id !== user?.id)
-							?.username?.charAt(0) || "?",
-					unread: conv.unread_count || 0,
-					lastMessage: conv.last_message?.content || "No messages yet",
-					time: new Date(conv.updated_at).toLocaleDateString(),
-					active: false,
-				}));
+				const formattedConversations = response.data.map((conversation) => {
+					const newConversation = conversation.participants?.find(
+						(p) => p.id !== user?.id
+					);
+					return {
+						id: newConversation.id,
+						name: newConversation?.name || "Unknown",
+						avatar: newConversation?.name?.charAt(0) || "?",
+						unread: conversation.unread_count || 0,
+						lastMessage:
+							conversation.last_message?.content || "No messages yet",
+						time: new Date(conversation.updated_at).toLocaleDateString(),
+						active: false,
+					};
+				});
 
 				setConversations(formattedConversations);
 			}
@@ -143,24 +138,23 @@ const ChatProvider = ({ children }) => {
 		}
 	}, [user?.id]);
 
-	const fetchMessages = useCallback(async (conversationId) => {
-		// if (!conversationId) {
-		// 	return;
-		// }
+	const fetchMessages = useCallback(async (otherUserId) => {
+		if (!otherUserId) {
+			return;
+		}
 
 		try {
 			setLoadingMessages(true);
 			setError("");
 
-			const otherUserId = activeConversation; // In your implementation, conversationId seems to be the other user's ID
+			// In your implementation, conversationId seems to be the other user's ID
 			const response = await instance.get(apis.chats.getMessages(otherUserId));
-
-			if (response.data) {
+			if (response.status === 200 && response.data) {
 				// Format the messages data
 				const formattedMessages = response.data.map((msg) => ({
 					id: msg.id,
 					text: msg.content,
-					sender: msg.sender.id,
+					sender: { id: msg.sender.id, name: msg.sender.name },
 					timestamp: msg.timestamp,
 					time: new Date(msg.timestamp).toLocaleTimeString([], {
 						hour: "2-digit",
@@ -182,12 +176,6 @@ const ChatProvider = ({ children }) => {
 		(event) => {
 			event?.preventDefault();
 
-			console.log({
-				"Message: ": inputMessage,
-				"Active conversation: ": activeConversation,
-				"User Id: ": user?.id,
-			});
-
 			if (!inputMessage.trim() || !socket || !activeConversation || !user?.id) {
 				return;
 			}
@@ -207,39 +195,6 @@ const ChatProvider = ({ children }) => {
 			}
 		},
 		[inputMessage, socket, activeConversation, user?.id]
-	);
-
-	// New function to start a conversation with a user from search results
-	const startNewConversation = useCallback(
-		async (userId) => {
-			try {
-				setError("");
-
-				// Check if conversation already exists
-				const existingConv = conversations.find((conv) =>
-					conv.participants?.some((p) => p.id === userId)
-				);
-
-				if (existingConv) {
-					setActiveConversation(existingConv.id);
-					return;
-				}
-
-				// If no existing conversation, set the active conversation to the user ID
-				// The backend will create the conversation when the first message is sent
-				setActiveConversation(userId);
-
-				// Clear messages since this is a new conversation
-				setMessages([]);
-
-				// Clear search input
-				setSearchUserInput("");
-			} catch (error) {
-				console.error("Error starting new conversation:", error);
-				setError("Failed to start conversation");
-			}
-		},
-		[conversations]
 	);
 
 	return (
@@ -265,7 +220,6 @@ const ChatProvider = ({ children }) => {
 
 				activeConversation,
 				setActiveConversation,
-				startNewConversation,
 
 				error,
 				messageEndRef,
@@ -276,5 +230,4 @@ const ChatProvider = ({ children }) => {
 };
 
 export const useChat = () => useContext(ChatContext);
-
 export default ChatProvider;
