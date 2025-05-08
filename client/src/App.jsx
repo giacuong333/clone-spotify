@@ -9,31 +9,32 @@ import SongProvider from "./contexts/Song";
 import UserProvider from "./contexts/User";
 import ChatProvider from "./contexts/Chat";
 import GenreProvider from "./contexts/genre";
-import SearchProvider from "./contexts/Search";
-
+import PlaylistProvider from "./contexts/playlist";
 const App = () => {
-	return (
-		<BrowserRouter>
-			<Axios>
-				<Auth>
-					<PlayerProvider>
-						<UserProvider>
-							<SongProvider>
-								<GenreProvider>
-									<SearchProvider>
-										<ChatProvider>
-											<Toast />
-											<AppRoutes />
-										</ChatProvider>
-									</SearchProvider>
-								</GenreProvider>
-							</SongProvider>
-						</UserProvider>
-					</PlayerProvider>
-				</Auth>
-			</Axios>
-		</BrowserRouter>
-	);
+  return (
+    <BrowserRouter>
+      <Axios>
+        <Auth>
+          <PlayerProvider>
+            <UserProvider>
+              <SongProvider>
+                <GenreProvider>
+                  <PlaylistProvider>
+                    <SearchProvider>
+                      <ChatProvider>
+                        <Toast />
+                        <AppRoutes />
+                      </ChatProvider>
+                    </SearchProvider>
+                  </PlaylistProvider>
+                </GenreProvider>
+              </SongProvider>
+            </UserProvider>
+          </PlayerProvider>
+        </Auth>
+      </Axios>
+    </BrowserRouter>
+  );
 };
 
 export default App;

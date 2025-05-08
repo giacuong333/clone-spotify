@@ -12,7 +12,7 @@ import {
 	ExpandOutlined,
 	DownloadOutlined,
 } from "@ant-design/icons";
-import Overlay from "../../Overlay";
+import Overlay from "../../Components/Overlay";
 import VolumeIcon from "../../Icons/VolumnIcon";
 import { Spin, Button, Tooltip } from "antd";
 import formatDate from "../../../utils/formatDate";
