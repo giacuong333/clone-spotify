@@ -297,9 +297,8 @@ class UserUpdateView(UpdateAPIView):
         serializer = self.get_serializer(instance, data=request.data, partial=True)
         if serializer.is_valid():
             updated_user = serializer.save()
-            return Response(
-                self.get_serializer(updated_user).data, status=status.HTTP_200_OK
-            )
+            response_serializer = UserDetailSerializer(updated_user)
+            return Response(response_serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
