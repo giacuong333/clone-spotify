@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { memo, useMemo, useState } from "react";
 import {
 	HomeOutlined,
 	SearchOutlined,
@@ -13,35 +13,43 @@ import paths from "../../constants/paths";
 import _ from "lodash";
 import { useAuth } from "../../contexts/Auth";
 import SongUploadForm from "../SongUploadForm";
-
-const popoverItems = [
-	{ id: 2, content: "Profile" },
-	{ id: 2.5, content: "My Statistics", action: () => navigate(paths.myStats) },
-	{
-		id: 3,
-		content: "Upgrade to Premium",
-		Icon: ExportOutlined,
-	},
-	{
-		id: 4,
-		content: "Support",
-		Icon: ExportOutlined,
-	},
-	{
-		id: 5,
-		content: "Download",
-		Icon: ExportOutlined,
-	},
-	{ id: 6, content: "Settings" },
-	{ id: 7, content: "Logout", action: (callback) => callback() },
-];
+import { useSearch } from "../../contexts/Search";
 
 const Navbar = () => {
 	const [form] = Form.useForm();
 	const navigate = useNavigate();
-	const [open, setOpen] = React.useState(false);
-	const { isAuthenticated, user, logout } = useAuth();
+	const [open, setOpen] = useState(false);
 	const [showSongUploadForm, setShowSongUploadForm] = useState(false);
+	const { isAuthenticated, user, logout } = useAuth();
+	const { setSearchInput, handleSearch } = useSearch();
+
+	const popoverItems = useMemo(() => {
+		return [
+			{ id: 2, content: "Profile", action: () => navigate(paths.profile) },
+			{
+				id: 2.5,
+				content: "My Statistics",
+				action: () => navigate(paths.myStats),
+			},
+			{
+				id: 3,
+				content: "Upgrade to Premium",
+				Icon: ExportOutlined,
+			},
+			{
+				id: 4,
+				content: "Support",
+				Icon: ExportOutlined,
+			},
+			{
+				id: 5,
+				content: "Download",
+				Icon: ExportOutlined,
+			},
+			{ id: 6, content: "Settings" },
+			{ id: 7, content: "Logout", action: (callback) => callback() },
+		];
+	}, []);
 
 	const hide = () => {
 		setOpen(false);
@@ -51,8 +59,9 @@ const Navbar = () => {
 		setOpen(newOpen);
 	};
 
-	const handleSearch = (values) => {
-		setSearchQuery(values["search"]);
+	const handleSearchForm = (values) => {
+		setSearchInput(values?.search || "");
+		handleSearch();
 		navigate(_.isEmpty(values) ? paths.home : paths.search);
 	};
 
@@ -97,7 +106,7 @@ const Navbar = () => {
 								{/* Search */}
 								<Form
 									form={form}
-									onFinish={handleSearch}
+									onFinish={handleSearchForm}
 									autoComplete='on'
 									layout='vertical'
 									className='w-full !h-full'>
@@ -125,7 +134,7 @@ const Navbar = () => {
 
 						{/* Right Section */}
 						<div className='flex items-center space-x-6 h-full'>
-							{isAuthenticated ? (
+							{!isAuthenticated ? (
 								<>
 									<div className='flex items-center gap-4 text-white text-sm'>
 										<p className='cursor-pointer text-gray-400 font-bold hover:text-white hover:scale-[1.05] transition-all'>
@@ -134,8 +143,37 @@ const Navbar = () => {
 										<p className='cursor-pointer text-gray-400 font-bold hover:text-white hover:scale-[1.05] transition-all'>
 											Support
 										</p>
-										<p className='cursor-pointer text-gray-400 font-bold hover:text-white hover:scale-[1.05] transition-all'>
-											Download
+										<p className='flex items-center gap-2 cursor-pointer text-gray-400 font-bold hover:text-white hover:scale-[1.05] transition-all'>
+											<DownloadOutlined />
+											<span>Download</span>
+										</p>
+									</div>
+									<div className='w-[1px] h-7 bg-white mr-8'></div>
+									<p
+										className='cursor-pointer text-gray-400 font-bold hover:text-white hover:scale-[1.05] transition-all'
+										onClick={() => navigate(paths.register)}>
+										Sign up
+									</p>
+									<p
+										className='text-center flex items-center bg-white h-full px-8 rounded-full cursor-pointer text-black font-bold hover:bg-gray-200 hover:scale-[1.05] transition-all'
+										onClick={() => navigate(paths.login)}>
+										Log in
+									</p>
+								</>
+							) : (
+								<>
+									<div className='flex items-center gap-4 text-white text-sm'>
+										<p
+											className='capitalize cursor-pointer text-gray-400 font-bold hover:text-white hover:scale-[1.05] transition-all'
+											onClick={() => navigate(paths.chats)}>
+											Chat
+										</p>
+									</div>
+									<div className='flex items-center gap-4 text-white text-sm'>
+										<p
+											className='capitalize cursor-pointer text-gray-400 font-bold hover:text-white hover:scale-[1.05] transition-all'
+											onClick={() => setShowSongUploadForm(true)}>
+											Upload Song
 										</p>
 									</div>
 									<div className='w-[1px] h-7 bg-white mr-8'></div>
@@ -184,19 +222,8 @@ const Navbar = () => {
 										</div>
 									</Popover>
 								</>
-							) : (
-								<>
-									<div className='flex items-center gap-4 text-white text-sm'>
-										<p
-											className='capitalize cursor-pointer text-gray-400 font-bold hover:text-white hover:scale-[1.05] transition-all'
-											onClick={() => setShowSongUploadForm(true)}>
-											Upload song
-										</p>
-									</div>
-									<div className='w-[1px] h-7 bg-white mr-8'></div>
-								</>
 							)}
-							<div className='flex items-center gap-6 text-white text-sm h-full'>
+							{/* <div className='flex items-center gap-6 text-white text-sm h-full'>
 								<span className='flex items-center gap-2 cursor-pointer text-gray-400 font-bold hover:text-white hover:scale-[1.05] transition-all'>
 									<DownloadOutlined />
 									<p>Install App</p>
@@ -241,19 +268,10 @@ const Navbar = () => {
 									</>
 								) : (
 									<>
-										<p
-											className='cursor-pointer text-gray-400 font-bold hover:text-white hover:scale-[1.05] transition-all'
-											onClick={() => navigate(paths.register)}>
-											Sign up
-										</p>
-										<p
-											className='text-center flex items-center bg-white h-full px-8 rounded-full cursor-pointer text-black font-bold hover:bg-gray-200 hover:scale-[1.05] transition-all'
-											onClick={() => navigate(paths.login)}>
-											Log in
-										</p>
+										
 									</>
 								)}
-							</div>
+							</div> */}
 						</div>
 					</div>
 				</nav>
@@ -266,4 +284,4 @@ const Navbar = () => {
 	);
 };
 
-export default React.memo(Navbar);
+export default memo(Navbar);

@@ -8,25 +8,34 @@ import {
 	Upload,
 	Trash2,
 	CheckCircle,
+	Video,
 } from "lucide-react";
 import Overlay from "../Overlay";
 import formatTime from "../../utils/formatTime";
 import { useSong } from "../../contexts/Song";
+import { useGenre } from "../../contexts/genre";
 
 export default function SongUploadForm({ onComplete, show, onShow }) {
 	const [title, setTitle] = useState("");
 	const [selectedGenres, setSelectedGenres] = useState([]);
 	const [songFile, setSongFile] = useState(null);
+	const [videoFile, setVideoFile] = useState(null);
 	const [coverImage, setCoverImage] = useState(null);
 	const [duration, setDuration] = useState("");
 	// const [releaseDate, setReleaseDate] = useState("");
 	const [previewUrl, setPreviewUrl] = useState("");
+	const [videoPreviewUrl, setVideoPreviewUrl] = useState("");
 	const [coverPreviewUrl, setCoverPreviewUrl] = useState("");
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState("");
 	const [success, setSuccess] = useState(false);
 	const [activeStep, setActiveStep] = useState(1);
 	const { create } = useSong();
+	const { genreList, fetchGenreList, loadingFetchGenreList } = useGenre();
+
+	useEffect(() => {
+		fetchGenreList();
+	}, [fetchGenreList]);
 
 	// Mock genres - in a real app, these would come from your API
 	const availableGenres = [
@@ -69,6 +78,16 @@ export default function SongUploadForm({ onComplete, show, onShow }) {
 		});
 	};
 
+	const handleVideoFileChange = (e) => {
+		const file = e.target.files[0];
+		if (!file) return;
+
+		// Create object URL for preview
+		const objectUrl = URL.createObjectURL(file);
+		setVideoPreviewUrl(objectUrl);
+		setVideoFile(file);
+	};
+
 	const handleCoverImageChange = (e) => {
 		const file = e.target.files[0];
 		if (!file) return;
@@ -97,6 +116,7 @@ export default function SongUploadForm({ onComplete, show, onShow }) {
 			// Validate form
 			if (!title) throw new Error("Title is required");
 			if (!songFile) throw new Error("Song file is required");
+			if (!videoFile) throw new Error("Video file is required");
 			if (!duration) throw new Error("Duration could not be determined");
 			if (selectedGenres.length === 0) {
 				throw new Error("At least one genre must be selected");
@@ -107,6 +127,7 @@ export default function SongUploadForm({ onComplete, show, onShow }) {
 			formData.append("duration", duration);
 			formData.append("genre_ids", selectedGenres.join(","));
 			formData.append("audio", songFile);
+			formData.append("video", videoFile);
 			formData.append("cover", coverImage);
 
 			await create(formData);
@@ -120,10 +141,12 @@ export default function SongUploadForm({ onComplete, show, onShow }) {
 				setTitle("");
 				setSelectedGenres([]);
 				setSongFile(null);
+				setVideoFile(null);
 				setCoverImage(null);
 				setDuration("");
 				// setReleaseDate("");
 				setPreviewUrl("");
+				setVideoPreviewUrl("");
 				setCoverPreviewUrl("");
 				setActiveStep(1);
 
@@ -148,13 +171,17 @@ export default function SongUploadForm({ onComplete, show, onShow }) {
 			setError("Please upload a song file");
 			return;
 		}
-		if (activeStep === 3 && selectedGenres.length === 0) {
+		if (activeStep === 3 && !videoFile) {
+			setError("Please upload a video file");
+			return;
+		}
+		if (activeStep === 4 && selectedGenres.length === 0) {
 			setError("Please select at least one genre");
 			return;
 		}
 
 		setError("");
-		setActiveStep((prev) => Math.min(prev + 1, 4));
+		setActiveStep((prev) => Math.min(prev + 1, 5));
 	};
 
 	const prevStep = () => {
@@ -206,7 +233,7 @@ export default function SongUploadForm({ onComplete, show, onShow }) {
 					<div className='bg-black bg-opacity-95 px-8 py-6 text-gray-200'>
 						{/* Progress indicators */}
 						<div className='flex justify-between mb-8'>
-							{[1, 2, 3, 4].map((step) => (
+							{[1, 2, 3, 4, 5].map((step) => (
 								<div key={step} className='flex flex-col items-center'>
 									<div
 										className={`w-10 h-10 rounded-full flex items-center justify-center ${
@@ -225,6 +252,8 @@ export default function SongUploadForm({ onComplete, show, onShow }) {
 											: step === 2
 											? "Audio"
 											: step === 3
+											? "Video"
+											: step === 4
 											? "Genre"
 											: "Media"}
 									</div>
@@ -370,25 +399,93 @@ export default function SongUploadForm({ onComplete, show, onShow }) {
 							</div>
 						)}
 
-						{/* Step 3 - Genres */}
+						{/* Step 3 - Video File */}
 						{activeStep === 3 && (
+							<div className='animate-fadeIn'>
+								<div className='mb-8'>
+									<label
+										htmlFor='videoFile'
+										className='block text-lg font-medium text-gray-200 mb-2'>
+										Upload your music video
+									</label>
+
+									{!videoFile ? (
+										<div className='border-2 border-dashed border-gray-700 rounded-lg p-8 text-center hover:border-green-600 transition-all duration-200'>
+											<label className='cursor-pointer w-full h-full flex flex-col items-center'>
+												<Video className='w-16 h-16 text-green-500 mb-2' />
+												<span className='text-gray-300 font-medium mb-2'>
+													Drag your video file here or click to browse
+												</span>
+												<span className='text-sm text-gray-500'>
+													MP4, MOV or WebM files
+												</span>
+												<input
+													type='file'
+													id='videoFile'
+													accept='video/*'
+													onChange={handleVideoFileChange}
+													className='hidden'
+													required
+												/>
+											</label>
+										</div>
+									) : (
+										<div className='bg-gray-800 rounded-lg p-4'>
+											<div className='flex items-center justify-between mb-3'>
+												<div className='flex items-center'>
+													<Video className='w-6 h-6 text-green-500 mr-2' />
+													<span className='font-medium text-gray-200 truncate max-w-xs'>
+														{videoFile.name}
+													</span>
+												</div>
+												<button
+													type='button'
+													onClick={() => {
+														setVideoFile(null);
+														setVideoPreviewUrl("");
+													}}
+													className='text-red-400 hover:text-red-300 p-1'>
+													<Trash2 className='h-5 w-5' />
+												</button>
+											</div>
+
+											<div className='mb-3'>
+												<video
+													controls
+													src={videoPreviewUrl}
+													className='w-full h-auto rounded'
+												/>
+											</div>
+
+											<div className='flex items-center justify-between text-sm'>
+												<span className='text-gray-400'>
+													Size: {(videoFile.size / (1024 * 1024)).toFixed(2)} MB
+												</span>
+											</div>
+										</div>
+									)}
+								</div>
+							</div>
+						)}
+
+						{/* Step 4 - Genres */}
+						{activeStep === 4 && (
 							<div className='animate-fadeIn'>
 								<div className='mb-8'>
 									<label className='block text-lg font-medium text-gray-200 mb-4'>
 										Select genres that match your song
 									</label>
 									<div className='grid grid-cols-2 sm:grid-cols-4 gap-3'>
-										{availableGenres.map((genre) => (
+										{genreList.map((genre) => (
 											<button
 												key={genre.id}
 												type='button'
 												onClick={() => handleGenreToggle(genre.id)}
-												className={`relative py-3 px-4 rounded-lg text-white font-medium transition-all duration-200
-                      ${
-												selectedGenres.includes(genre.id)
-													? `${genre.color} shadow-md scale-105`
-													: "bg-gray-800 hover:bg-gray-700"
-											}`}>
+												className={`relative py-3 px-4 rounded-lg text-white font-medium transition-all duration-200 ${
+													selectedGenres.includes(genre.id)
+														? `bg-green-600 shadow-md scale-105`
+														: "bg-gray-800 hover:bg-gray-700"
+												}`}>
 												{genre.name}
 												{selectedGenres.includes(genre.id) && (
 													<span className='absolute top-1 right-1'>
@@ -402,8 +499,8 @@ export default function SongUploadForm({ onComplete, show, onShow }) {
 							</div>
 						)}
 
-						{/* Step 4 - Additional Info */}
-						{activeStep === 4 && (
+						{/* Step 5 - Additional Info */}
+						{activeStep === 5 && (
 							<div className='animate-fadeIn space-y-6'>
 								{/* Cover Image */}
 								<div>
@@ -468,30 +565,6 @@ export default function SongUploadForm({ onComplete, show, onShow }) {
 									</div>
 								</div>
 
-								{/* Release Date */}
-								{/* <div>
-									<label
-										htmlFor='releaseDate'
-										className='block text-lg font-medium text-gray-200 mb-2'>
-										Release Date
-									</label>
-									<div className='relative'>
-										<div className='absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none'>
-											<Calendar className='h-5 w-5 text-gray-500' />
-										</div>
-										<input
-											type='date'
-											id='releaseDate'
-											value={releaseDate}
-											onChange={(e) => setReleaseDate(e.target.value)}
-											className='w-full pl-10 px-4 py-3 border-2 border-gray-800 rounded-lg bg-gray-900 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all text-white'
-										/>
-									</div>
-									<p className='text-sm text-gray-500 mt-1'>
-										When would you like your song to be available to listeners?
-									</p>
-								</div> */}
-
 								{/* Summary */}
 								<div className='bg-gray-900 p-4 rounded-lg mt-6 border border-gray-800'>
 									<h3 className='font-medium text-gray-300 mb-2'>Preview</h3>
@@ -526,6 +599,11 @@ export default function SongUploadForm({ onComplete, show, onShow }) {
 													{formatTime(duration)}
 												</p>
 											)}
+											{videoFile && (
+												<p className='text-xs text-green-400'>
+													Video: {videoFile.name.split(".").pop().toUpperCase()}
+												</p>
+											)}
 										</div>
 									</div>
 								</div>
@@ -546,7 +624,7 @@ export default function SongUploadForm({ onComplete, show, onShow }) {
 								Back
 							</button>
 
-							{activeStep < 4 ? (
+							{activeStep < 5 ? (
 								<button
 									onClick={nextStep}
 									className='px-6 py-2 bg-gradient-to-r from-green-500 to-green-800 text-white rounded-lg font-medium hover:from-green-600 hover:to-green-700 shadow-md transition-all duration-200 cursor-pointer'>

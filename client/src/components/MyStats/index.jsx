@@ -1,9 +1,9 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { Row, Col, Card, Statistic, Spin, Alert, Typography } from 'antd';
-import { CustomerServiceOutlined, DownloadOutlined } from '@ant-design/icons'; 
-import { instance } from '../../contexts/Axios'; 
-import { apis } from '../../constants/apis';   
-import { useAuth } from '../../contexts/Auth'; 
+import { CustomerServiceOutlined, DownloadOutlined } from '@ant-design/icons';
+import { instance } from '../../contexts/Axios';
+import { apis } from '../../constants/apis';
+import { useAuth } from '../../contexts/Auth';
 
 const { Title } = Typography;
 
@@ -11,7 +11,7 @@ const MyStats = () => {
     const [stats, setStats] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
-    const { user, isAuthenticated } = useAuth(); 
+    const { user, isAuthenticated } = useAuth();
 
     const fetchMyStats = useCallback(async () => {
         if (!isAuthenticated || !user) {
@@ -22,7 +22,6 @@ const MyStats = () => {
         setLoading(true);
         setError(null);
         try {
-
             const response = await instance.get(apis.users.getStats());
             if (response.status === 200) {
                 setStats(response.data);
@@ -32,21 +31,25 @@ const MyStats = () => {
             }
         } catch (err) {
             console.error("Error fetching user statistics:", err);
-            setError(err.response?.data?.detail || err.response?.data?.error || err.message || "An error occurred while fetching your statistics.");
+            setError(
+                err.response?.data?.detail ||
+                err.response?.data?.error ||
+                err.message ||
+                "An error occurred while fetching your statistics."
+            );
             setStats(null);
         } finally {
             setLoading(false);
         }
-    }, [isAuthenticated, user]); 
+    }, [isAuthenticated, user]);
 
     useEffect(() => {
-        fetchMyStats(); 
-    }, [fetchMyStats]); 
+        fetchMyStats();
+    }, [fetchMyStats]);
 
     if (!isAuthenticated) {
-         return <Alert message="Please log in to view your statistics." type="info" />;
+        return <Alert message="Please log in to view your statistics." type="info" />;
     }
-
 
     return (
         <div style={{ padding: '20px' }}>
@@ -56,7 +59,7 @@ const MyStats = () => {
                 {stats ? (
                     <Row gutter={16}>
                         <Col xs={24} sm={12}>
-                            <Card variant="borderless"> 
+                            <Card variant="borderless">
                                 <Statistic
                                     title="Total Listens"
                                     value={stats.total_listens !== undefined ? stats.total_listens : '--'}
@@ -65,7 +68,7 @@ const MyStats = () => {
                             </Card>
                         </Col>
                         <Col xs={24} sm={12}>
-                             <Card variant="borderless">
+                            <Card variant="borderless">
                                 <Statistic
                                     title="Total Downloads"
                                     value={stats.total_downloads !== undefined ? stats.total_downloads : '--'}

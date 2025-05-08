@@ -7,6 +7,7 @@ import Axios from "./contexts/Axios";
 import PlayerProvider from "./contexts/Player";
 import SongProvider from "./contexts/Song";
 import UserProvider from "./contexts/User";
+import ChatProvider from "./contexts/Chat";
 import GenreProvider from "./contexts/genre";
 import PlaylistProvider from "./contexts/playlist";
 const App = () => {
@@ -19,9 +20,12 @@ const App = () => {
               <SongProvider>
                 <GenreProvider>
                   <PlaylistProvider>
-                    <Toast />
-                    <AppRoutes />
-                    <Toast />
+                    <SearchProvider>
+                      <ChatProvider>
+                        <Toast />
+                        <AppRoutes />
+                      </ChatProvider>
+                    </SearchProvider>
                   </PlaylistProvider>
                 </GenreProvider>
               </SongProvider>

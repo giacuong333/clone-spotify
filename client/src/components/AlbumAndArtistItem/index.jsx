@@ -10,7 +10,7 @@ const AlbumAndArtistItem = ({ item, type, index, list }) => {
 
 	const handleClickItem = (event, path) => {
 		event.stopPropagation();
-		navigate(path.replace(":id", item?.id));
+		navigate(`${path}?detailsId=${item?.id}&type=${type}`);
 	};
 
 	const handlePlay = (event) => {
@@ -23,11 +23,11 @@ const AlbumAndArtistItem = ({ item, type, index, list }) => {
 
 	return (
 		<li
-			className='w-full h-full group'
+			className='group'
 			onClick={(event) => handleClickItem(event, paths.details)}>
-			<div className='w-full flex flex-col items-start justify-center cursor-pointer hover:bg-neutral-800 p-4 rounded-md'>
+			<div className='w-40 flex flex-col items-start justify-center cursor-pointer hover:bg-neutral-800 p-4 rounded-md'>
 				{/* Image */}
-				<div className='min-h-32 min-w-32 relative'>
+				<div className='min-h-32 min-w-32 max-w-32 relative'>
 					<img
 						src={
 							item?.cover_url || // For songs
