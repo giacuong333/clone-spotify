@@ -19,6 +19,7 @@ from .serializers import (
     UserDetailSerializer,
     UserUpdateSerializer,
 )
+from apps.songs.serializers import EnhancedSongSerializer
 from rest_framework.generics import (
     ListCreateAPIView,
     RetrieveAPIView,
@@ -325,3 +326,13 @@ class UserDeleteView(DestroyAPIView):
             {"message": "User soft-deleted successfully."},
             status=status.HTTP_204_NO_CONTENT,
         )
+
+
+class UserSearchView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        query = request.query_params.get("q", "")
+        result = User.search(query)
+        serializer = UserCreationSerializer(result, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)

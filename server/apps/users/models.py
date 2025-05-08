@@ -56,9 +56,9 @@ class User(Document):
     @property
     def is_anonymous(self):
         return False
-    
+
     def get_username(self):
-         return self.email
+        return self.email
 
     def get_id(self):
         return str(self.id)
@@ -110,3 +110,14 @@ class User(Document):
         user.deleted_at = datetime.datetime.now()
         user.save()
         return True
+
+    @staticmethod
+    def search(query):
+        try:
+            if not query or query.strip() == "":
+                return User.objects.none()
+            return User.objects.filter(
+                name__icontains=query, deleted_at=None, role="user"
+            )
+        except DoesNotExist:
+            return []

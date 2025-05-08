@@ -1,7 +1,12 @@
 import React from "react";
 import SongItem from "../SongItem";
 
-const SongList = ({ songList, isSearch }) => {
+const SongList = ({ songList }) => {
+	console.log("Song list", songList);
+	if (songList?.length === 0) {
+		return <p className='text-white'>No songs</p>;
+	}
+
 	return (
 		<ul className='flex flex-col gap-2'>
 			{songList?.map((item, index) => {

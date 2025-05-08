@@ -18,6 +18,7 @@ class Song(Document):
     title = StringField(required=True)
     genre = ListField(ReferenceField(Genre))
     audio = FileField(required=True)
+    video = FileField(required=True)
     cover = FileField(required=True)
     user = ReferenceField(User, required=True, default=None)
     duration = IntField(required=True)
@@ -58,3 +59,10 @@ class Song(Document):
             return result > 0
         except DoesNotExist:
             return False
+        
+    @staticmethod
+    def search(query): 
+        try: 
+            return Song.objects.filter(title__icontains=query, deleted_at=None)
+        except DoesNotExist: 
+            return []

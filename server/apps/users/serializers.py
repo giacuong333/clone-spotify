@@ -34,6 +34,19 @@ class UserCreationSerializer(serializers.Serializer):
 class UserListSerializer(serializers.Serializer):
     id = serializers.CharField(read_only=True, source="pk")
     name = serializers.CharField(read_only=True)
+    email = serializers.CharField()
+    image = serializers.SerializerMethodField(allow_null=True, read_only=True)
+
+    def get_image(self, obj):
+        try:
+            if obj.image and hasattr(obj.image, "grid_id"):
+                grid_file = obj.image.grid_id
+                content = obj.image.read()
+                base64_data = base64.b64encode(content).decode("utf-8")
+                return f"data:image/jpeg;base64,{base64_data}"
+        except Exception as e:
+            print("Error reading image from GridFS:", e)
+        return None
 
 
 # class UserRegisterSerializer(serializers.Serializer):
@@ -45,7 +58,7 @@ class UserListSerializer(serializers.Serializer):
 #         user = User.create(validated_data)
 #         if isinstance(user, ValueError):
 #             raise serializers.ValidationError({"message": str(user)})
-#             return {"_id": str(user.id)}  
+#             return {"_id": str(user.id)}
 
 #         # from utils.hash_and_verify_password import hash_password
 #         # validated_data['password'] = hash_password(validated_data['password'])

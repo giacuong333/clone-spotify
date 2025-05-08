@@ -6,7 +6,7 @@ const Headerbar = () => {
 			<h2 className='font-bold text-lg'>Chat</h2>
 			<div className='flex items-center'>
 				<button className='p-2 hover:bg-gray-800 rounded-full'>
-					<Menu size={20} />
+					<Menu size={20} className='cursor-pointer' />
 				</button>
 			</div>
 		</div>

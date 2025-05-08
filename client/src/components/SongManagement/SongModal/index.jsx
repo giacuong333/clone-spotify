@@ -7,10 +7,14 @@ import {
 	ClockCircleOutlined,
 	CalendarOutlined,
 	CheckCircleOutlined,
+	VideoCameraOutlined,
+	AudioOutlined,
+	ExpandOutlined,
+	DownloadOutlined,
 } from "@ant-design/icons";
 import Overlay from "../../Overlay";
 import VolumeIcon from "../../Icons/VolumnIcon";
-import { Spin } from "antd";
+import { Spin, Button, Tooltip } from "antd";
 import formatDate from "../../../utils/formatDate";
 import formatTime from "../../../utils/formatTime";
 import { useSong } from "../../../contexts/Song";
@@ -26,20 +30,39 @@ const SongModal = ({
 	const [duration, setDuration] = useState(0);
 	const [volume, setVolume] = useState(0.5);
 	const [showVolume, setShowVolume] = useState(false);
+	const [isFullscreen, setIsFullscreen] = useState(false);
 
 	const previousVolumeRef = useRef(0.5);
 	const audioRef = useRef(null);
+	const videoRef = useRef(null);
+	const activeMediaRef = useRef(null);
 	const progressBarRef = useRef(null);
 	const volumeTimerRef = useRef(null);
-	const { handleDownload } = useSong();
+	const videoContainerRef = useRef(null);
+	const { handleDownload, handleDownloadVideo } = useSong();
+
+	const isVideo = songDetails?.video_url || songDetails?.media_type === "video";
+
+	useEffect(() => {
+		// Set the active media reference based on type
+		if (isVideo && videoRef.current) {
+			activeMediaRef.current = videoRef.current;
+		} else if (audioRef.current) {
+			activeMediaRef.current = audioRef.current;
+		}
+
+		// Reset playing state when media changes
+		setIsPlaying(false);
+		setCurrentTime(0);
+	}, [songDetails?.video_url, songDetails?.audio_url, isVideo]);
 
 	// Handle play/pause
 	const togglePlay = () => {
-		if (audioRef.current) {
+		if (activeMediaRef.current) {
 			if (isPlaying) {
-				audioRef.current.pause();
+				activeMediaRef.current.pause();
 			} else {
-				audioRef.current.play().catch((error) => {
+				activeMediaRef.current.play().catch((error) => {
 					console.error("Playback failed:", error);
 				});
 			}
@@ -49,9 +72,11 @@ const SongModal = ({
 
 	// Update progress bar
 	const updateTime = () => {
-		if (audioRef.current) {
-			setCurrentTime(audioRef.current.currentTime);
-			setDuration(audioRef.current.duration || songDetails?.duration || 0);
+		if (activeMediaRef.current) {
+			setCurrentTime(activeMediaRef.current.currentTime);
+			setDuration(
+				activeMediaRef.current.duration || songDetails?.duration || 0
+			);
 		}
 	};
 
@@ -60,9 +85,9 @@ const SongModal = ({
 		e.preventDefault();
 		if (
 			progressBarRef.current &&
-			audioRef.current &&
-			audioRef.current.duration &&
-			audioRef.current.readyState >= 2
+			activeMediaRef.current &&
+			activeMediaRef.current.duration &&
+			activeMediaRef.current.readyState >= 2
 		) {
 			const rect = progressBarRef.current.getBoundingClientRect();
 			const clickPosition = e.clientX - rect.left;
@@ -71,8 +96,8 @@ const SongModal = ({
 				0,
 				Math.min(1, clickPosition / width)
 			);
-			const newTime = progressPercentage * audioRef.current.duration;
-			audioRef.current.currentTime = newTime;
+			const newTime = progressPercentage * activeMediaRef.current.duration;
+			activeMediaRef.current.currentTime = newTime;
 			setCurrentTime(newTime);
 		}
 	};
@@ -82,8 +107,8 @@ const SongModal = ({
 		const newVolume = parseFloat(e.target.value);
 		setVolume(newVolume);
 		previousVolumeRef.current = newVolume;
-		if (audioRef.current) {
-			audioRef.current.volume = newVolume;
+		if (activeMediaRef.current) {
+			activeMediaRef.current.volume = newVolume;
 		}
 
 		// Show volume indicator
@@ -100,23 +125,50 @@ const SongModal = ({
 		}, 1000);
 	}, []);
 
+	// Toggle fullscreen for video
+	const toggleFullscreen = () => {
+		if (isVideo && videoContainerRef.current) {
+			if (!document.fullscreenElement) {
+				videoContainerRef.current.requestFullscreen().catch((err) => {
+					console.error(
+						`Error attempting to enable fullscreen: ${err.message}`
+					);
+				});
+			} else {
+				document.exitFullscreen();
+			}
+		}
+	};
+
+	// Handle fullscreen change events
+	useEffect(() => {
+		const handleFullscreenChange = () => {
+			setIsFullscreen(!!document.fullscreenElement);
+		};
+
+		document.addEventListener("fullscreenchange", handleFullscreenChange);
+		return () => {
+			document.removeEventListener("fullscreenchange", handleFullscreenChange);
+		};
+	}, []);
+
 	// Calculate progress percentage
 	const progressPercentage = duration > 0 ? (currentTime / duration) * 100 : 0;
 
 	// Reset playing state when modal closes
 	useEffect(() => {
-		if (!toggle && isPlaying && audioRef.current) {
-			audioRef.current.pause();
+		if (!toggle && isPlaying && activeMediaRef.current) {
+			activeMediaRef.current.pause();
 			setIsPlaying(false);
 		}
 	}, [toggle, isPlaying]);
 
-	// Set initial volume when audio element is created
+	// Set initial volume when media element is created
 	useEffect(() => {
-		if (audioRef.current) {
-			audioRef.current.volume = volume;
+		if (activeMediaRef.current) {
+			activeMediaRef.current.volume = volume;
 		}
-	}, [songDetails?.audio_url, volume]);
+	}, [songDetails?.audio_url, songDetails?.video_url, volume]);
 
 	// Clean up volume timer on unmount
 	useEffect(() => {
@@ -127,13 +179,22 @@ const SongModal = ({
 		};
 	}, []);
 
-	const handleDownloadSong = (event) => {
-		handleDownload(
-			event,
-			songDetails?.audio_url,
-			songDetails?.title,
-			songDetails?.user?.name
-		);
+	const handleDownloadMedia = (event) => {
+		if (!isVideo) {
+			handleDownload(
+				event,
+				songDetails?.audio_url,
+				songDetails?.title,
+				songDetails?.user?.name
+			);
+		} else {
+			handleDownloadVideo(
+				event,
+				songDetails?.video_url,
+				songDetails?.title,
+				songDetails?.user?.name
+			);
+		}
 	};
 
 	return (
@@ -148,8 +209,8 @@ const SongModal = ({
 							? "pointer-events-auto opacity-100 scale-100"
 							: "pointer-events-none opacity-0 scale-95"
 					}`}>
-					{/* Hidden audio element (Customize the control) */}
-					{songDetails?.audio_url && (
+					{/* Hidden media elements (Customize the control) */}
+					{songDetails?.audio_url && !isVideo && (
 						<audio
 							ref={audioRef}
 							src={songDetails.audio_url}
@@ -174,9 +235,16 @@ const SongModal = ({
 						)}
 						<div className='relative bg-gradient-to-l from-black/5 to-black/20 p-6 text-white'>
 							<div className='flex justify-between items-start'>
-								<h2 className='text-3xl font-bold text-black/70'>
-									{songDetails?.title || "Song Details"}
-								</h2>
+								<div className='flex items-center space-x-2'>
+									<h2 className='text-3xl font-bold text-black/70'>
+										{songDetails?.title || "Media Details"}
+									</h2>
+									{isVideo ? (
+										<VideoCameraOutlined className='text-blue-500 text-xl' />
+									) : (
+										<AudioOutlined className='text-purple-500 text-xl' />
+									)}
+								</div>
 								<button
 									className='bg-white/20 text-white hover:bg-white/50 rounded-md py-2 px-2.5 transition-colors cursor-pointer'
 									onClick={() => setToggle(false)}>
@@ -189,33 +257,57 @@ const SongModal = ({
 						</div>
 					</div>
 
-					{/* Album cover and details */}
+					{/* Content area */}
 					<div className='p-6 overflow-y-auto max-h-[calc(90vh-120px)]'>
 						<div className='flex flex-col lg:flex-row gap-6'>
-							{/* Album Cover with Play Button Overlay */}
+							{/* Media Player Area */}
 							<div className='lg:w-1/3 relative group'>
-								{songDetails?.cover_url ? (
-									<div className='relative'>
-										<img
-											src={songDetails.cover_url}
-											alt={songDetails.title || "Album cover"}
-											className='w-full aspect-square object-cover rounded-lg shadow-md group-hover:border-2 group-hover:border-black transition-all'
+								{isVideo ? (
+									// Video Container
+									<div className='relative' ref={videoContainerRef}>
+										<video
+											ref={videoRef}
+											src={songDetails.video_url}
+											poster={songDetails.cover_url}
+											className='w-full rounded-lg shadow-md'
+											onTimeUpdate={updateTime}
+											onLoadedMetadata={updateTime}
+											onEnded={() => setIsPlaying(false)}
+											preload='metadata'
 										/>
+										{!isPlaying && (
+											<div
+												className='absolute inset-0 flex items-center justify-center bg-black/30 rounded-lg cursor-pointer'
+												onClick={togglePlay}>
+												<PlayCircleFilled className='text-white text-6xl' />
+											</div>
+										)}
+									</div>
+								) : (
+									// Audio with Cover Image
+									<div className='relative'>
+										{songDetails?.cover_url ? (
+											<img
+												src={songDetails.cover_url}
+												alt={songDetails.title || "Album cover"}
+												className='w-full aspect-square object-cover rounded-lg shadow-md'
+											/>
+										) : (
+											<div className='w-full aspect-square bg-gray-200 rounded-lg flex items-center justify-center'>
+												<span className='text-gray-400'>No Cover</span>
+											</div>
+										)}
 										{songDetails?.audio_url && (
 											<div
 												className='absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg cursor-pointer'
 												onClick={togglePlay}>
 												{isPlaying ? (
-													<PauseCircleFilled className='text-white text-6xl' />
+													<PauseCircleFilled className='!text-white text-6xl' />
 												) : (
-													<PlayCircleFilled className='text-white text-6xl' />
+													<PlayCircleFilled className='!text-white text-6xl' />
 												)}
 											</div>
 										)}
-									</div>
-								) : (
-									<div className='w-full aspect-square bg-gray-200 rounded-lg flex items-center justify-center'>
-										<span className='text-gray-400'>No Cover</span>
 									</div>
 								)}
 							</div>
@@ -271,8 +363,8 @@ const SongModal = ({
 									</div>
 								</div>
 
-								{/* Custom Audio Player */}
-								{songDetails?.audio_url && (
+								{/* Custom Media Player Controls */}
+								{(songDetails?.audio_url || songDetails?.video_url) && (
 									<div className='mt-6 bg-gray-100 rounded-lg p-4'>
 										<div className='flex items-center space-x-4 mb-3'>
 											<button
@@ -286,6 +378,28 @@ const SongModal = ({
 											</button>
 											<div className='text-sm font-medium'>
 												{formatTime(currentTime)} / {formatTime(duration)}
+											</div>
+
+											{/* Additional Controls */}
+											<div className='ml-auto flex items-center space-x-2'>
+												{isVideo && (
+													<Tooltip title='Fullscreen'>
+														<Button
+															icon={<ExpandOutlined />}
+															onClick={toggleFullscreen}
+															size='small'
+															type='text'
+														/>
+													</Tooltip>
+												)}
+												<Tooltip title='Download'>
+													<Button
+														icon={<DownloadOutlined />}
+														onClick={handleDownloadMedia}
+														size='small'
+														type='text'
+													/>
+												</Tooltip>
 											</div>
 										</div>
 
@@ -343,14 +457,14 @@ const SongModal = ({
 
 								{/* Links */}
 								<div className='mt-6 pt-4 border-t border-gray-200'>
-									{songDetails?.audio_url && (
+									{(songDetails?.audio_url || songDetails?.video_url) && (
 										<div className='flex items-center justify-between mb-2'>
 											<span className='text-sm font-medium text-gray-500'>
-												File URL:
+												{isVideo ? "Video File:" : "Audio File:"}
 											</span>
 											<button
 												className='cursor-pointer hover:underline'
-												onClick={handleDownloadSong}>
+												onClick={handleDownloadMedia}>
 												Download
 											</button>
 										</div>

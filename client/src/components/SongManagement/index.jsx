@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Table, Tag, Input, Button, Tooltip, Badge } from "antd";
+import { Table, Tag, Input, Button, Tooltip, Badge, Select } from "antd";
 import { useSong } from "../../contexts/Song";
 import { useAuth } from "../../contexts/Auth";
 import {
@@ -9,6 +9,8 @@ import {
 	PlayCircleOutlined,
 	FilterOutlined,
 	ReloadOutlined,
+	VideoCameraOutlined,
+	AudioOutlined,
 } from "@ant-design/icons";
 import SongModal from "./SongModal";
 import ConfirmPopup from "../ConfirmPopup";
@@ -31,6 +33,7 @@ const SongManagement = () => {
 	const [isConfirmPopupVisible, setIsConfirmPopupVisible] = useState(false);
 	const [searchText, setSearchText] = useState("");
 	const [isDeleting, setIsDeleting] = useState(false);
+	const [mediaTypeFilter, setMediaTypeFilter] = useState("all");
 
 	useEffect(() => {
 		fetchSongList();
@@ -46,8 +49,12 @@ const SongManagement = () => {
 		setSearchText(e.target.value);
 	};
 
+	const handleMediaTypeChange = (value) => {
+		setMediaTypeFilter(value);
+	};
+
 	const filteredData = useMemo(() => {
-		return songList.filter(
+		let filtered = songList.filter(
 			(song) =>
 				song?.title?.toLowerCase().includes(searchText.toLowerCase()) ||
 				song?.user?.name?.toLowerCase().includes(searchText.toLowerCase()) ||
@@ -55,7 +62,17 @@ const SongManagement = () => {
 					g.name.toLowerCase().includes(searchText.toLowerCase())
 				)
 		);
-	}, [songList, searchText]);
+
+		// Apply media type filter
+		if (mediaTypeFilter !== "all") {
+			filtered = filtered.filter((song) => {
+				const hasVideo = song?.video_url || song?.media_type === "video";
+				return mediaTypeFilter === "video" ? hasVideo : !hasVideo;
+			});
+		}
+
+		return filtered;
+	}, [songList, searchText, mediaTypeFilter]);
 
 	const dataSource = filteredData.map((s, index) => ({
 		key: s?.id,
@@ -63,20 +80,21 @@ const SongManagement = () => {
 		title: s?.title,
 		genre: s?.genre?.map((g) => g.name) || [],
 		user: s?.user?.name || "N/A",
-		file_url: s?.file_url,
+		file_url: s?.file_url || s?.audio_url,
+		video_url: s?.video_url,
 		cover_url: s?.cover_url,
 		duration: s?.duration,
 		released_at: s?.released_at,
 		approved_at: s?.approved_at,
 		deleted_at: s?.deleted_at,
-		// status: s?.approved_at ? "approved" : "pending",
+		media_type: s?.video_url || s?.media_type === "video" ? "video" : "audio",
 	}));
 
-	// const getStatusColor = (status) => {
-	// 	if (status === "approved") return "green";
-	// 	if (status === "pending") return "orange";
-	// 	return "default";
-	// };
+	const getMediaTypeIcon = (type) => {
+		if (type === "video")
+			return <VideoCameraOutlined className='!text-white' />;
+		return <AudioOutlined className='!text-white' />;
+	};
 
 	const columns = useMemo(
 		() => [
@@ -87,12 +105,12 @@ const SongManagement = () => {
 				width: 60,
 			},
 			{
-				title: "Song",
+				title: "Media",
 				dataIndex: "title",
 				key: "title",
 				render: (text, record) => (
 					<div className='flex items-center space-x-3'>
-						<div className='w-10 h-10 bg-gray-200 rounded-md flex items-center justify-center overflow-hidden'>
+						<div className='w-10 h-10 bg-gray-200 rounded-md flex items-center justify-center overflow-hidden relative'>
 							{record.cover_url ? (
 								<img
 									src={record.cover_url}
@@ -102,12 +120,29 @@ const SongManagement = () => {
 							) : (
 								<PlayCircleOutlined className='text-gray-400' />
 							)}
+							{/* Media type indicator */}
+							<span className='absolute bottom-0 right-0 p-0.5 rounded-tl-md bg-black/50'>
+								{getMediaTypeIcon(record.media_type)}
+							</span>
 						</div>
 						<div>
 							<div className='font-medium text-gray-800'>{text}</div>
 							<div className='text-xs text-gray-500'>{record.user}</div>
 						</div>
 					</div>
+				),
+			},
+			{
+				title: "Type",
+				dataIndex: "media_type",
+				key: "media_type",
+				width: 90,
+				render: (type) => (
+					<Tag
+						color={type === "video" ? "blue" : "purple"}
+						className='uppercase'>
+						{type}
+					</Tag>
 				),
 			},
 			{
@@ -138,18 +173,6 @@ const SongManagement = () => {
 				width: 120,
 				render: (text) => (text ? new Date(text).toLocaleDateString() : "N/A"),
 			},
-			// {
-			// 	title: "Status",
-			// 	dataIndex: "status",
-			// 	key: "status",
-			// 	width: 120,
-			// 	render: (status) => (
-			// 		<Badge
-			// 			status={status === "approved" ? "success" : "warning"}
-			// 			text={<span className='capitalize'>{status}</span>}
-			// 		/>
-			// 	),
-			// },
 			{
 				title: "Actions",
 				dataIndex: "actions",
@@ -209,13 +232,14 @@ const SongManagement = () => {
 	const handleRefresh = () => {
 		fetchSongList();
 		setSearchText("");
+		setMediaTypeFilter("all");
 	};
 
 	return (
 		<div className='space-y-6'>
 			{/* Header Section */}
 			<div className='flex justify-between items-center'>
-				<h1 className='text-2xl font-bold text-gray-800'>Song Management</h1>
+				<h1 className='text-2xl font-bold text-gray-800'>Media Management</h1>
 				<Button
 					type='text'
 					icon={<ReloadOutlined />}
@@ -239,11 +263,17 @@ const SongManagement = () => {
 				</div>
 
 				<div className='flex items-center gap-2'>
-					<Button
-						icon={<FilterOutlined />}
-						className='border-gray-300 text-gray-600'>
-						Filter
-					</Button>
+					<Select
+						defaultValue='all'
+						value={mediaTypeFilter}
+						onChange={handleMediaTypeChange}
+						style={{ width: 120 }}
+						options={[
+							{ value: "all", label: "All Media" },
+							{ value: "audio", label: "Audio Only" },
+							{ value: "video", label: "Videos" },
+						]}
+					/>
 
 					{selectedRowKeys.length > 0 && (
 						<Button
@@ -266,8 +296,8 @@ const SongManagement = () => {
 					columns={columns}
 					loading={loadingFetchSongList}
 					pagination={{
-						pageSize: 10,
-						showTotal: (total) => `Total ${total} songs`,
+						pageSize: 5,
+						showTotal: (total) => `Total ${total} items`,
 						className: "p-4",
 					}}
 					className='custom-table'
@@ -288,7 +318,7 @@ const SongManagement = () => {
 				setToggle={handleCancelDeleteSongs}
 				onOk={processDeleteSongs}
 				onCancel={handleCancelDeleteSongs}
-				title='Are you sure you want to delete selected songs?'
+				title='Are you sure you want to delete selected media items?'
 				message='This action can be undone.'
 			/>
 		</div>

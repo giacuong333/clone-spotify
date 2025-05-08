@@ -14,7 +14,6 @@ const GenreProvider = ({ children }) => {
 		try {
 			setLoadingFetchGenreList(true);
 			const response = await instance.get(apis.genres.getAll());
-			console.log("Fetched genre list:", response.data); // Log danh sách thể loại
 			if (response.status === 200) {
 				setGenreList(response.data);
 			}

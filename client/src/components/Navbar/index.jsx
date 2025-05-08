@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import { memo, useMemo, useState } from "react";
 import {
 	HomeOutlined,
 	SearchOutlined,
@@ -13,13 +13,15 @@ import paths from "../../constants/paths";
 import _ from "lodash";
 import { useAuth } from "../../contexts/Auth";
 import SongUploadForm from "../SongUploadForm";
+import { useSearch } from "../../contexts/Search";
 
 const Navbar = () => {
 	const [form] = Form.useForm();
 	const navigate = useNavigate();
-	const [open, setOpen] = React.useState(false);
-	const { isAuthenticated, user, logout } = useAuth();
+	const [open, setOpen] = useState(false);
 	const [showSongUploadForm, setShowSongUploadForm] = useState(false);
+	const { isAuthenticated, user, logout } = useAuth();
+	const { setSearchInput, handleSearch } = useSearch();
 
 	const popoverItems = useMemo(() => {
 		return [
@@ -57,8 +59,9 @@ const Navbar = () => {
 		setOpen(newOpen);
 	};
 
-	const handleSearch = (values) => {
-		setSearchQuery(values["search"]);
+	const handleSearchForm = (values) => {
+		setSearchInput(values?.search || "");
+		handleSearch();
 		navigate(_.isEmpty(values) ? paths.home : paths.search);
 	};
 
@@ -103,7 +106,7 @@ const Navbar = () => {
 								{/* Search */}
 								<Form
 									form={form}
-									onFinish={handleSearch}
+									onFinish={handleSearchForm}
 									autoComplete='on'
 									layout='vertical'
 									className='w-full !h-full'>
@@ -281,4 +284,4 @@ const Navbar = () => {
 	);
 };
 
-export default React.memo(Navbar);
+export default memo(Navbar);

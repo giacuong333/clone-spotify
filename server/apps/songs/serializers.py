@@ -37,9 +37,10 @@ class SongSerializer(serializers.Serializer):
 
 
 class EnhancedSongSerializer(SongSerializer):
-    """Enhanced serializer that includes audio and cover URLs"""
+    """Enhanced serializer that includes audio, video and cover URLs"""
 
     audio_url = serializers.SerializerMethodField()
+    video_url = serializers.SerializerMethodField()
     cover_url = serializers.SerializerMethodField()
 
     def get_audio_url(self, obj):
@@ -48,6 +49,14 @@ class EnhancedSongSerializer(SongSerializer):
         if request and obj.audio and hasattr(obj.audio, "grid_id"):
             base_url = request.build_absolute_uri("/").rstrip("/")
             return f"{base_url}/api/songs/{obj.id}/audio"
+        return None
+
+    def get_video_url(self, obj):
+        """Generate URL for streaming the video file"""
+        request = self.context.get("request")
+        if request and obj.video and hasattr(obj.video, "grid_id"):
+            base_url = request.build_absolute_uri("/").rstrip("/")
+            return f"{base_url}/api/songs/{obj.id}/video"
         return None
 
     def get_cover_url(self, obj):
@@ -65,6 +74,7 @@ class SongCreateSerializer(serializers.Serializer):
     title = serializers.CharField()
     genre_ids = serializers.ListField(child=serializers.CharField(), required=False)
     audio = serializers.FileField()
+    video = serializers.FileField()  # Added video field as required
     cover = serializers.FileField(required=False)
     duration = serializers.IntegerField()
     released_at = serializers.DateTimeField(required=False)
@@ -103,7 +113,9 @@ class SongCreateSerializer(serializers.Serializer):
         validated_data["genre"] = genres
 
         # Add released_at
-        validated_data["released_at"] = datetime.now()
+        validated_data["released_at"] = validated_data.get(
+            "released_at", datetime.now()
+        )
 
         # Add deleted_at null
         validated_data["deleted_at"] = validated_data.get("deleted_at", None)

@@ -11,10 +11,12 @@ from .views import (
     UserDeleteView,
     AdminStatsView,
     UserRenderView,
-    UserUpdateView
+    UserUpdateView,
+    UserSearchView,
 )
 
 urlpatterns = [
+    path("query/", UserSearchView.as_view(), name="user-query"),
     path("register/", RegisterUserView.as_view(), name="user_register"),
     path("profile/", UserProfileView.as_view(), name="user_profile"),
     path("stats/", UserStatsView.as_view(), name="user_stats"),
@@ -25,9 +27,7 @@ urlpatterns = [
     path("<str:user_id>/stats/", UserStatsByIdView.as_view(), name="admin_user_stats"),
     path("<str:user_id>/delete/", UserDeleteView.as_view(), name="admin_user_delete"),
     path("admin/stats/", AdminStatsView.as_view(), name="admin_overall_stats"),
-    
     path("<str:id>", UserDetailView.as_view(), name="user-detail"),
     path("<str:id>/update", UserUpdateView.as_view(), name="user-update"),
     path("<str:id>/delete", UserDeleteView.as_view(), name="user-delete"),
-    
 ]

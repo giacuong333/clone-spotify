@@ -1,39 +1,50 @@
-import { useState } from "react";
 import { Send, Paperclip, Mic, Smile } from "lucide-react";
+import { useChat } from "../../../contexts/Chat";
 
-const MessageInput = ({ onSendMessage }) => {
-	const [input, setInput] = useState("");
+const MessageInput = () => {
+	const { inputMessage, setInputMessage, sendMessage } = useChat();
 
-	const handleSend = () => {
-		if (input.trim() === "") return;
-		onSendMessage(input);
-		setInput("");
+	const handleSetInputMessage = (e) => {
+		setInputMessage(e.target.value);
+	};
+
+	const handleKeyPress = (e) => {
+		if (e.key === "Enter" && !e.shiftKey) {
+			e.preventDefault();
+			sendMessage(inputMessage);
+		}
+	};
+
+	const handleSendClick = (e) => {
+		e.preventDefault();
+		sendMessage(inputMessage);
 	};
 
 	return (
 		<div className='p-4 border-t border-gray-800'>
-			<div className='flex items-center bg-gray-800 rounded-full px-4 py-2'>
+			<div className='flex items-center bg-gray-800 rounded-full p-2 ps-4'>
 				<button className='text-gray-400 mr-2'>
-					<Paperclip size={20} />
+					<Paperclip size={20} className='cursor-pointer' />
 				</button>
 				<input
 					type='text'
-					value={input}
-					onChange={(e) => setInput(e.target.value)}
-					onKeyPress={(e) => e.key === "Enter" && handleSend()}
+					value={inputMessage}
+					onChange={handleSetInputMessage}
+					onKeyDown={handleKeyPress}
 					placeholder='Nhập tin nhắn...'
 					className='flex-1 bg-transparent outline-none text-white'
 				/>
 				<button className='text-gray-400 mx-2'>
-					<Smile size={20} />
+					<Smile size={20} className='cursor-pointer' />
 				</button>
 				<button className='text-gray-400 mr-2'>
-					<Mic size={20} />
+					<Mic size={20} className='cursor-pointer' />
 				</button>
 				<button
-					onClick={handleSend}
-					className='bg-green-500 w-8 h-8 rounded-full flex items-center justify-center'>
+					onClick={handleSendClick}
+					className='bg-green-500 w-fit h-8 px-2 rounded-full flex items-center justify-center gap-2 cursor-pointer'>
 					<Send size={16} />
+					<p className='text-sm'>Send</p>
 				</button>
 			</div>
 		</div>

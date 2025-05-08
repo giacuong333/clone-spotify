@@ -9,6 +9,7 @@ import SongProvider from "./contexts/Song";
 import UserProvider from "./contexts/User";
 import ChatProvider from "./contexts/Chat";
 import GenreProvider from "./contexts/genre";
+import SearchProvider from "./contexts/Search";
 
 const App = () => {
 	return (
@@ -19,10 +20,12 @@ const App = () => {
 						<UserProvider>
 							<SongProvider>
 								<GenreProvider>
-									<ChatProvider>
-										<Toast />
-										<AppRoutes />
-									</ChatProvider>
+									<SearchProvider>
+										<ChatProvider>
+											<Toast />
+											<AppRoutes />
+										</ChatProvider>
+									</SearchProvider>
 								</GenreProvider>
 							</SongProvider>
 						</UserProvider>

@@ -1,28 +1,55 @@
 import { Phone, Video, MoreVertical } from "lucide-react";
+import { useUser } from "../../../contexts/User";
+import { useChat } from "../../../contexts/Chat";
+import { useMemo } from "react";
 
 const ChatHeader = ({ conversation }) => {
+	const { activeConversation } = useChat();
+	const { user, searchUserResult } = useUser();
+
+	// Get the active conversation's name for the header
+	const activeChatName = useMemo(() => {
+		// First check if it's a search result
+		const searchUser = searchUserResult.find(
+			(u) => u.id === activeConversation
+		);
+		if (searchUser) {
+			return searchUser.name || searchUser.username;
+		}
+
+		console.log("searchUser", searchUser);
+
+		// Then check existing conversations
+		const conversation = user?.conversations?.find(
+			(c) => c.id === activeConversation
+		);
+		if (conversation) {
+			return conversation.name;
+		}
+
+		return "Chat";
+	}, [activeConversation, searchUserResult, user]);
+
+	console.log("activeChatName", activeChatName);
+
 	return (
 		<div className='p-4 border-b border-gray-800 flex justify-between items-center'>
 			<div className='flex items-center'>
-				<div className='w-10 h-10 rounded-full bg-green-500 flex items-center justify-center'>
-					<span className='font-bold'>{conversation?.avatar || "S"}</span>
+				<div className='w-8 h-8 rounded-full bg-green-500 flex items-center justify-center mr-3'>
+					<p className='font-bold'>{activeChatName.charAt(0).toUpperCase()}</p>
 				</div>
-				<div className='ml-3'>
-					<h3 className='font-semibold'>
-						{conversation?.name || "Spotify Support"}
-					</h3>
-					<p className='text-xs text-gray-400'>Online</p>
-				</div>
+				<h3 className='font-medium'>{activeChatName}</h3>
 			</div>
+
 			<div className='flex items-center space-x-3'>
 				<button className='p-2 hover:bg-gray-800 rounded-full'>
-					<Phone size={18} />
+					<Phone size={18} className='cursor-pointer' />
 				</button>
 				<button className='p-2 hover:bg-gray-800 rounded-full'>
-					<Video size={18} />
+					<Video size={18} className='cursor-pointer' />
 				</button>
 				<button className='p-2 hover:bg-gray-800 rounded-full'>
-					<MoreVertical size={18} />
+					<MoreVertical size={18} className='cursor-pointer' />
 				</button>
 			</div>
 		</div>

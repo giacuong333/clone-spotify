@@ -32,7 +32,6 @@ const GenreManagement = () => {
 
 	useEffect(() => {
 		fetchGenreList();
-		console.log("Fetched genre list:", genreList); // Log danh sách thể loại
 	}, [fetchGenreList]);
 
 	const rowSelection = {

@@ -1,4 +1,3 @@
-import React from "react";
 import { BarsOutlined, PlusOutlined } from "@ant-design/icons";
 import { Button, Col, Row, Tooltip } from "antd";
 

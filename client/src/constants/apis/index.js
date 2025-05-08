@@ -17,15 +17,18 @@ export const apis = {
 		getStats: () => `/api/users/stats/`,
 		getStatsById: (id) => `/api/users/${id}/stats/`,
 		getAdminStats: () => "/api/users/admin/stats/",
+		queryUser: () => `/api/users/query/`,
 	},
 	songs: {
 		getAll: () => `/api/songs/`,
+		search: () => `/api/songs/search/`,
 		getById: (id) => `/api/songs/${id}/`,
 		delete: () => `/api/songs/delete/`,
 		create: () => `/api/songs/create/`,
 	},
 	chats: {
-		getConversations: () => `/conversations`,
+		getConversations: () => "/conversations/",
+		getMessages: (otherUserId) => `/conversations/${otherUserId}/messages/`,
 	},
 	genres: {
 		getAll: () => `/api/genres/`,

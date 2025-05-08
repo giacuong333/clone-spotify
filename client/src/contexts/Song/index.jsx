@@ -2,6 +2,7 @@ import React, { useCallback, useState } from "react";
 import { apis } from "../../constants/apis";
 import { instance } from "../Axios";
 import { notify } from "../../components/Toast";
+import { useAuth } from "../../contexts/Auth";
 
 const SongContext = React.createContext();
 
@@ -10,7 +11,7 @@ const Song = ({ children }) => {
 	const [songDetails, setSongDetails] = useState(null);
 	const [loadingFetchSongList, setLoadingFetchSongList] = useState(false);
 	const [loadingFetchDetails, setLoadingFetchDetails] = useState(false);
-	const [searchInput, setSearchInput] = useState("");
+	const { isAuthenticated } = useAuth();
 
 	const fetchSongList = useCallback(async () => {
 		try {
@@ -42,10 +43,9 @@ const Song = ({ children }) => {
 
 	const handleDeleteSongs = async (songIds) => {
 		try {
+			const data = { song_ids: songIds };
 			setLoadingFetchSongList(true);
-			const response = await instance.delete(apis.songs.delete(), {
-				data: { song_ids: songIds },
-			});
+			const response = await instance.post(apis.songs.delete(), { data });
 			if (response.status === 204) {
 				notify("Delete successfully");
 				await fetchSongList();
@@ -58,27 +58,43 @@ const Song = ({ children }) => {
 		}
 	};
 
-	const create = useCallback(async (formData) => {
-		try {
-			const response = await instance.post(apis.songs.create(), formData, {
-				headers: {
-					"Content-Type": "multipart/form-data",
-				},
-			});
-			if (response.status === 201) {
-				//
-			} else {
-				throw new Error("Failed to upload song");
+	const create = useCallback(
+		async (formData) => {
+			if (!isAuthenticated) {
+				notify("Login to upload song", "error");
+				return;
 			}
-		} catch (error) {
-			console.log("Error creating song:", error);
-			throw error;
-		}
-	}, []);
+
+			try {
+				const response = await instance.post(apis.songs.create(), formData, {
+					headers: {
+						"Content-Type": "multipart/form-data",
+					},
+				});
+				if (response.status === 201) {
+					notify("Song uploaded successfully");
+					await fetchSongList();
+					return response.data;
+				} else {
+					throw new Error("Failed to upload song");
+				}
+			} catch (error) {
+				console.log("Error creating song:", error);
+				notify("Upload failed", "error");
+				throw error;
+			}
+		},
+		[fetchSongList]
+	);
 
 	const handleDownload = useCallback((event, audio_url, title, userName) => {
 		event.stopPropagation();
 		event.preventDefault();
+
+		if (!isAuthenticated) {
+			notify("Login to download the song", "error");
+			return;
+		}
 
 		if (audio_url) {
 			const downloadLink = document.createElement("a");
@@ -107,6 +123,45 @@ const Song = ({ children }) => {
 		}
 	}, []);
 
+	const handleDownloadVideo = useCallback(
+		(event, video_url, title, userName) => {
+			event.stopPropagation();
+			event.preventDefault();
+
+			if (!isAuthenticated) {
+				notify("Login to download the video", "error");
+				return;
+			}
+
+			if (video_url) {
+				const downloadLink = document.createElement("a");
+
+				fetch(video_url)
+					.then((response) => response.blob())
+					.then((blob) => {
+						const blobUrl = URL.createObjectURL(blob);
+
+						downloadLink.href = blobUrl;
+						const fileName = `${title || "video"}-${userName}.mp4`;
+						downloadLink.setAttribute("download", fileName);
+
+						document.body.appendChild(downloadLink);
+						downloadLink.click();
+
+						setTimeout(() => {
+							document.body.removeChild(downloadLink);
+							URL.revokeObjectURL(blobUrl);
+						}, 100);
+					})
+					.catch((error) => {
+						console.error("Error downloading the video file:", error);
+						notify("Failed to download the video", "error");
+					});
+			}
+		},
+		[]
+	);
+
 	return (
 		<SongContext.Provider
 			value={{
@@ -119,6 +174,7 @@ const Song = ({ children }) => {
 				create,
 				handleDeleteSongs,
 				handleDownload,
+				handleDownloadVideo,
 			}}>
 			{children}
 		</SongContext.Provider>
