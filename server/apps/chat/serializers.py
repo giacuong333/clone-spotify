@@ -9,7 +9,15 @@ class ConversationSerializer(serializers.Serializer):
     last_message = serializers.SerializerMethodField()
     
     def get_participants(self, obj):
-        return UserSerializer(obj.participants, many=True).data
+        # return UserSerializer(obj.participants, many=True).data
+        participants = []
+        for participant in obj.participants:
+            participants.append({
+                'id': str(participant.id),
+                'username': participant.username,
+                'email': participant.email,
+                'role': participant.role
+            })
         
     def get_last_message(self, obj):
         message = Message.objects(conversation=obj).order_by('-timestamp').first()
