@@ -60,10 +60,10 @@ const Song = ({ children }) => {
 
 	const create = useCallback(
 		async (formData) => {
-			if (!isAuthenticated) {
-				notify("Login to upload song", "error");
-				return;
-			}
+			// if (!isAuthenticated) {
+			// 	notify("Login to upload song", "error");
+			// 	return;
+			// }
 
 			try {
 				const response = await instance.post(apis.songs.create(), formData, {

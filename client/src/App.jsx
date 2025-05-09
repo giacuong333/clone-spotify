@@ -10,7 +10,7 @@ import UserProvider from "./contexts/User";
 import ChatProvider from "./contexts/Chat";
 import GenreProvider from "./contexts/genre";
 import SearchProvider from "./contexts/Search";
-
+import PlaylistProvider from "./contexts/playlist";
 const App = () => {
 	return (
 		<BrowserRouter>
@@ -22,8 +22,10 @@ const App = () => {
 								<GenreProvider>
 									<SearchProvider>
 										<ChatProvider>
+											<PlaylistProvider>
 											<Toast />
 											<AppRoutes />
+											</PlaylistProvider>
 										</ChatProvider>
 									</SearchProvider>
 								</GenreProvider>

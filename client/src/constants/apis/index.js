@@ -37,4 +37,12 @@ export const apis = {
 		create: () => `/api/genres/create/`,
 		update: (id) => `/api/genres/${id}/update/`,
 	},
+	playlists: {
+		getAll: () => `/api/playlists/`,
+		getById: (id) => `/api/playlists/${id}/`,
+		create: () => `/api/playlists/create/`,
+		update: (id) => `/api/playlists/${id}/update/`,
+		delete: (id) => `/api/playlists/${id}/delete/`,
+		addSong: (id) => `/api/playlists/${id}/add-song/`,
+	},
 };

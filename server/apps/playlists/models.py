@@ -1,3 +1,4 @@
+from email.policy import default
 from mongoengine import (
     Document,
     StringField,
@@ -18,11 +19,15 @@ class PlaylistSong(EmbeddedDocument):
 
 
 class Playlist(Document):
+    meta = {
+        'db_alias': 'default',
+        'collection': 'playlists'  
+    }
     user = ReferenceField(User)
     name = StringField(required=True)
     cover_url = StringField()
     is_favorite = StringField()
     desc = StringField()
-    songs = ListField(EmbeddedDocumentField(PlaylistSong))
+    songs = ListField(EmbeddedDocumentField(PlaylistSong), default=list)
     created_at = DateTimeField(default=datetime.datetime.now)
     updated_at = DateTimeField(default=datetime.datetime.now)
