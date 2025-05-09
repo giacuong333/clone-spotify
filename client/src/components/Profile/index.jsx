@@ -2,6 +2,7 @@ import { lazy, Suspense, useRef, useEffect } from "react";
 import { useUser } from "../../contexts/User";
 import { Spin } from "antd";
 import AlbumAndArtistWrap from "../AlbumAndArtistWrap";
+import { useAuth } from "../../contexts/Auth";
 
 const Header = lazy(() => import("./Header"));
 const Cover = lazy(() => import("./Cover"));
@@ -114,10 +115,10 @@ const followingList = [
 
 const Profile = () => {
   const contentRef = useRef(null);
-  const { userDetail, fetchUserDetail } = useUser();
+  const { user, setUser } = useAuth();
 
   useEffect(() => {
-    fetchUserDetail("680756213e4af1765d235d7d");
+    console.log("User in Profile:", user);
   }, []);
 
   return (
@@ -126,13 +127,13 @@ const Profile = () => {
         <Spin spinning tip='Please wait...' fullscreen size='large'></Spin>
       }>
       <div className='w-full h-full overflow-y-auto' ref={contentRef}>
-        <Header name={userDetail?.name || "Demo"} contentRef={contentRef} />
+        <Header name={user?.name || "Demo"} contentRef={contentRef} />
         <Cover
-          user={userDetail}
+          user={user}
           followingCount={10}
           playlistCount={5}
         />
-        <MainContent songList={songList} user = {userDetail}/>
+        <MainContent songList={songList} user = {user} setUser = {setUser}/>
         <div className='mt-10 flex flex-col gap-10'>
           <AlbumAndArtistWrap
             title='Public Playlists'

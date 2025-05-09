@@ -19,7 +19,8 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "rest_framework",
-    # "channels",
+    # WebSocket
+    "channels",
     # apps
     "apps.listenedAt",
     "apps.downloadedAt",

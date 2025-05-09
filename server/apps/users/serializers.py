@@ -1,5 +1,5 @@
-# server/apps/users/serializers.py
 from rest_framework import serializers
+from utils.hash_and_verify_password import hash_password
 from .models import User
 from datetime import datetime
 from rest_framework.exceptions import ValidationError, NotFound
@@ -149,6 +149,7 @@ class UserUpdateSerializer(serializers.Serializer):
     name = serializers.CharField(required=False)
     bio = serializers.CharField(required=False, allow_blank=True)
     image = serializers.FileField(required=False, allow_null=True)
+    password = serializers.CharField(required=False, write_only=True, min_length=8)
 
     def update(self, instance, validated_data):
         image = validated_data.get("image", None)
@@ -158,6 +159,10 @@ class UserUpdateSerializer(serializers.Serializer):
         for field in ["name", "bio"]:
             if field in validated_data:
                 setattr(instance, field, validated_data[field])
+
+        password = validated_data.get("password")
+        if password:
+            instance.password = hash_password(password)
 
         instance.updated_at = datetime.datetime.now()
         instance.save()

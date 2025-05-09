@@ -7,15 +7,6 @@ const ProfileDropdownMenu = ({ user, setUser }) => {
 	const menuRef = useRef(null);
 	const [showEditModal, setShowEditModal] = useState(false);
 
-	const handleSave = (formData) => {
-		// Gọi API update ở đây
-		console.log("Updated form data", formData);
-		// axios.patch(`/api/users/${user.id}`, formData);
-	};
-
-	// Đóng menu khi click ra ngoài
-	useEffect(() => {}, []);
-
 	const handleCopy = () => {
 		navigator.clipboard.writeText(window.location.href);
 		alert("Link copied!");
@@ -49,7 +40,7 @@ const ProfileDropdownMenu = ({ user, setUser }) => {
 						open={showEditModal}
 						onClose={() => setShowEditModal(false)}
 						user={user}
-						onSave={handleSave}
+						setUser={setUser}
 					/>
 				</div>
 			)}

@@ -3,7 +3,7 @@ import { useUser } from "../../../contexts/User";
 import { useChat } from "../../../contexts/Chat";
 import { useMemo } from "react";
 
-const ChatHeader = ({ conversation }) => {
+const ChatHeader = () => {
 	const { activeConversation } = useChat();
 	const { user, searchUserResult } = useUser();
 

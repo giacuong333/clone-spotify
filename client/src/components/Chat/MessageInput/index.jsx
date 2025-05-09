@@ -11,13 +11,13 @@ const MessageInput = () => {
 	const handleKeyPress = (e) => {
 		if (e.key === "Enter" && !e.shiftKey) {
 			e.preventDefault();
-			sendMessage(inputMessage);
+			sendMessage(e);
 		}
 	};
 
 	const handleSendClick = (e) => {
 		e.preventDefault();
-		sendMessage(inputMessage);
+		sendMessage(e);
 	};
 
 	return (

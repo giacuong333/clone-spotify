@@ -7,7 +7,7 @@ from mongoengine import (
     DateTimeField,
     ReferenceField,
     ListField,
-    DictField,
+    BooleanField,
 )
 
 
@@ -21,8 +21,8 @@ class Conversation(Document):
 
     @classmethod
     def get_or_create(cls, user1_id, user2_id):
-        user1 = User.objects.get(id=user1_id)
-        user2 = User.objects.get(id=user2_id)
+        user1 = User.get_user_by_id(user1_id)
+        user2 = User.get_user_by_id(user2_id)
 
         conversation = cls.objects(participants__all=[user1, user2]).first()
         if not conversation:
@@ -36,6 +36,6 @@ class Message(Document):
     sender = ReferenceField(User)
     content = StringField(required=True)
     timestamp = DateTimeField(default=datetime.now)
-    is_read = models.BooleanField(default=False)
+    is_read = BooleanField(default=False)
 
     meta = {"collection": "messages"}

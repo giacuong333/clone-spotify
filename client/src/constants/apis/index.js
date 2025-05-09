@@ -8,7 +8,7 @@ export const apis = {
 		getAllByRoleUser: () => `/api/users/render/`,
 		create: () => `/api/users/create`,
 		register: () => `/api/users/register/`,
-		update: () => `/api/users/update`,
+		update: (id) => `/api/users/${id}/update`,
 		delete: (param) => `/api/users/delete/${param}`,
 		getAll: () => `/api/users/`,
 		getById: (id) => `/api/users/${id}`,
@@ -27,8 +27,9 @@ export const apis = {
 		create: () => `/api/songs/create/`,
 	},
 	chats: {
-		getConversations: () => "/conversations/",
-		getMessages: (otherUserId) => `/conversations/${otherUserId}/messages/`,
+		getConversations: () => "/api/chat/conversations/",
+		getMessages: (otherUserId) =>
+			`/api/chat/conversations/${otherUserId}/messages/`,
 	},
 	genres: {
 		getAll: () => `/api/genres/`,

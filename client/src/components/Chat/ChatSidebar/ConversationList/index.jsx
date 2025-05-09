@@ -1,3 +1,4 @@
+import { useAuth } from "../../../../contexts/Auth";
 import { useChat } from "../../../../contexts/Chat";
 import { useUser } from "../../../../contexts/User";
 import ConversationItem from "../ConversationItem";
@@ -11,9 +12,10 @@ const ConversationList = () => {
 		setActiveConversation,
 		fetchConversations,
 		searchUserInput,
-		startNewConversation,
+		fetchMessages,
 	} = useChat();
 	const { searchUserResult, loadingSearchUserResult } = useUser();
+	const { user } = useAuth();
 
 	// When component mounts, render existing conversations
 	useEffect(() => {
@@ -29,14 +31,8 @@ const ConversationList = () => {
 		}
 	}, [searchUserInput, searchUserResult, conversations]);
 
-	const handleItemClick = (item) => {
-		if (searchUserInput.trim() !== "") {
-			// If user clicking a search result, start a new conversation
-			startNewConversation(item);
-		} else {
-			// Otherwise, it's an existing conversation
-			setActiveConversation(item);
-		}
+	const handleItemClick = (otherUserId) => {
+		setActiveConversation(otherUserId);
 	};
 
 	if (
@@ -49,6 +45,8 @@ const ConversationList = () => {
 			</div>
 		);
 	}
+
+	console.log("Conversation List: ", displayItems);
 
 	return (
 		<div className='overflow-y-auto flex-1'>

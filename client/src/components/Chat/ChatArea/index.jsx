@@ -6,15 +6,14 @@ import { MessageSquare } from "lucide-react";
 import { useChat } from "../../../contexts/Chat";
 
 const ChatArea = () => {
-	const messageEndRef = useRef(null);
-	const { activeConversation, messages } = useChat();
+	const { activeConversation } = useChat();
 
 	return (
 		<div className='w-2/3 flex flex-col border border-l-0 border-gray-800 rounded-tr-lg'>
-			<ChatHeader conversation={activeConversation} />
+			<ChatHeader />
 			{activeConversation ? (
 				<>
-					<MessageList messages={messages} messageEndRef={messageEndRef} />
+					<MessageList />
 					<MessageInput />
 				</>
 			) : (

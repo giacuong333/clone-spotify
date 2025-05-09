@@ -4,6 +4,8 @@ import { useChat } from "../../../contexts/Chat";
 const MessageList = () => {
 	const { messages, messageEndRef, loadingMessages } = useChat();
 
+	console.log("messages", messages);
+
 	if (loadingMessages) {
 		return (
 			<div className='flex-1 flex items-center justify-center'>
