@@ -13,6 +13,7 @@ const AlbumAndArtistDetails = lazy(() =>
 	import("../../components/AlbumAndArtistDetails")
 );
 const ChatInterface = lazy(() => import("../../components/Chat/ChatInterface"));
+const StatisticsPage = lazy(() => import("../../pages/StatisticsPage")); 
 const Profile = lazy(() => import("../../components/Profile"));
 const Search = lazy(() => import("../../components/Search"));
 const PlaylistDetails = lazy(() =>
@@ -108,13 +109,20 @@ const routes = [
 		isPublic: false,
 		isAdminPage: true,
 	},
+	// {
+	// 	path: paths.statistic,
+	// 	Layout: AdminLayout,
+	// 	Page: AdminStatistics,
+	// 	isPublic: false,
+	// 	isAdminPage: true,
+	// },
 	{
-		path: paths.statistic,
-		Layout: AdminLayout,
-		Page: AdminStatistics,
-		isPublic: false,
-		isAdminPage: true,
-	},
+        path: paths.statistics, // Đường dẫn đến trang thống kê chung (ví dụ: /statistics)
+        Layout: MainLayout,     // Dùng MainLayout
+        Page: StatisticsPage,   // Component StatisticsPage
+        isPublic: true,         // Cho phép mọi người xem (kể cả khách)
+                                // Nếu muốn chỉ user đăng nhập xem thì đổi thành isPublic: false
+    },
 ];
 
 export default routes;

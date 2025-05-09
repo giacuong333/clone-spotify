@@ -335,3 +335,110 @@ class UserSearchView(APIView):
         result = User.search(query)
         serializer = UserCreationSerializer(result, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class UserSongHistoryView(APIView):
+    """
+    API view để lấy lịch sử nghe và tải bài hát của user đang đăng nhập.
+    """
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = request.user # User đã được xác thực
+        
+        user_object_id = None
+        try:
+            # Đảm bảo user.id (thường là string từ JWT) được chuyển thành ObjectId đúng cách
+            user_object_id = ObjectId(str(user.id))
+        except Exception as e:
+            # Log lỗi này nếu cần thiết cho việc theo dõi phía server
+            # print(f"ERROR: Could not convert user.id '{user.id}' to ObjectId: {e}")
+            return Response({"song_history": [], "error": "Invalid user ID format in token"}, status=status.HTTP_400_BAD_REQUEST)
+
+        # --- 1. Thống kê các bài hát đã NGHE ---
+        pipeline_listened = [
+            {'$match': {'user': user_object_id}}, 
+            {'$group': {
+                '_id': '$song', 
+                'listen_count': {'$sum': 1}
+            }},
+            {'$project': { 
+                'song_id': '$_id', 
+                'listen_count': 1,
+                '_id': 0 
+            }},
+            {'$sort': {'listen_count': -1}} 
+        ]
+        try:
+            listened_songs_aggregation = list(ListenedAt.objects.aggregate(*pipeline_listened))
+        except Exception as e:
+            # Log lỗi aggregation nếu cần
+            # print(f"ERROR: Aggregation for listened songs failed: {e}")
+            listened_songs_aggregation = []
+
+
+        # --- 2. Thống kê các bài hát đã TẢI ---
+        pipeline_downloaded = [
+            {'$match': {'user': user_object_id}},
+            {'$group': {
+                '_id': '$song',
+                'download_count': {'$sum': 1}
+            }},
+            {'$project': {
+                'song_id': '$_id',
+                'download_count': 1,
+                '_id': 0
+            }},
+            {'$sort': {'download_count': -1}}
+        ]
+        try:
+            downloaded_songs_aggregation = list(DownloadedAt.objects.aggregate(*pipeline_downloaded))
+        except Exception as e:
+            # Log lỗi aggregation nếu cần
+            # print(f"ERROR: Aggregation for downloaded songs failed: {e}")
+            downloaded_songs_aggregation = []
+        
+        # --- 3. Tạo một map để tổng hợp thông tin ---
+        song_interaction_map = {}
+
+        for item in listened_songs_aggregation:
+            # song_id từ aggregation là ObjectId, chuyển thành string để làm key trong dict Python
+            song_id_str = str(item['song_id']) 
+            if song_id_str not in song_interaction_map:
+                # Lưu cả ObjectId gốc để query Song object sau này
+                song_interaction_map[song_id_str] = {'listen_count': 0, 'download_count': 0, 'song_object_id': item['song_id']}
+            song_interaction_map[song_id_str]['listen_count'] = item['listen_count']
+
+        for item in downloaded_songs_aggregation:
+            song_id_str = str(item['song_id'])
+            if song_id_str not in song_interaction_map:
+                song_interaction_map[song_id_str] = {'listen_count': 0, 'download_count': 0, 'song_object_id': item['song_id']}
+            song_interaction_map[song_id_str]['download_count'] = item['download_count']
+        
+        # --- 4. Tạo kết quả cuối cùng ---
+        final_song_history_list = []
+        
+        for song_id_str, counts_and_id_obj in song_interaction_map.items():
+            song_object_id_from_map = counts_and_id_obj['song_object_id']
+            try:
+                # Fetch object Song hoàn chỉnh từ database bằng ObjectId đã lưu
+                song_object = Song.objects.get(id=song_object_id_from_map)
+                
+                # Serialize object Song đó, truyền context request để tạo URL media
+                serialized_song_data = EnhancedSongSerializer(song_object, context={'request': request}).data
+                
+                final_song_history_list.append({
+                    'song': serialized_song_data,
+                    'user_listen_count': counts_and_id_obj.get('listen_count', 0),
+                    'user_download_count': counts_and_id_obj.get('download_count', 0)
+                })
+            except Song.DoesNotExist:
+                # Ghi log nếu cần theo dõi bài hát không tìm thấy
+                # print(f"WARNING: Song with ID {song_id_str} (ObjectId: {song_object_id_from_map}) not found in 'songs' collection. Skipping.")
+                continue 
+            except Exception as e:
+                # Ghi log lỗi chi tiết nếu có vấn đề khi xử lý một bài hát
+                # print(f"ERROR: Error processing song {song_id_str} (ObjectId: {song_object_id_from_map}): {e}")
+                continue 
+
+        return Response({"song_history": final_song_history_list}, status=status.HTTP_200_OK)

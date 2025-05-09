@@ -19,12 +19,12 @@ from django.urls import path, include
 
 urlpatterns = [
     # path('admin/', admin.site.urls),
-    path("api/auths/", include("apps.auths.urls")),
-    path("api/genres/", include("apps.genre.urls")),
-    path("api/users/", include("apps.users.urls")),
-    path("api/songs/", include("apps.songs.urls")),
-    path("api/downloadedAt/", include("apps.downloadedAt.urls")),
-    path("api/listenedAt/", include("apps.listenedAt.urls")),
-    path("api/playlists/", include("apps.playlists.urls")),
-    path("api/chat/", include("apps.chat.urls")),
+    path("auths/", include("apps.auths.urls")),
+    path("genres/", include("apps.genre.urls")),
+    path("users/", include("apps.users.urls")),
+    path("songs/", include("apps.songs.urls")),
+    path("downloadedAt/", include("apps.downloadedAt.urls")),
+    path("listenedAt/", include("apps.listenedAt.urls")),
+    path("playlists/", include("apps.playlists.urls")),
+    path("chat/", include("apps.chat.urls")),
 ]

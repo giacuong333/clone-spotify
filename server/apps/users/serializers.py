@@ -9,6 +9,9 @@ import datetime
 from bson import ObjectId
 import base64
 
+from apps.songs.serializers import EnhancedSongSerializer
+
+
 
 class UserCreationSerializer(serializers.Serializer):
     id = serializers.CharField(read_only=True)
@@ -167,3 +170,11 @@ class UserUpdateSerializer(serializers.Serializer):
         instance.updated_at = datetime.datetime.now()
         instance.save()
         return instance
+
+class UserSongInteractionSerializer(serializers.Serializer):
+    song = EnhancedSongSerializer() # Hoặc chỉ các trường cần thiết của Song
+    listen_count = serializers.IntegerField(default=0)
+    download_count = serializers.IntegerField(default=0)
+
+    class Meta:
+        fields = ['song', 'listen_count', 'download_count']

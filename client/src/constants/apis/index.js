@@ -20,6 +20,7 @@ export const apis = {
 		getStatsById: (id) => `/api/users/${id}/stats/`,
 		getAdminStats: () => "/api/users/admin/stats/",
 		queryUser: () => `/api/users/query/`,
+		getSongHistory: () => `/api/users/song-history/`,
 	},
 	songs: {
 		getAll: () => `/api/songs/`,
@@ -27,6 +28,8 @@ export const apis = {
 		getById: (id) => `/api/songs/${id}/`,
 		delete: () => `/api/songs/delete/`,
 		create: () => `/api/songs/create/`,
+		getTopListened: () => `/api/songs/stats/top-listened/`,  
+		getTopDownloaded: () => `/api/songs/stats/top-downloaded/`,
 	},
 	chats: {
 		getConversations: () => "/api/chat/conversations/",
