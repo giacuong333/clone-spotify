@@ -14,9 +14,23 @@ import { DownloadOutlined } from "@ant-design/icons";
 import { useSong } from "../../contexts/Song";
 import { useDownloadedAt } from "../../contexts/DownloadedAt";
 import { useAuth } from "../../contexts/Auth";
-import { notify } from "../Toast";
+import { usePlaylist } from "../../contexts/playlist";
+import { useParams } from "react-router-dom";
 
 const NowPlayingBar = () => {
+	const { id } = useParams();
+	const { addSongToPlaylist, fetchPlaylistDetail } = usePlaylist();
+
+	const handleAddSong = async () => {
+		try {
+			await addSongToPlaylist(id, currentSong.id); // Sử dụng currentSong thay vì item
+			console.log("Song added to playlist successfully");
+			fetchPlaylistDetail(id);
+		} catch (error) {
+			console.error("Error adding song to playlist:", error);
+		}
+	};
+
 	const [progressPercentage, setProgressPercentage] = useState(0);
 	const [volume, setVolume] = useState(0.5);
 	const [currentTime, setCurrentTime] = useState("00:00");
@@ -240,7 +254,7 @@ const NowPlayingBar = () => {
 						</p>
 					</div>
 					<div className='flex items-center gap-6'>
-						<Tooltip title='Add to playlist'>
+						<Tooltip title='Add to playlist' onClick={handleAddSong}>
 							<PlusCircleIcon className='w-4 h-4 text-white/75 cursor-pointer hover:text-white' />
 						</Tooltip>
 						{/* Download Icon*/}

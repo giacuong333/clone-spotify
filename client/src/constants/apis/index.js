@@ -46,4 +46,12 @@ export const apis = {
 	listened_at: {
 		create: () => `/api/listenedAt/save/`,
 	},
+	playlists: {
+		getAll: () => `/api/playlists/`,
+		getById: (id) => `/api/playlists/${id}/`,
+		create: () => `/api/playlists/create/`,
+		update: (id) => `/api/playlists/${id}/update/`,
+		delete: (id) => `/api/playlists/${id}/delete/`,
+		addSong: (id) => `/api/playlists/${id}/add-song/`,
+	},
 };

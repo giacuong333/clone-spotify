@@ -12,6 +12,7 @@ import GenreProvider from "./contexts/genre";
 import SearchProvider from "./contexts/Search";
 import DownloadedProvider from "./contexts/DownloadedAt";
 import ListenedProvider from "./contexts/ListenedAt";
+import PlaylistProvider from "./contexts/playlist";
 
 const App = () => {
 	return (
@@ -26,8 +27,10 @@ const App = () => {
 										<SearchProvider>
 											<ChatProvider>
 												<DownloadedProvider>
-													<Toast />
-													<AppRoutes />
+													<PlaylistProvider>
+														<Toast />
+														<AppRoutes />
+													</PlaylistProvider>
 												</DownloadedProvider>
 											</ChatProvider>
 										</SearchProvider>
