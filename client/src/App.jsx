@@ -10,26 +10,32 @@ import UserProvider from "./contexts/User";
 import ChatProvider from "./contexts/Chat";
 import GenreProvider from "./contexts/genre";
 import SearchProvider from "./contexts/Search";
+import DownloadedProvider from "./contexts/DownloadedAt";
+import ListenedProvider from "./contexts/ListenedAt";
 
 const App = () => {
 	return (
 		<BrowserRouter>
 			<Axios>
 				<Auth>
-					<PlayerProvider>
-						<UserProvider>
-							<SongProvider>
-								<GenreProvider>
-									<SearchProvider>
-										<ChatProvider>
-											<Toast />
-											<AppRoutes />
-										</ChatProvider>
-									</SearchProvider>
-								</GenreProvider>
-							</SongProvider>
-						</UserProvider>
-					</PlayerProvider>
+					<ListenedProvider>
+						<PlayerProvider>
+							<UserProvider>
+								<SongProvider>
+									<GenreProvider>
+										<SearchProvider>
+											<ChatProvider>
+												<DownloadedProvider>
+													<Toast />
+													<AppRoutes />
+												</DownloadedProvider>
+											</ChatProvider>
+										</SearchProvider>
+									</GenreProvider>
+								</SongProvider>
+							</UserProvider>
+						</PlayerProvider>
+					</ListenedProvider>
 				</Auth>
 			</Axios>
 		</BrowserRouter>

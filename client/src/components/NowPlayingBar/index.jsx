@@ -12,6 +12,9 @@ import formatTime from "../../utils/formatTime";
 import { Tooltip } from "antd";
 import { DownloadOutlined } from "@ant-design/icons";
 import { useSong } from "../../contexts/Song";
+import { useDownloadedAt } from "../../contexts/DownloadedAt";
+import { useAuth } from "../../contexts/Auth";
+import { notify } from "../Toast";
 
 const NowPlayingBar = () => {
 	const [progressPercentage, setProgressPercentage] = useState(0);
@@ -24,6 +27,8 @@ const NowPlayingBar = () => {
 	const { handleDownload } = useSong();
 	const { currentSong, isPlaying, togglePlay, playNext, playPrevious } =
 		usePlayer();
+	const { saveDownloadedAt } = useDownloadedAt();
+	const { user } = useAuth();
 
 	const audioRef = useRef(null);
 	const progressBarRef = useRef(null);
@@ -190,13 +195,18 @@ const NowPlayingBar = () => {
 		}
 	};
 
-	const handleDownloadSong = (event) => {
-		handleDownload(
+	const handleDownloadSong = async (event) => {
+		const downloadPromise = handleDownload(
 			event,
 			currentSong?.audio_url,
 			currentSong?.title,
 			currentSong?.user?.name
 		);
+
+		const payload = { user_id: user?.id, song_id: currentSong?.id };
+		const savePromise = saveDownloadedAt(payload);
+
+		await Promise.all([downloadPromise, savePromise]);
 	};
 
 	// Get song info from current song or use placeholder

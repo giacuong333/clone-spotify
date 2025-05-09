@@ -3,6 +3,8 @@ export const apis = {
 		login: () => `/api/auths/login/`,
 		logout: () => `/api/auths/logout/`,
 		refresh: () => `/api/auths/refresh/`,
+		loginByGoogle: () => `/api/auths/google/auth-url/`,
+		googleBackendCallback: () => "/api/auths/google/callback/",
 	},
 	users: {
 		getAllByRoleUser: () => `/api/users/render/`,
@@ -37,5 +39,11 @@ export const apis = {
 		delete: () => `/api/genres/delete/`,
 		create: () => `/api/genres/create/`,
 		update: (id) => `/api/genres/${id}/update/`,
+	},
+	downloaded_at: {
+		create: () => `/api/downloadedAt/save/`,
+	},
+	listened_at: {
+		create: () => `/api/listenedAt/save/`,
 	},
 };

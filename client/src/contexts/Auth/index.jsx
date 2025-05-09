@@ -22,6 +22,81 @@ const Auth = ({ children }) => {
 		}
 	}, []);
 
+	useEffect(() => {
+		const isGoogleCallbackPath =
+			paths.googleLoginCallback === location.pathname;
+		if (isGoogleCallbackPath) {
+			const params = new URLSearchParams(location.search);
+			const error = params.get("error");
+
+			if (error) {
+				notify("Login failed", "error");
+				navigate(paths.login);
+			}
+
+			const code = params.get("code");
+
+			const loginByGoogle = async () => {
+				try {
+					const response = await instance.get(
+						apis.auths.googleBackendCallback(),
+						{ params: { code } }
+					);
+					if (response.status === 200) {
+						console.log(response.data);
+						const { access, refresh, user } = response.data;
+						// Store tokens in localStorage
+						localStorage.setItem("accessToken", access);
+						localStorage.setItem("refreshToken", refresh);
+						localStorage.setItem("user", JSON.stringify(user));
+
+						setAccessToken(access);
+						setRefreshToken(refresh);
+						setUser(user);
+						notify("Authenticate by Google successfully");
+						navigate(user?.role === "admin" ? paths.admin : paths.home);
+					}
+				} catch (error) {
+					console.log("Error", error);
+					notify("Login failed", "error");
+					navigate(paths.home);
+				}
+			};
+
+			loginByGoogle();
+		}
+	}, [navigate]);
+
+	const loginByGoogle = async () => {
+		try {
+			setPendingLogin(true);
+			const response = await instance.get(apis.auths.loginByGoogle());
+			if (response.status === 200) {
+				window.location.href = response.data?.auth_url;
+			}
+			console.log("Login response:", response.data);
+
+			// if (response.status === 200) {
+			// 	const { access, refresh, user } = response.data;
+			// 	// Store tokens in localStorage
+			// 	localStorage.setItem("accessToken", access);
+			// 	localStorage.setItem("refreshToken", refresh);
+			// 	localStorage.setItem("user", JSON.stringify(user));
+
+			// 	setAccessToken(access);
+			// 	setRefreshToken(refresh);
+			// 	setUser(user);
+			// 	notify("Login successful");
+			// 	navigate(user?.role === "admin" ? paths.admin : paths.home);
+			// }
+		} catch (e) {
+			console.error("Login failed:", e.response?.data || e.message);
+			notify("Login failed", "error");
+		} finally {
+			setPendingLogin(false);
+		}
+	};
+
 	const login = async (payload) => {
 		try {
 			setPendingLogin(true);
@@ -101,6 +176,7 @@ const Auth = ({ children }) => {
 				pendingLogout,
 				pendingRefresh,
 				login,
+				loginByGoogle,
 				register,
 				logout,
 				isAuthenticated,

@@ -1,13 +1,22 @@
 from datetime import timedelta
 from pathlib import Path
 from mongoengine import connect
-
+import os
+from dotenv import load_dotenv
 
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+load_dotenv()
 
 SECRET_KEY = "django-insecure-c@i^7drg7&s)-y73ai08l(@wmhe==8(tk2k(29$av+@yrrvuq-"
 DEBUG = True
 ALLOWED_HOSTS = []
+
+
+
+GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID")
+GOOGLE_CLIENT_SECRET = os.environ.get("GOOGLE_CLIENT_SECRET")
+GOOGLE_REDIRECT_URI = os.environ.get("GOOGLE_REDIRECT_URI")
 
 
 INSTALLED_APPS = [
@@ -30,7 +39,7 @@ INSTALLED_APPS = [
     "apps.auths",
     "apps.genre",
     "apps.chat",
-    'rest_framework_simplejwt',
+    "rest_framework_simplejwt",
 ]
 
 MIDDLEWARE = [
@@ -48,11 +57,11 @@ MIDDLEWARE = [
 # Socket config
 ASGI_APPLICATION = "server.asgi.application"
 CHANNEL_LAYERS = {
-    'default': {
-        'BACKEND': 'channels.layers.InMemoryChannelLayer',
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer",
     },
 }
-    
+
 
 # REST AND JWT CONFIG
 REST_FRAMEWORK = {
@@ -93,7 +102,11 @@ SIMPLE_JWT = {
 
 # CORS CONFIG
 CORS_ALLOW_ALL_ORIGINS = True
-CORS_ALLOWED_ORIGINS = ["http://localhost:5173", "http://127.0.0.1:5173", "http://127.0.0.1:8000"]
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "http://127.0.0.1:8000",
+]
 CSRF_TRUSTED_ORIGINS = CORS_ALLOWED_ORIGINS
 CORS_ALLOW_CREDENTIALS = True
 

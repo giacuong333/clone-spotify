@@ -2,22 +2,25 @@ import { Send, Paperclip, Mic, Smile } from "lucide-react";
 import { useChat } from "../../../contexts/Chat";
 
 const MessageInput = () => {
-	const { inputMessage, setInputMessage, sendMessage } = useChat();
+	const { inputMessage, setInputMessage, sendMessage, fetchConversations } =
+		useChat();
 
 	const handleSetInputMessage = (e) => {
 		setInputMessage(e.target.value);
 	};
 
-	const handleKeyPress = (e) => {
+	const handleKeyPress = async (e) => {
 		if (e.key === "Enter" && !e.shiftKey) {
 			e.preventDefault();
 			sendMessage(e);
+			await fetchConversations();
 		}
 	};
 
-	const handleSendClick = (e) => {
+	const handleSendClick = async (e) => {
 		e.preventDefault();
 		sendMessage(e);
+		await fetchConversations();
 	};
 
 	return (

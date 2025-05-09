@@ -7,6 +7,7 @@ from mongoengine import (
 )
 from mongoengine.errors import DoesNotExist
 import datetime
+from mongoengine import Document, StringField, DateTimeField, BooleanField
 
 
 class User(Document):
@@ -19,6 +20,8 @@ class User(Document):
     created_at = DateTimeField(default=datetime.datetime.now)
     updated_at = DateTimeField(default=datetime.datetime.now)
     deleted_at = DateTimeField(default=None, null=True)
+    google_id = StringField()
+    is_oauth_user = BooleanField(default=False)
 
     meta = {"collection": "users"}
 

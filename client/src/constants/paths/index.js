@@ -2,6 +2,7 @@ const paths = {
 	home: "/",
 	register: "/register",
 	login: "/login",
+	googleLoginCallback: "/auth/google/callback",
 	details: "/details",
 	chats: "/chats",
 	profile: "/profile",

@@ -51,12 +51,13 @@ const ChatProvider = ({ children }) => {
 			// Handle incoming messages
 			newSocket.onmessage = (event) => {
 				const data = JSON.parse(event.data);
+				console.log("Data: ", data);
 				setMessages((prev) => [
 					...prev,
 					{
 						id: data.messageId,
 						text: data.message,
-						sender: data.senderId,
+						sender: { id: data.senderId, name: data.senderName },
 						timestamp: data.timestamp,
 						time: new Date(data.timestamp).toLocaleTimeString([], {
 							hour: "2-digit",
@@ -183,7 +184,7 @@ const ChatProvider = ({ children }) => {
 			try {
 				const messageData = {
 					message: inputMessage,
-					senderId: user.id,
+					senderId: user?.id,
 					receiverId: activeConversation,
 				};
 
@@ -194,7 +195,7 @@ const ChatProvider = ({ children }) => {
 				setError("Failed to send message");
 			}
 		},
-		[inputMessage, socket, activeConversation, user?.id]
+		[inputMessage, socket, activeConversation, user?.id, user?.name]
 	);
 
 	return (

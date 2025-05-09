@@ -12,7 +12,7 @@ const ConversationList = () => {
 		setActiveConversation,
 		fetchConversations,
 		searchUserInput,
-		fetchMessages,
+		setSearchUserInput,
 	} = useChat();
 	const { searchUserResult, loadingSearchUserResult } = useUser();
 	const { user } = useAuth();
@@ -33,7 +33,16 @@ const ConversationList = () => {
 
 	const handleItemClick = (otherUserId) => {
 		setActiveConversation(otherUserId);
+		setSearchUserInput("");
 	};
+
+	if (displayItems.length === 0) {
+		return (
+			<div className='flex-1 flex items-center justify-center text-gray-400'>
+				No conversations.
+			</div>
+		);
+	}
 
 	if (
 		(loadingConversations && !searchUserInput) ||
@@ -45,8 +54,6 @@ const ConversationList = () => {
 			</div>
 		);
 	}
-
-	console.log("Conversation List: ", displayItems);
 
 	return (
 		<div className='overflow-y-auto flex-1'>

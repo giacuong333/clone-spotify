@@ -7,3 +7,14 @@ class ListenedAt(Document):
     user = ReferenceField(User)
     song = ReferenceField(Song)
     listened_at = DateTimeField()
+
+    meta = {"collection": "listened_at"}
+
+    @staticmethod
+    def create(data):
+        try:
+            listenedAt = ListenedAt(**data)
+            listenedAt.save()
+            return listenedAt
+        except ValueError as e:
+            return ValueError({"Error: ", str(e)})

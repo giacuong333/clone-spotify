@@ -10,7 +10,7 @@ import { useAuth } from "../../contexts/Auth";
 const Login = () => {
 	const [form] = Form.useForm();
 	const navigate = useNavigate();
-	const { login, pendingLogin } = useAuth();
+	const { login, loginByGoogle, pendingLogin } = useAuth();
 
 	const onFinish = async (values) => {
 		console.log("Payload: ", values);
@@ -62,6 +62,7 @@ const Login = () => {
 						{/* Social Login Buttons */}
 						<div className='space-y-2 mb-6'>
 							<Button
+								onClick={loginByGoogle}
 								icon={
 									<div className=''>
 										<GoogleIcon width={25} height={24} />

@@ -119,7 +119,7 @@ const Song = ({ children }) => {
 	}, []);
 
 	const handleDownloadVideo = useCallback(
-		(event, video_url, title, userName) => {
+		async (event, video_url, title, userName) => {
 			event.stopPropagation();
 			event.preventDefault();
 
@@ -129,32 +129,32 @@ const Song = ({ children }) => {
 			}
 
 			if (video_url) {
-				const downloadLink = document.createElement("a");
+				try {
+					const downloadLink = document.createElement("a");
 
-				fetch(video_url)
-					.then((response) => response.blob())
-					.then((blob) => {
-						const blobUrl = URL.createObjectURL(blob);
+					const response = await fetch(video_url);
+					const blob = await response.blob();
+					const blobUrl = URL.createObjectURL(blob);
 
-						downloadLink.href = blobUrl;
-						const fileName = `${title || "video"}-${userName}.mp4`;
-						downloadLink.setAttribute("download", fileName);
+					downloadLink.href = blobUrl;
+					const fileName = `${title || "video"}-${userName}.mp4`;
+					downloadLink.setAttribute("download", fileName);
 
-						document.body.appendChild(downloadLink);
-						downloadLink.click();
+					document.body.appendChild(downloadLink);
+					downloadLink.click();
+					notify("Downloaded");
 
-						setTimeout(() => {
-							document.body.removeChild(downloadLink);
-							URL.revokeObjectURL(blobUrl);
-						}, 100);
-					})
-					.catch((error) => {
-						console.error("Error downloading the video file:", error);
-						notify("Failed to download the video", "error");
-					});
+					setTimeout(() => {
+						document.body.removeChild(downloadLink);
+						URL.revokeObjectURL(blobUrl);
+					}, 100);
+				} catch (error) {
+					console.error("Error downloading the video file:", error);
+					notify("Download failed", "error");
+				}
 			}
 		},
-		[]
+		[isAuthenticated]
 	);
 
 	return (
