@@ -14,10 +14,6 @@ const MainContent = ({ songList, user, setUser }) => {
 					<div className='w-full py-6 flex items-center justify-start gap-6'>
 						<ProfileDropdownMenu user={user} setUser={setUser} />
 					</div>
-
-					<div>
-						<SongListWrap songList={songList} title='Top tracks this month' />
-					</div>
 				</div>
 			</div>
 		</Suspense>

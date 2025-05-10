@@ -187,7 +187,7 @@ class SongCreateView(APIView):
 
 class SongBulkDestroyView(APIView):
     permission_classes = [AllowAny]
-    http_method_names = ['post', 'options']
+    http_method_names = ["post", "options"]
     # permission_classes = [IsAuthenticated]
 
     def post(self, request):
@@ -224,11 +224,13 @@ class SongSearchView(APIView):
     def get(self, request, *args, **kwargs):
         query = request.query_params.get("query", "").strip()
         search_type = request.query_params.get("type", "All").strip()
+        user_id = request.query_params.get("user_id", "").strip("/")
 
         print("QUERY:", query)
         print("SEARCH TYPE:", search_type)
+        print("USER ID:", user_id)
 
-        if not query:
+        if not query and not user_id:
             return Response({}, status=status.HTTP_200_OK)
 
         try:
@@ -263,6 +265,19 @@ class SongSearchView(APIView):
             #         playlists, many=True, context={"request": request}
             #     )
             #     response_data["playlists"] = playlist_serializer.data
+
+            if user_id:
+                try:
+                    user = User.objects.get(id=user_id)  # Lấy thông tin người dùng
+                    user_songs = Song.objects.filter(user=user, deleted_at=None)
+                    song_serializer = EnhancedSongSerializer(
+                        user_songs, many=True, context={"request": request}
+                    )
+                    response_data["songs_by_user"] = song_serializer.data
+                except User.DoesNotExist:
+                    return Response(
+                        {"error": "User not found"}, status=status.HTTP_404_NOT_FOUND
+                    )
 
             return Response(response_data, status=status.HTTP_200_OK)
         except Exception as e:

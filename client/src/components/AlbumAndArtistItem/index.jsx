@@ -31,12 +31,12 @@ const AlbumAndArtistItem = ({ item, type, index, list }) => {
 					<img
 						src={
 							item?.cover_url || // For songs
-							item?.image_url || // For users
+							item?.image || // For users
 							"https://cdn.pixabay.com/photo/2023/02/18/11/00/icon-7797704_640.png"
 						}
 						alt={item?.title}
 						className={`w-full h-full object-center object-cover ${
-							type === "album" ? "rounded-lg" : "rounded-full"
+							type === "user" ? "rounded-full" : "rounded-lg"
 						}`}
 					/>
 
@@ -60,10 +60,10 @@ const AlbumAndArtistItem = ({ item, type, index, list }) => {
 
 				{/* Texts */}
 				<div className='mt-2'>
-					<p className='hover:underline text-white truncate'>
+					<p className='hover:underline text-white truncate break-words'>
 						{item?.title || item?.name}
 					</p>
-					<p className='text-gray-400 text-sm'>{item?.artist || item?.type}</p>
+					<p className='text-gray-400 text-sm'>{item?.type}</p>
 				</div>
 			</div>
 		</li>

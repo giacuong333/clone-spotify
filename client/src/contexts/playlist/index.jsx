@@ -57,6 +57,22 @@ const PlaylistProvider = ({ children }) => {
 		[isAuthenticated]
 	);
 
+	const fetchPlaylistsByUser = useCallback(async (userId) => {
+		if (!isAuthenticated) {
+			return;
+		}
+
+		try {
+			const response = await instance.get(apis.playlists.getByUserId(userId));
+			if (response.status === 200) {
+				return response;
+			}
+		} catch (error) {
+			console.log("Error while fetching playlists by user: ", error);
+			setError(error);
+		} 
+	}, [isAuthenticated]);
+
 	const addSongToPlaylist = useCallback(
 		async (payload) => {
 			if (!isAuthenticated) {
@@ -206,6 +222,8 @@ const PlaylistProvider = ({ children }) => {
 				editPlaylistTitle,
 				deletePlaylist,
 				createPlaylist,
+
+				fetchPlaylistsByUser,
 			}}>
 			{children}
 		</PlaylistContext.Provider>

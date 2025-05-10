@@ -27,6 +27,7 @@ export const apis = {
 		getById: (id) => `/api/songs/${id}/`,
 		delete: () => `/api/songs/delete/`,
 		create: () => `/api/songs/create/`,
+		getByUserId: (id) => `/api/songs/search/?user_id=${id}/`,
 	},
 	chats: {
 		getConversations: () => "/api/chat/conversations/",
@@ -54,5 +55,6 @@ export const apis = {
 		editPlaylistTitle: () => `/api/playlists/edit/`,
 		deletePlaylist: () => `/api/playlists/delete/`,
 		createPlaylist: () => `/api/playlists/create/`,
+		getByUserId: (id) => `/api/playlists/user/?user_id=${id}/`,
 	},
 };

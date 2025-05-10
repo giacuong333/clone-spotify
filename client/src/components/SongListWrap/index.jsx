@@ -3,7 +3,7 @@ import SongList from "../SongList";
 
 const SongListWrap = ({ songList, title, canHover = false }) => {
 	return (
-		<div>
+		<div className="mx-auto"> 
 			<p
 				className={`text-white text-2xl font-bold font-sans mb-6 ${
 					canHover ? "hover:underline" : ""
