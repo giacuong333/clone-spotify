@@ -12,7 +12,7 @@ class SongsOfPlaylistSerializer(serializers.Serializer):
         try:
             if not obj.song:
                 return None
-            return EnhancedSongSerializer(obj.song).data
+            return EnhancedSongSerializer(obj.song, context=self.context).data
         except DoesNotExist:
             return None
 
