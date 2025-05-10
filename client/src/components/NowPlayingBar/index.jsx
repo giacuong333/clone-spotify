@@ -15,22 +15,10 @@ import { useSong } from "../../contexts/Song";
 import { useDownloadedAt } from "../../contexts/DownloadedAt";
 import { useAuth } from "../../contexts/Auth";
 import { usePlaylist } from "../../contexts/playlist";
-import { useParams } from "react-router-dom";
+import { Popover } from "antd";
+import SongIcon from "../../components/Icons/SongIcon";
 
 const NowPlayingBar = () => {
-	const { id } = useParams();
-	const { addSongToPlaylist, fetchPlaylistDetail } = usePlaylist();
-
-	const handleAddSong = async () => {
-		try {
-			await addSongToPlaylist(id, currentSong.id); // Sử dụng currentSong thay vì item
-			console.log("Song added to playlist successfully");
-			fetchPlaylistDetail(id);
-		} catch (error) {
-			console.error("Error adding song to playlist:", error);
-		}
-	};
-
 	const [progressPercentage, setProgressPercentage] = useState(0);
 	const [volume, setVolume] = useState(0.5);
 	const [currentTime, setCurrentTime] = useState("00:00");
@@ -47,6 +35,14 @@ const NowPlayingBar = () => {
 	const audioRef = useRef(null);
 	const progressBarRef = useRef(null);
 	const animationRef = useRef(null);
+
+	const { addSongToPlaylist, playlists } = usePlaylist();
+
+	const [visible, setVisible] = useState(false);
+
+	const handleVisibleChange = (newVisible) => {
+		setVisible(newVisible);
+	};
 
 	// Effect to handle play/pause state
 	useEffect(() => {
@@ -130,8 +126,6 @@ const NowPlayingBar = () => {
 			};
 		}
 	}, [doesRepeat, isShuffled]);
-
-	console.log("Audio ref:", audioRef);
 
 	// Function to update progress bar using requestAnimationFrame
 	const updateProgress = () => {
@@ -223,12 +217,17 @@ const NowPlayingBar = () => {
 		await Promise.all([downloadPromise, savePromise]);
 	};
 
+	const handleAddSongToPlaylist = async (playlist_id) => {
+		const payload = { playlist_id, song_id: currentSong?.id };
+		await addSongToPlaylist(payload);
+	};
+
 	// Get song info from current song or use placeholder
 	const songThumbnail =
 		currentSong?.cover_url ||
 		"https://i.scdn.co/image/ab67616d00004851e1379f9837c5cf0a33365ffb";
-	const songTitle = currentSong?.title || "UH VEI VEI";
-	const artistName = currentSong?.user?.name || "KREZUS";
+	const songTitle = currentSong?.title || "SONG TITLE";
+	const artistName = currentSong?.user?.name || "USER";
 
 	return (
 		<section className='bg-black h-20 w-full'>
@@ -239,11 +238,17 @@ const NowPlayingBar = () => {
 				{/* Song Information */}
 				<div className='flex items-center gap-3 w-full'>
 					<div className='w-14 h-14 rounded overflow-hidden'>
-						<img
-							src={songThumbnail}
-							alt='Song thumbnail'
-							className='w-full h-full object-center object-cover'
-						/>
+						{currentSong?.cover_url ? (
+							<img
+								src={songThumbnail}
+								alt='Song thumbnail'
+								className='w-full h-full object-center object-cover'
+							/>
+						) : (
+							<span className='bg-white/20 w-full h-full flex items-center justify-center'>
+								<SongIcon className='text-white/50' width='32' height='32' />
+							</span>
+						)}
 					</div>
 					<div>
 						<p className='hover:underline text-white uppercase cursor-pointer'>
@@ -254,9 +259,49 @@ const NowPlayingBar = () => {
 						</p>
 					</div>
 					<div className='flex items-center gap-6'>
-						<Tooltip title='Add to playlist' onClick={handleAddSong}>
-							<PlusCircleIcon className='w-4 h-4 text-white/75 cursor-pointer hover:text-white' />
-						</Tooltip>
+						{/* Show playlists */}
+						<Popover
+							content={
+								<ul className='bg-gray-900/5 rounded shadow-lg py-1'>
+									<li className='text-white mb-2 text-center'>
+										Your playlists
+									</li>
+									{playlists.map((playlist, index) => {
+										return (
+											<li
+												key={playlist?.id || index}
+												className='hover:bg-black/40 cursor-pointer px-2 py-1 rounded my-0.5'
+												onClick={() => handleAddSongToPlaylist(playlist?.id)}>
+												<div className='flex items-center justify-start gap-2'>
+													<span className='flex items-center justify-center rounded'>
+														<SongIcon
+															className='text-white/50'
+															width='26'
+															height='26'
+														/>
+													</span>
+													<span>
+														<p className='text-white'>{playlist.name}</p>
+													</span>
+												</div>
+											</li>
+										);
+									})}
+								</ul>
+							}
+							open={visible}
+							onOpenChange={handleVisibleChange}
+							trigger='click'
+							placement='bottomLeft'
+							destroyTooltipOnHide
+							getPopupContainer={(triggerNode) => triggerNode.parentNode}
+							color='gray'
+							arrow={false}>
+							<span style={{ display: "none" }}></span>
+							<Tooltip title='Add to playlist'>
+								<PlusCircleIcon className='w-4 h-4 text-white/75 cursor-pointer hover:text-white' />
+							</Tooltip>
+						</Popover>
 						{/* Download Icon*/}
 
 						<Tooltip title='Download song'>

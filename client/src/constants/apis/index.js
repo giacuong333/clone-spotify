@@ -48,10 +48,11 @@ export const apis = {
 	},
 	playlists: {
 		getAll: () => `/api/playlists/`,
-		getById: (id) => `/api/playlists/${id}/`,
-		create: () => `/api/playlists/create/`,
-		update: (id) => `/api/playlists/${id}/update/`,
-		delete: (id) => `/api/playlists/${id}/delete/`,
-		addSong: (id) => `/api/playlists/${id}/add-song/`,
+		getDetail: () => `/api/playlists/detail/`,
+		addSongToPlaylist: () => `/api/playlists/songs/add/`,
+		removeSongFromPlaylist: () => `/api/playlists/songs/remove/`,
+		editPlaylistTitle: () => `/api/playlists/edit/`,
+		deletePlaylist: () => `/api/playlists/delete/`,
+		createPlaylist: () => `/api/playlists/create/`,
 	},
 };
