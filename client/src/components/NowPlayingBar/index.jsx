@@ -19,40 +19,33 @@ import { Popover } from "antd";
 import SongIcon from "../../components/Icons/SongIcon";
 
 const NowPlayingBar = () => {
-	const [progressPercentage, setProgressPercentage] = useState(0);
 	const [volume, setVolume] = useState(0.5);
 	const [currentTime, setCurrentTime] = useState("00:00");
 	const [duration, setDuration] = useState("00:00");
 	const [doesRepeat, setDoesRepeat] = useState(false);
 	const [isShuffled, setIsShuffled] = useState(false);
-
-	const { handleDownload } = useSong();
-	const { currentSong, isPlaying, togglePlay, playNext, playPrevious } =
-		usePlayer();
-	const { saveDownloadedAt } = useDownloadedAt();
-	const { user } = useAuth();
+	const [visible, setVisible] = useState(false);
 
 	const audioRef = useRef(null);
 	const progressBarRef = useRef(null);
 	const animationRef = useRef(null);
 
+	const { user } = useAuth();
+	const { handleDownload } = useSong();
+	const { saveDownloadedAt } = useDownloadedAt();
 	const { addSongToPlaylist, playlists } = usePlaylist();
-
-	const [visible, setVisible] = useState(false);
+	const { currentSong, isPlaying, togglePlay, playNext, playPrevious } =
+		usePlayer();
 
 	const handleVisibleChange = (newVisible) => {
 		setVisible(newVisible);
 	};
 
-	// Effect to handle play/pause state
+	// Handle play/pause state
 	useEffect(() => {
 		if (audioRef.current) {
 			if (isPlaying) {
-				audioRef.current.play().catch((err) => {
-					console.error("Error playing audio:", err);
-					// Reset playing state if play fails
-					togglePlay();
-				});
+				audioRef.current.play();
 				animationRef.current = requestAnimationFrame(updateProgress);
 			} else {
 				audioRef.current.pause();
@@ -61,7 +54,7 @@ const NowPlayingBar = () => {
 		}
 	}, [isPlaying]);
 
-	// Effect to load new song when currentSong changes
+	// Load new song when currentSong changes
 	useEffect(() => {
 		if (currentSong && audioRef.current) {
 			// Load new audio source
@@ -69,9 +62,7 @@ const NowPlayingBar = () => {
 			audioRef.current.load();
 
 			if (isPlaying) {
-				audioRef.current.play().catch((err) => {
-					console.error("Error playing new audio:", err);
-				});
+				audioRef.current.play();
 			}
 		}
 	}, [currentSong]);
@@ -88,8 +79,6 @@ const NowPlayingBar = () => {
 			const handleTimeUpdate = () => {
 				if (audio.duration) {
 					setCurrentTime(formatTime(audio.currentTime));
-					const percentage = (audio.currentTime / audio.duration) * 100;
-					setProgressPercentage(percentage);
 				}
 			};
 
@@ -122,7 +111,9 @@ const NowPlayingBar = () => {
 				audio.removeEventListener("timeupdate", handleTimeUpdate);
 				audio.removeEventListener("loadedmetadata", handleLoadedMetadata);
 				audio.removeEventListener("ended", handleEnded);
-				cancelAnimationFrame(animationRef.current);
+				if (animationRef.current) {
+					cancelAnimationFrame(animationRef.current);
+				}
 			};
 		}
 	}, [doesRepeat, isShuffled]);
@@ -131,9 +122,6 @@ const NowPlayingBar = () => {
 	const updateProgress = () => {
 		if (audioRef.current) {
 			if (audioRef.current.duration) {
-				const percentage =
-					(audioRef.current.currentTime / audioRef.current.duration) * 100;
-				setProgressPercentage(percentage);
 				setCurrentTime(formatTime(audioRef.current.currentTime));
 			}
 			animationRef.current = requestAnimationFrame(updateProgress);
@@ -191,15 +179,26 @@ const NowPlayingBar = () => {
 		}
 	};
 
+	// Fast forward and rewind functions are removed as they're not needed.
+	// The handleSeek function now handles all seeking functionality through the progress bar.
 	const handleSeek = (event) => {
-		if (audioRef.current && progressBarRef.current) {
-			const progressBar = progressBarRef.current;
-			const rect = progressBar.getBoundingClientRect();
-			const clickedPosition = event.clientX - rect.left;
-			const newProgress = (clickedPosition / rect.width) * 100;
-			const seekTime = (newProgress / 100) * audioRef.current.duration;
+		if (audioRef.current && audioRef.current.duration) {
+			// Get the seek time from the input value
+			const seekTime = parseFloat(event.target.value);
+
+			// Store the current playing state
+			const wasPlaying = !audioRef.current.paused;
+
+			// Set the new current time
 			audioRef.current.currentTime = seekTime;
-			setProgressPercentage(newProgress);
+
+			// Update UI
+			setCurrentTime(formatTime(seekTime));
+
+			// If it was playing before seeking, ensure it continues playing
+			if (wasPlaying && audioRef.current.paused) {
+				audioRef.current.play();
+			}
 		}
 	};
 
@@ -228,6 +227,9 @@ const NowPlayingBar = () => {
 		"https://i.scdn.co/image/ab67616d00004851e1379f9837c5cf0a33365ffb";
 	const songTitle = currentSong?.title || "SONG TITLE";
 	const artistName = currentSong?.user?.name || "USER";
+
+	// Convert duration string back to seconds for the progress bar max value
+	const durationInSeconds = audioRef.current?.duration || 0;
 
 	return (
 		<section className='bg-black h-20 w-full'>
@@ -387,16 +389,15 @@ const NowPlayingBar = () => {
 					{/* Progress Bar */}
 					<div className='flex items-center justify-center gap-2 w-full px-20'>
 						<p className='text-white/70 text-xs'>{currentTime}</p>
-						<div
+						<input
 							ref={progressBarRef}
-							className='h-1 w-full rounded-full bg-white/50 group cursor-pointer'
-							onClick={handleSeek}>
-							<div
-								className='h-full rounded-full bg-white group-hover:bg-[#3BE477] relative'
-								style={{ width: `${progressPercentage}%` }}>
-								<div className='group-hover:block hidden absolute right-0 top-1/2 translate-x-1/2 -translate-y-1/2 bg-white w-3 h-3 rounded-full'></div>
-							</div>
-						</div>
+							type='range'
+							min='0'
+							max={durationInSeconds}
+							value={audioRef.current?.currentTime || 0}
+							onChange={handleSeek}
+							className='w-full accent-[#009634] cursor-pointer'
+						/>
 						<p className='text-white/70 text-xs'>{duration}</p>
 					</div>
 				</div>
