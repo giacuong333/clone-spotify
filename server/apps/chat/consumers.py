@@ -51,7 +51,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
             }
         )
     
-    # Retrieve from room group
+    # Retrieve from channel layer
     async def chat_message(self, event):
         message = event['message']
         sender_id = event['sender_id']
