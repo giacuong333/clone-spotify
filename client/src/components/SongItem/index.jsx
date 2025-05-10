@@ -27,7 +27,7 @@ const SongItem = ({ item, order, playlistId }) => {
           <div className="flex items-center gap-4">
             <div className="max-w-10 h-auto rounded-md overflow-hidden">
               <img
-                src="https://i.scdn.co/image/ab67616d00001e02a1bc26cdd8eecd89da3adc39"
+                src={item?.cover_url}
                 alt="Song"
                 className="w-full h-full object-center object-cover"
               />

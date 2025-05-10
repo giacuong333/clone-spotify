@@ -1,4 +1,4 @@
-const Cover = ({ user, playlistCount = 0, songCount = 0 }) => {
+const UserCover = ({ user, playlistCount = 0, songCount = 0 }) => {
 	
 	return (
 		<div className='flex items-center p-6 bg-gradient-to-b from-[#2a6e7f] to-[#0f2a2e] rounded-xl text-white'>
@@ -28,4 +28,4 @@ const Cover = ({ user, playlistCount = 0, songCount = 0 }) => {
 	);
 };
 
-export default Cover;
+export default UserCover;

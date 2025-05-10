@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from .models import Song
 from apps.genre.serializers import GenreSerializer
-from apps.users.serializers import UserCreationSerializer
+from apps.users.serializers import UserDetailSerializer
 from bson import ObjectId
 from mongoengine.errors import DoesNotExist
 from datetime import datetime
@@ -27,7 +27,7 @@ class SongSerializer(serializers.Serializer):
         try:
             if not obj.user:
                 return None
-            return UserCreationSerializer(obj.user).data
+            return UserDetailSerializer(obj.user).data
         except DoesNotExist:
             return None  # Return None if user reference is invalid
 

@@ -8,7 +8,6 @@ from .serializers import PlaylistSerializer
 
 
 class GetAllView(APIView):
-    permission_classes = [IsAuthenticated]
 
     def get(self, request):
         user = request.user
@@ -167,3 +166,24 @@ class CreatePlaylistView(APIView):
             )
 
         return Response("Created", status=status.HTTP_201_CREATED)
+
+
+class GetPlaylistsByUserIdView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user_id = request.query_params.get("user_id", None).strip("/")
+
+        if not user_id:
+            return Response("User ID is required", status=status.HTTP_400_BAD_REQUEST)
+
+        # Lấy tất cả playlist của user_id
+        playlists = Playlist.findAll(user_id)
+        if playlists is None:
+            return Response(
+                "No playlists found for this user", status=status.HTTP_404_NOT_FOUND
+            )
+
+        # Serialize data và trả về
+        serializer = PlaylistSerializer(playlists, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)

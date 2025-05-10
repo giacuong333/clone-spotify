@@ -32,13 +32,24 @@ const Song = ({ children }) => {
 			setLoadingFetchDetails(true);
 			const response = await instance.get(apis.songs.getById(songId));
 			if (response.status === 200) {
-				setSongDetails(response.data);
+				return response;
 			}
 		} catch (error) {
 			console.log("Error response:", error.response);
 		} finally {
 			setLoadingFetchDetails(false);
 		}
+	}, []);
+
+	const fetchSongsByUserId = useCallback(async (userId) => {
+		try {
+			const response = await instance.get(apis.songs.getByUserId(userId));
+			if (response.status === 200) {
+				return response;
+			}
+		} catch (error) {
+			console.log("Error response:", error.response);
+		} 
 	}, []);
 
 	const handleDeleteSongs = async (songIds) => {
@@ -170,6 +181,7 @@ const Song = ({ children }) => {
 				handleDeleteSongs,
 				handleDownload,
 				handleDownloadVideo,
+				fetchSongsByUserId
 			}}>
 			{children}
 		</SongContext.Provider>
