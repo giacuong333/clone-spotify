@@ -1,7 +1,7 @@
 from django.urls import path
-from apps.listenedAt.views import SaveListenedAtView
+from apps.listenedAt.views import SaveListenedAtView, GetAllListenedAtView
 
 urlpatterns = [
-    path("save/", SaveListenedAtView.as_view(), name="save-listen")
+    path("", GetAllListenedAtView.as_view(), name="get-all-listened-at"),
+    path("save/", SaveListenedAtView.as_view(), name="save-listen"),
 ]
- 

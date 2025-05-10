@@ -25,9 +25,7 @@ const SongCover = ({ song }) => {
 								src={song?.user?.image || "https://cdn.pixabay.com/photo/2023/02/18/11/00/icon-7797704_640.png"} 
 								alt="" />
 							<p className='text-md text-white/80 mb-1'>
-								<span className="font-bold">{song?.user?.name}</span> 
-								&bull; {new Date(song?.released_at).getFullYear()} 
-								&bull; {formatTime(song?.duration)} &bull; {3714493} 
+								<span className="font-bold">{song?.user?.name}</span> &bull; {new Date(song?.released_at).getFullYear()} &bull; {formatTime(song?.duration)} &bull; {song?.listened_at_count} views
 							</p>
 						</div>
 					

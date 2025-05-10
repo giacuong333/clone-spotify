@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from .models import Song
+from apps.listenedAt.models import ListenedAt
 from apps.genre.serializers import GenreSerializer
 from apps.users.serializers import UserDetailSerializer
 from bson import ObjectId
@@ -38,6 +39,7 @@ class EnhancedSongSerializer(SongSerializer):
     audio_url = serializers.SerializerMethodField()
     video_url = serializers.SerializerMethodField()
     cover_url = serializers.SerializerMethodField()
+    listened_at_count = serializers.SerializerMethodField()
 
     def get_audio_url(self, obj):
         """Generate URL for streaming the audio file"""
@@ -62,6 +64,10 @@ class EnhancedSongSerializer(SongSerializer):
             base_url = request.build_absolute_uri("/").rstrip("/")
             return f"{base_url}/api/songs/{obj.id}/cover"
         return None
+
+    def get_listened_at_count(self, obj):
+        """Calculate the number of times this song has been listened to"""
+        return ListenedAt.objects.filter(song=obj).count()
 
 
 class SongCreateSerializer(serializers.Serializer):
