@@ -1,4 +1,4 @@
-import { memo, useEffect, useState } from "react";
+import { memo, useEffect } from "react";
 import PlaylistItem from "../PlaylistItem";
 import { usePlaylist } from "../../../contexts/playlist";
 

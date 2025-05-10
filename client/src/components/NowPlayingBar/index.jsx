@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect, useCallback } from "react";
 import PlusCircleIcon from "../Icons/PlusCircleIcon";
 import NextIcon from "../Icons/NextIcon";
 import PrevIcon from "../Icons/PrevIcon";
@@ -44,6 +44,20 @@ const NowPlayingBar = () => {
 		setVisible(newVisible);
 	};
 
+	// Function to update progress bar using requestAnimationFrame
+	// Define updateProgress with useCallback and NO dependencies
+	const updateProgress = useCallback(() => {
+		if (audioRef.current) {
+			if (audioRef.current.duration) {
+				const percentage =
+					(audioRef.current.currentTime / audioRef.current.duration) * 100;
+				setProgressPercentage(percentage);
+				setCurrentTime(formatTime(audioRef.current.currentTime));
+			}
+			animationRef.current = requestAnimationFrame(updateProgress);
+		}
+	}, []);
+
 	// Effect to handle play/pause state
 	useEffect(() => {
 		if (audioRef.current) {
@@ -53,13 +67,21 @@ const NowPlayingBar = () => {
 					// Reset playing state if play fails
 					togglePlay();
 				});
+				// Start animation frame only when playing
+				cancelAnimationFrame(animationRef.current); // Cancel any existing animation
 				animationRef.current = requestAnimationFrame(updateProgress);
 			} else {
 				audioRef.current.pause();
+				// Cancel animation frame when paused
 				cancelAnimationFrame(animationRef.current);
 			}
 		}
-	}, [isPlaying]);
+
+		// Clean up function to ensure animation frame is canceled
+		return () => {
+			cancelAnimationFrame(animationRef.current);
+		};
+	}, [isPlaying, updateProgress]);
 
 	// Effect to load new song when currentSong changes
 	useEffect(() => {
@@ -73,8 +95,12 @@ const NowPlayingBar = () => {
 					console.error("Error playing new audio:", err);
 				});
 			}
+
+			// Reset progress when a new song is loaded
+			setProgressPercentage(0);
+			setCurrentTime("00:00");
 		}
-	}, [currentSong]);
+	}, [currentSong, isPlaying]);
 
 	// Set up audio event listeners on component mount
 	useEffect(() => {
@@ -104,11 +130,7 @@ const NowPlayingBar = () => {
 					audio.currentTime = 0;
 					audio.play();
 				} else {
-					const nextSong = playNext(isShuffled);
-					if (!nextSong) {
-						// If no next song, just stop playing
-						togglePlay();
-					}
+					playNext(isShuffled);
 				}
 			};
 
@@ -125,20 +147,7 @@ const NowPlayingBar = () => {
 				cancelAnimationFrame(animationRef.current);
 			};
 		}
-	}, [doesRepeat, isShuffled]);
-
-	// Function to update progress bar using requestAnimationFrame
-	const updateProgress = () => {
-		if (audioRef.current) {
-			if (audioRef.current.duration) {
-				const percentage =
-					(audioRef.current.currentTime / audioRef.current.duration) * 100;
-				setProgressPercentage(percentage);
-				setCurrentTime(formatTime(audioRef.current.currentTime));
-			}
-			animationRef.current = requestAnimationFrame(updateProgress);
-		}
-	};
+	}, [doesRepeat, isShuffled, playNext, volume]);
 
 	const handleVolumeChange = (event) => {
 		const newVolume = parseFloat(event.target.value);
@@ -220,6 +229,7 @@ const NowPlayingBar = () => {
 	const handleAddSongToPlaylist = async (playlist_id) => {
 		const payload = { playlist_id, song_id: currentSong?.id };
 		await addSongToPlaylist(payload);
+		setVisible(false); // Close the popover after adding
 	};
 
 	// Get song info from current song or use placeholder
@@ -308,7 +318,7 @@ const NowPlayingBar = () => {
 							<DownloadOutlined
 								className='text-lg !text-white/75 hover:!text-white cursor-pointer'
 								onClick={handleDownloadSong}
-								disabled={currentSong?.audio_url}
+								disabled={!currentSong?.audio_url}
 							/>
 						</Tooltip>
 					</div>

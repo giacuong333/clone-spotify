@@ -7,7 +7,7 @@ const paths = {
 	chats: "/chats",
 	profile: "/profile",
 	search: "/search",
-	playlist: "/playlists/:id",
+	playlist: "/playlist/detail/:id",
 	admin: "/admin",
 	users: "/admin/users",
 	songs: "/admin/songs",
