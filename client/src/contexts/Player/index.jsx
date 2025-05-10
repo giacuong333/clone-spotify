@@ -1,15 +1,47 @@
-import React from "react";
+import { createContext, useContext, useEffect, useState } from "react";
+import { useAuth } from "../Auth";
+import { notify } from "../../components/Toast";
+import { useListenedAt } from "../ListenedAt";
 
-const PlayerContext = React.createContext();
+const PlayerContext = createContext();
 
 const PlayerProvider = ({ children }) => {
-	const [currentSong, setCurrentSong] = React.useState(null);
-	const [songList, setSongList] = React.useState([]);
-	const [isPlaying, setIsPlaying] = React.useState(false);
+	const [currentSong, setCurrentSong] = useState(null);
+	const [currentSongIndex, setCurrentSongIndex] = useState(0);
+	const [songList, setSongList] = useState([]);
+	const [isPlaying, setIsPlaying] = useState(false);
+	const { isAuthenticated } = useAuth();
+	const { isSaved, saveListenedAt, resetSaveStatus } = useListenedAt();
 
-	const playSong = (song, songs) => {
+	// Track when a song starts playing
+	useEffect(() => {
+		// Only save when a song starts playing and hasn't been saved yet
+		if (isPlaying && currentSong && !isSaved && currentSong.id) {
+			saveListenedAt(currentSong.id);
+		}
+	}, [currentSong, isPlaying, isSaved, saveListenedAt]);
+
+	// Reset save status when song changes
+	useEffect(() => {
+		if (currentSong) {
+			resetSaveStatus();
+		}
+	}, [currentSong, resetSaveStatus]);
+
+	const playSong = (song, songs, index = null) => {
+		if (!isAuthenticated) {
+			notify("Log in to listen", "error");
+			return;
+		}
+
 		setCurrentSong(song);
 		setSongList(songs);
+		if (index !== null) {
+			setCurrentSongIndex(index);
+		} else if (songs && songs.length) {
+			const songIndex = songs.findIndex((s) => s.id === song.id);
+			setCurrentSongIndex(songIndex >= 0 ? songIndex : 0);
+		}
 		setIsPlaying(true);
 	};
 
@@ -17,20 +49,50 @@ const PlayerProvider = ({ children }) => {
 		setIsPlaying(!isPlaying);
 	};
 
+	const playNext = (shuffle = false) => {
+		if (!songList.length) {
+			return null;
+		}
+		let nextIndex;
+		if (shuffle) {
+			const randomIndex = Math.floor(Math.random() * songList.length);
+			nextIndex = randomIndex;
+		} else {
+			nextIndex = (currentSongIndex + 1) % songList.length;
+		}
+		setCurrentSongIndex(nextIndex);
+		setCurrentSong(songList[nextIndex]);
+		return songList[nextIndex];
+	};
+
+	const playPrevious = () => {
+		if (!songList.length) {
+			return null;
+		}
+		const prevIndex =
+			currentSongIndex === 0 ? songList.length - 1 : currentSongIndex - 1;
+		setCurrentSongIndex(prevIndex);
+		setCurrentSong(songList[prevIndex]);
+		return songList[prevIndex];
+	};
+
 	return (
 		<PlayerContext.Provider
 			value={{
 				currentSong,
+				currentSongIndex,
 				songList,
 				isPlaying,
 				playSong,
 				togglePlay,
+				playNext,
+				playPrevious,
 			}}>
 			{children}
 		</PlayerContext.Provider>
 	);
 };
 
-export const usePlayer = () => React.useContext(PlayerContext);
+export const usePlayer = () => useContext(PlayerContext);
 
 export default PlayerProvider;

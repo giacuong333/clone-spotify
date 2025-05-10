@@ -1,9 +1,8 @@
-import React from "react";
 import { Form, Input, Button, ConfigProvider, Spin } from "antd";
-import SpotifyLogo from "../../components/SpotifyLogo";
-import GoogleIcon from "../../components/GoogleIcon";
-import FacebookIcon from "../../components/FacebookIcon";
-import AppleIcon from "../../components/AppleIcon";
+import SpotifyLogo from "../../components/Icons/SpotifyLogo";
+import GoogleIcon from "../../components/Icons/GoogleIcon";
+import FacebookIcon from "../../components/Icons/FacebookIcon";
+import AppleIcon from "../../components/Icons/AppleIcon";
 import paths from "../../constants/paths";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/Auth";
@@ -11,9 +10,10 @@ import { useAuth } from "../../contexts/Auth";
 const Login = () => {
 	const [form] = Form.useForm();
 	const navigate = useNavigate();
-	const { login, pendingLogin } = useAuth();
+	const { login, loginByGoogle, pendingLogin } = useAuth();
 
 	const onFinish = async (values) => {
+		console.log("Payload: ", values);
 		await login(values);
 	};
 
@@ -62,6 +62,7 @@ const Login = () => {
 						{/* Social Login Buttons */}
 						<div className='space-y-2 mb-6'>
 							<Button
+								onClick={loginByGoogle}
 								icon={
 									<div className=''>
 										<GoogleIcon width={25} height={24} />

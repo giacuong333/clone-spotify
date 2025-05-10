@@ -26,12 +26,12 @@ const ConfirmPopup = ({
 					<div className='w-full flex justify-end mt-4'>
 						<button
 							onClick={onCancel}
-							className='px-4 py-2 text-[#274b609f] transition font-semibold'>
+							className='px-4 py-2 text-[#274b609f] transition font-semibold cursor-pointer'>
 							{cancelButtonText}
 						</button>
 						<button
 							onClick={onOk}
-							className='px-4 py-2 text-[#274b609f] transition font-semibold'>
+							className='px-4 py-2 text-[#274b609f] transition font-semibold cursor-pointer'>
 							{okButtonText}
 						</button>
 					</div>

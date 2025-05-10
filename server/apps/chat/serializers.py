@@ -1,4 +1,4 @@
-from apps.users.serializers import UserSerializer
+from apps.users.serializers import UserDisplaySerializer
 from apps.chat.models import Conversation, Message
 from rest_framework import serializers
 
@@ -9,15 +9,7 @@ class ConversationSerializer(serializers.Serializer):
     last_message = serializers.SerializerMethodField()
     
     def get_participants(self, obj):
-        return UserSerializer(obj.participants, many=True).data
-        # participants = []
-        # for participant in obj.participants:
-        #     participants.append({
-        #         'id': str(participant.id),
-        #         'username': participant.username,
-        #         'email': participant.email,
-        #         'role': participant.role
-        #     })
+        return UserDisplaySerializer(obj.participants, many=True).data
         
     def get_last_message(self, obj):
         message = Message.objects(conversation=obj).order_by('-timestamp').first()
@@ -39,5 +31,5 @@ class MessageSerializer(serializers.Serializer):
     def get_sender(self, obj):
         return {
             'id': str(obj.sender.id),
-            'username': obj.sender.username
+            'name': obj.sender.name
         }

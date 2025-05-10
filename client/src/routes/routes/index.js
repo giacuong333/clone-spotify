@@ -12,11 +12,20 @@ const Register = lazy(() => import("../../pages/Register"));
 const AlbumAndArtistDetails = lazy(() =>
 	import("../../components/AlbumAndArtistDetails")
 );
+const ChatInterface = lazy(() => import("../../components/Chat/ChatInterface"));
+const Profile = lazy(() => import("../../components/Profile"));
 const Search = lazy(() => import("../../components/Search"));
-const Admin = lazy(() => import("../../pages/Admin"));
+const PlaylistDetails = lazy(() =>
+	import("../../components/PlaylistDetails")
+);
 const UserManagement = lazy(() => import("../../components/UserManagement"));
 const SongManagement = lazy(() => import("../../components/SongManagement"));
 const GenreManagement = lazy(() => import("../../components/GenreManagement"));
+
+const Admin = lazy(() => import("../../pages/Admin"));
+const AdminStatistics = lazy(() =>
+	import("../../components/AdminStatistics/index.jsx")
+);
 
 const routes = [
 	{
@@ -47,9 +56,28 @@ const routes = [
 		isPublic: true,
 	},
 	{
+		path: paths.profile,
+		Layout: MainLayout,
+		Page: Profile,
+		isPublic: true,
+		isAuthPage: false,
+	},
+	{
 		path: paths.search,
 		Layout: MainLayout,
 		Page: Search,
+		isPublic: true,
+	},
+	{
+		path: paths.chats,
+		Layout: MainLayout,
+		Page: ChatInterface,
+		isPublic: false,
+	},
+	{
+		path: paths.playlist,
+		Layout: MainLayout,
+		Page: PlaylistDetails,
 		isPublic: true,
 	},
 	{
@@ -77,6 +105,13 @@ const routes = [
 		path: paths.genres,
 		Layout: AdminLayout,
 		Page: GenreManagement,
+		isPublic: false,
+		isAdminPage: true,
+	},
+	{
+		path: paths.statistic,
+		Layout: AdminLayout,
+		Page: AdminStatistics,
 		isPublic: false,
 		isAdminPage: true,
 	},

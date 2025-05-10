@@ -6,18 +6,39 @@ import Toast from "./components/Toast";
 import Axios from "./contexts/Axios";
 import PlayerProvider from "./contexts/Player";
 import SongProvider from "./contexts/Song";
+import UserProvider from "./contexts/User";
+import ChatProvider from "./contexts/Chat";
+import GenreProvider from "./contexts/genre";
+import SearchProvider from "./contexts/Search";
+import DownloadedProvider from "./contexts/DownloadedAt";
+import ListenedProvider from "./contexts/ListenedAt";
+import PlaylistProvider from "./contexts/playlist";
 
 const App = () => {
 	return (
 		<BrowserRouter>
 			<Axios>
 				<Auth>
-					<PlayerProvider>
-						<SongProvider>
-							<AppRoutes />
-							<Toast />
-						</SongProvider>
-					</PlayerProvider>
+					<ListenedProvider>
+						<PlayerProvider>
+							<UserProvider>
+								<SongProvider>
+									<GenreProvider>
+										<SearchProvider>
+											<ChatProvider>
+												<DownloadedProvider>
+													<PlaylistProvider>
+														<Toast />
+														<AppRoutes />
+													</PlaylistProvider>
+												</DownloadedProvider>
+											</ChatProvider>
+										</SearchProvider>
+									</GenreProvider>
+								</SongProvider>
+							</UserProvider>
+						</PlayerProvider>
+					</ListenedProvider>
 				</Auth>
 			</Axios>
 		</BrowserRouter>
