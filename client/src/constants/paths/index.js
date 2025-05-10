@@ -8,6 +8,7 @@ const paths = {
 	profile: "/profile",
 	search: "/search",
 	playlist: "/playlist/detail/:id",
+	statistics: "/statistics",
 	admin: "/admin",
 	users: "/admin/users",
 	songs: "/admin/songs",

@@ -8,6 +8,8 @@ from .views import (
     SongCoverView,
     SongSearchView,
     SongVideoView,
+    TopListenedSongsView,   
+    TopDownloadedSongsView, 
 )
 
 urlpatterns = [
@@ -19,4 +21,6 @@ urlpatterns = [
     path("<str:song_id>/audio", SongFileView.as_view(), name="song-audio"),
     path("<str:song_id>/video", SongVideoView.as_view(), name="song-video"),
     path("<str:song_id>/cover", SongCoverView.as_view(), name="song-cover"),
+    path("stats/top-listened/", TopListenedSongsView.as_view(), name="top_listened_songs"), 
+    path("stats/top-downloaded/", TopDownloadedSongsView.as_view(), name="top_downloaded_songs"), 
 ]
