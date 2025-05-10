@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     "apps.genre",
     "apps.chat",
     "rest_framework_simplejwt",
+    "apps.admin_analytics",
 ]
 
 MIDDLEWARE = [
