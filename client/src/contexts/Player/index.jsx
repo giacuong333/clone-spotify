@@ -1,6 +1,7 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import { useAuth } from "../Auth";
 import { notify } from "../../components/Toast";
+import { useListenedAt } from "../ListenedAt";
 
 const PlayerContext = createContext();
 
@@ -10,6 +11,22 @@ const PlayerProvider = ({ children }) => {
 	const [songList, setSongList] = useState([]);
 	const [isPlaying, setIsPlaying] = useState(false);
 	const { isAuthenticated } = useAuth();
+	const { isSaved, saveListenedAt, resetSaveStatus } = useListenedAt();
+
+	// Track when a song starts playing
+	useEffect(() => {
+		// Only save when a song starts playing and hasn't been saved yet
+		if (isPlaying && currentSong && !isSaved && currentSong.id) {
+			saveListenedAt(currentSong.id);
+		}
+	}, [currentSong, isPlaying, isSaved, saveListenedAt]);
+
+	// Reset save status when song changes
+	useEffect(() => {
+		if (currentSong) {
+			resetSaveStatus();
+		}
+	}, [currentSong, resetSaveStatus]);
 
 	const playSong = (song, songs, index = null) => {
 		if (!isAuthenticated) {

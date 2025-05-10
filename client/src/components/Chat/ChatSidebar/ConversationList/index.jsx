@@ -1,3 +1,4 @@
+import { useAuth } from "../../../../contexts/Auth";
 import { useChat } from "../../../../contexts/Chat";
 import { useUser } from "../../../../contexts/User";
 import ConversationItem from "../ConversationItem";
@@ -11,9 +12,10 @@ const ConversationList = () => {
 		setActiveConversation,
 		fetchConversations,
 		searchUserInput,
-		startNewConversation,
+		setSearchUserInput,
 	} = useChat();
 	const { searchUserResult, loadingSearchUserResult } = useUser();
+	const { user } = useAuth();
 
 	// When component mounts, render existing conversations
 	useEffect(() => {
@@ -29,15 +31,18 @@ const ConversationList = () => {
 		}
 	}, [searchUserInput, searchUserResult, conversations]);
 
-	const handleItemClick = (item) => {
-		if (searchUserInput.trim() !== "") {
-			// If user clicking a search result, start a new conversation
-			startNewConversation(item);
-		} else {
-			// Otherwise, it's an existing conversation
-			setActiveConversation(item);
-		}
+	const handleItemClick = (otherUserId) => {
+		setActiveConversation(otherUserId);
+		setSearchUserInput("");
 	};
+
+	if (displayItems.length === 0) {
+		return (
+			<div className='flex-1 flex items-center justify-center text-gray-400'>
+				No conversations.
+			</div>
+		);
+	}
 
 	if (
 		(loadingConversations && !searchUserInput) ||

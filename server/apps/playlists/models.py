@@ -2,27 +2,111 @@ from mongoengine import (
     Document,
     StringField,
     ReferenceField,
-    ListField,
-    EmbeddedDocument,
-    EmbeddedDocumentField,
     DateTimeField,
+    FileField,
+    ListField,
+    DoesNotExist,
+    BooleanField,
+    EmbeddedDocumentField,
+    EmbeddedDocument,
+    ValidationError,
 )
 from apps.users.models import User
 from apps.songs.models import Song
-import datetime
+from datetime import datetime
 
 
-class PlaylistSong(EmbeddedDocument):
-    song = ReferenceField(Song)
-    added_at = DateTimeField(default=datetime.datetime.now)
+class SongsOfPlaylist(EmbeddedDocument):
+    song = ReferenceField(Song, required=True)
+    added_at = DateTimeField(dafault=datetime.now)
 
 
 class Playlist(Document):
-    user = ReferenceField(User)
+    user = ReferenceField(User, required=True)
     name = StringField(required=True)
-    cover_url = StringField()
-    is_favorite = StringField()
+    cover = FileField()
+    is_favorite = BooleanField(default=False)
     desc = StringField()
-    songs = ListField(EmbeddedDocumentField(PlaylistSong))
-    created_at = DateTimeField(default=datetime.datetime.now)
-    updated_at = DateTimeField(default=datetime.datetime.now)
+    songs = ListField(EmbeddedDocumentField(SongsOfPlaylist))
+    created_at = DateTimeField(default=datetime.now)
+    updated_at = DateTimeField(default=datetime.now)
+
+    meta = {"collection": "playlists"}
+
+    @staticmethod
+    def create(data):
+        try:
+            playlist = Playlist(**data)
+            playlist.save()
+            return playlist
+        except (ValidationError, ValueError) as e:
+            return ValueError({"Error: ", str(e)})
+
+    @staticmethod
+    def findAll(user_id):
+        try:
+            return Playlist.objects(user=user_id)
+        except DoesNotExist:
+            return None
+
+    @staticmethod
+    def findById(playlist_id):
+        try:
+            return Playlist.objects.get(id=playlist_id)
+        except DoesNotExist:
+            return None
+
+    @staticmethod
+    def addSongToPlayList(playlist_id, song_id):
+        try:
+            playlist = Playlist.findById(playlist_id)
+            song = Song.findById(song_id)
+            if not playlist or not song:
+                return None
+            song_entry = SongsOfPlaylist(song=song, added_at=datetime.now())
+            playlist.songs.append(song_entry)
+            playlist.updated_at = datetime.now()
+            playlist.save()
+            return playlist
+        except DoesNotExist:
+            return None
+        
+    @staticmethod
+    def removeSongFromPlayList(playlist_id, song_id):
+        try:
+            playlist = Playlist.findById(playlist_id)
+            song = Song.findById(song_id)
+            if not playlist or not song:
+                return None
+            song_entry = SongsOfPlaylist(song=song)
+            playlist.songs.remove(song_entry)
+            playlist.updated_at = datetime.now()
+            playlist.save()
+            return playlist
+        except DoesNotExist:
+            return None
+
+    @staticmethod
+    def delete(playlist_id):
+        try:
+            playlist = Playlist.objects(id=playlist_id)
+            if not playlist:
+                return False
+            playlist.delete()
+            return True
+        except DoesNotExist:
+            return False
+
+    @staticmethod
+    def update(playlist_id, data):
+        try:
+            playlist = Playlist.findById(id=playlist_id)
+            if not playlist:
+                return None
+            for key, value in data.items():
+                setattr(playlist, key, value)
+            playlist.updated_at = datetime.now()
+            playlist.save()
+            return playlist
+        except (DoesNotExist, ValidationError) as e:
+            return None

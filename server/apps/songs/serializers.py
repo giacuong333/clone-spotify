@@ -1,15 +1,13 @@
 from rest_framework import serializers
 from .models import Song
 from apps.genre.serializers import GenreSerializer
-from apps.users.serializers import UserListSerializer
+from apps.users.serializers import UserCreationSerializer
 from bson import ObjectId
 from mongoengine.errors import DoesNotExist
 from datetime import datetime
 
 
 class SongSerializer(serializers.Serializer):
-    """Base serializer for Song model that includes all fields from the model"""
-
     id = serializers.CharField(read_only=True)
     title = serializers.CharField()
     genre = serializers.SerializerMethodField()
@@ -21,17 +19,15 @@ class SongSerializer(serializers.Serializer):
     )
 
     def get_genre(self, obj):
-        """Get serialized genre data"""
         if not obj.genre:
             return []
         return GenreSerializer(obj.genre, many=True).data
 
     def get_user(self, obj):
-        """Get serialized user data, handle missing/invalid user reference"""
         try:
             if not obj.user:
                 return None
-            return UserListSerializer(obj.user).data
+            return UserCreationSerializer(obj.user).data
         except DoesNotExist:
             return None  # Return None if user reference is invalid
 

@@ -1,4 +1,3 @@
-import { useState } from "react";
 import Sidebar from "../ChatSidebar/ChatSidebarInterface";
 import ChatArea from "../ChatArea";
 import { useChat } from "../../../contexts/Chat";

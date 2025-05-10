@@ -2,7 +2,7 @@ import MessageItem from "../MessageItem";
 import { useChat } from "../../../contexts/Chat";
 
 const MessageList = () => {
-	const { messages, messageEndRef, loadingMessages } = useChat();
+	const { messages, loadingMessages } = useChat();
 
 	if (loadingMessages) {
 		return (
@@ -23,7 +23,6 @@ const MessageList = () => {
 					<MessageItem key={message.id} message={message} />
 				))
 			)}
-			<div ref={messageEndRef} />
 		</div>
 	);
 };

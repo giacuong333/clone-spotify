@@ -1,4 +1,3 @@
-# server/apps/users/serializers.py
 from rest_framework import serializers
 from utils.hash_and_verify_password import hash_password
 from .models import User

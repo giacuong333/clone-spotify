@@ -9,7 +9,6 @@ const GenreProvider = ({ children }) => {
 	const [genreList, setGenreList] = useState([]);
 	const [loadingFetchGenreList, setLoadingFetchGenreList] = useState(false);
 
-	// Fetch genre list
 	const fetchGenreList = useCallback(async () => {
 		try {
 			setLoadingFetchGenreList(true);
@@ -25,7 +24,6 @@ const GenreProvider = ({ children }) => {
 		}
 	}, []);
 
-	// Create a new genre
 	const createGenre = useCallback(
 		async (formData) => {
 			try {
@@ -47,7 +45,7 @@ const GenreProvider = ({ children }) => {
 
 	const updateGenre = useCallback(
 		async (genreId, formData) => {
-			console.log("Updating genre with ID:", genreId, "and data:", formData); // Log dữ liệu
+			console.log("Updating genre with ID:", genreId, "and data:", formData);
 			try {
 				const response = await instance.put(
 					apis.genres.update(genreId),
@@ -70,7 +68,7 @@ const GenreProvider = ({ children }) => {
 	// Delete genres
 	const handleDeleteGenres = useCallback(
 		async (genreIds) => {
-			console.log("Deleting genres with IDs:", genreIds); // Log danh sách ID
+			console.log("Deleting genres with IDs:", genreIds);
 			try {
 				const response = await instance.post(apis.genres.delete(), {
 					genre_ids: genreIds,

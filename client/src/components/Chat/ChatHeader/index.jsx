@@ -3,7 +3,7 @@ import { useUser } from "../../../contexts/User";
 import { useChat } from "../../../contexts/Chat";
 import { useMemo } from "react";
 
-const ChatHeader = ({ conversation }) => {
+const ChatHeader = () => {
 	const { activeConversation } = useChat();
 	const { user, searchUserResult } = useUser();
 
@@ -33,7 +33,7 @@ const ChatHeader = ({ conversation }) => {
 	console.log("activeChatName", activeChatName);
 
 	return (
-		<div className='p-4 border-b border-gray-800 flex justify-between items-center'>
+		<div className='px-4 py-4.5 border-b border-gray-800 flex justify-between items-center'>
 			<div className='flex items-center'>
 				<div className='w-8 h-8 rounded-full bg-green-500 flex items-center justify-center mr-3'>
 					<p className='font-bold'>{activeChatName.charAt(0).toUpperCase()}</p>

@@ -1,0 +1,182 @@
+import { createContext, memo, useCallback, useContext, useState } from "react";
+import { useAuth } from "../Auth";
+import { instance } from "../Axios";
+import { apis } from "../../constants/apis";
+import { notify } from "../../components/Toast";
+
+const PlaylistContext = createContext();
+
+const PlaylistProvider = ({ children }) => {
+	const [playlists, setPlaylists] = useState([]);
+	const [playlist, setPlaylist] = useState({});
+	const [error, setError] = useState("");
+	const [loadingPlaylists, setLoadingPlaylists] = useState(false);
+	const [loadingPlaylist, setLoadingPlaylist] = useState(false);
+	const { isAuthenticated } = useAuth();
+
+	const fetchPlaylists = useCallback(async () => {
+		if (!isAuthenticated) {
+			return;
+		}
+
+		try {
+			setLoadingPlaylists(true);
+			const response = await instance.get(apis.playlists.getAll());
+			if (response.status === 200) {
+				setPlaylists(response.data);
+			}
+		} catch (error) {
+			console.log("Error while fetching playlists", error);
+			setError(error);
+		} finally {
+			setLoadingPlaylists(false);
+		}
+	}, [isAuthenticated]);
+
+	const fetchPlaylist = useCallback(async () => {
+		if (!isAuthenticated) {
+			return;
+		}
+
+		try {
+			setLoadingPlaylists(true);
+		} catch (error) {
+			console.log("Error while fetching playlist", error);
+			setError(error);
+		} finally {
+			setLoadingPlaylists(false);
+		}
+	}, [isAuthenticated]);
+
+	const addSongToPlaylist = useCallback(
+		async (payload) => {
+			if (!isAuthenticated) {
+				return;
+			}
+			const response = await instance.post(
+				apis.playlists.addSongToPlaylist(),
+				payload
+			);
+			if (response.status === 201 || response.status === 200) {
+				notify("Added");
+			}
+			try {
+				setLoadingPlaylists(true);
+			} catch (error) {
+				console.log("Error while adding song to playlist", error);
+				setError(error);
+			} finally {
+				setLoadingPlaylists(false);
+			}
+		},
+		[isAuthenticated]
+	);
+
+	const removeSongFromPlaylist = useCallback(async () => {
+		if (!isAuthenticated) {
+			return;
+		}
+
+		try {
+			setLoadingPlaylists(true);
+		} catch (error) {
+			console.log("Error while removing song from playlist", error);
+			setError(error);
+		} finally {
+			setLoadingPlaylists(false);
+		}
+	}, [isAuthenticated]);
+
+	const editPlaylistTitle = useCallback(async () => {
+		if (!isAuthenticated) {
+			return;
+		}
+
+		try {
+			setLoadingPlaylists(true);
+		} catch (error) {
+			console.log("Error while editing playlist", error);
+			setError(error);
+		} finally {
+			setLoadingPlaylists(false);
+		}
+	}, [isAuthenticated]);
+
+	const deletePlaylist = useCallback(
+		async (playlist_id) => {
+			if (!isAuthenticated) {
+				return;
+			}
+
+			try {
+				setLoadingPlaylists(true);
+				const response = await instance.delete(
+					apis.playlists.deletePlaylist(),
+					{ params: { playlist_id } }
+				);
+				if (response.status === 204) {
+					notify("Playlist deleted");
+					await fetchPlaylists();
+				}
+			} catch (error) {
+				console.log("Error while deleting playlist", error);
+				setError(error);
+			} finally {
+				setLoadingPlaylists(false);
+			}
+		},
+		[isAuthenticated, fetchPlaylists]
+	);
+
+	const createPlaylist = useCallback(
+		async (payload) => {
+			if (!isAuthenticated) {
+				return;
+			}
+
+			try {
+				setLoadingPlaylists(true);
+				const response = await instance.post(
+					apis.playlists.createPlaylist(),
+					payload
+				);
+				if (response.status === 201) {
+					notify("Playlist created");
+					await fetchPlaylists();
+				}
+			} catch (error) {
+				console.log("Error while deleting playlist", error);
+				setError(error);
+			} finally {
+				setLoadingPlaylists(false);
+			}
+		},
+		[isAuthenticated, fetchPlaylists]
+	);
+
+	return (
+		<PlaylistContext.Provider
+			value={{
+				playlists,
+				playlist,
+
+				loadingPlaylists,
+				loadingPlaylist,
+
+				error,
+
+				fetchPlaylists,
+				fetchPlaylist,
+				addSongToPlaylist,
+				removeSongFromPlaylist,
+				editPlaylistTitle,
+				deletePlaylist,
+				createPlaylist,
+			}}>
+			{children}
+		</PlaylistContext.Provider>
+	);
+};
+
+export const usePlaylist = () => useContext(PlaylistContext);
+export default memo(PlaylistProvider);
