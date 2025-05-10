@@ -27,8 +27,8 @@ const NowPlayingBar = () => {
 	const [visible, setVisible] = useState(false);
 
 	const audioRef = useRef(null);
-	const progressBarRef = useRef(null);
 	const animationRef = useRef(null);
+	const progressBarRef = useRef(null);
 
 	const { user } = useAuth();
 	const { handleDownload } = useSong();
@@ -40,19 +40,6 @@ const NowPlayingBar = () => {
 	const handleVisibleChange = (newVisible) => {
 		setVisible(newVisible);
 	};
-
-	// Handle play/pause state
-	useEffect(() => {
-		if (audioRef.current) {
-			if (isPlaying) {
-				audioRef.current.play();
-				animationRef.current = requestAnimationFrame(updateProgress);
-			} else {
-				audioRef.current.pause();
-				cancelAnimationFrame(animationRef.current);
-			}
-		}
-	}, [isPlaying]);
 
 	// Load new song when currentSong changes
 	useEffect(() => {
@@ -67,63 +54,78 @@ const NowPlayingBar = () => {
 		}
 	}, [currentSong]);
 
+	// Play/pause
+	useEffect(() => {
+		if (audioRef.current) {
+			if (isPlaying) {
+				audioRef.current.play();
+				animationRef.current = requestAnimationFrame(updateProgress);
+			} else {
+				audioRef.current.pause();
+				cancelAnimationFrame(animationRef.current);
+			}
+		}
+	}, [isPlaying]);
+
 	// Set up audio event listeners on component mount
 	useEffect(() => {
 		const audio = audioRef.current;
 
-		if (audio) {
-			// Initialize volume
-			audio.volume = volume;
+		if (!audio) return;
 
-			// Time update event
-			const handleTimeUpdate = () => {
-				if (audio.duration) {
-					setCurrentTime(formatTime(audio.currentTime));
+		// Initialize volume
+		audio.volume = volume;
+
+		// Time update event
+		const handleTimeUpdate = () => {
+			if (audio.duration) {
+				setCurrentTime(formatTime(audio.currentTime));
+			}
+		};
+
+		// Load metadata event
+		const handleLoadedMetadata = () => {
+			setDuration(formatTime(audio.duration));
+		};
+
+		// Ended event
+		const handleEnded = () => {
+			if (doesRepeat) {
+				audio.currentTime = 0;
+				audio.play();
+			} else {
+				const nextSong = playNext(isShuffled);
+				if (!nextSong) {
+					togglePlay();
 				}
-			};
+			}
+		};
 
-			// Load metadata event
-			const handleLoadedMetadata = () => {
-				setDuration(formatTime(audio.duration));
-			};
+		audio.addEventListener("timeupdate", handleTimeUpdate);
+		audio.addEventListener("loadedmetadata", handleLoadedMetadata);
+		audio.addEventListener("ended", handleEnded);
 
-			// Ended event
-			const handleEnded = () => {
-				if (doesRepeat) {
-					audio.currentTime = 0;
-					audio.play();
-				} else {
-					const nextSong = playNext(isShuffled);
-					if (!nextSong) {
-						// If no next song, just stop playing
-						togglePlay();
-					}
-				}
-			};
-
-			// Add event listeners
-			audio.addEventListener("timeupdate", handleTimeUpdate);
-			audio.addEventListener("loadedmetadata", handleLoadedMetadata);
-			audio.addEventListener("ended", handleEnded);
-
-			// Clean up event listeners on unmount
-			return () => {
-				audio.removeEventListener("timeupdate", handleTimeUpdate);
-				audio.removeEventListener("loadedmetadata", handleLoadedMetadata);
-				audio.removeEventListener("ended", handleEnded);
-				if (animationRef.current) {
-					cancelAnimationFrame(animationRef.current);
-				}
-			};
-		}
+		return () => {
+			audio.removeEventListener("timeupdate", handleTimeUpdate);
+			audio.removeEventListener("loadedmetadata", handleLoadedMetadata);
+			audio.removeEventListener("ended", handleEnded);
+			if (animationRef.current) cancelAnimationFrame(animationRef.current);
+		};
 	}, [doesRepeat, isShuffled]);
 
 	// Function to update progress bar using requestAnimationFrame
 	const updateProgress = () => {
-		if (audioRef.current) {
-			if (audioRef.current.duration) {
-				setCurrentTime(formatTime(audioRef.current.currentTime));
-			}
+		const audio = audioRef.current;
+
+		if (!audio || !audio.duration) return;
+
+		setCurrentTime(formatTime(audio.currentTime));
+
+		if (progressBarRef.current) {
+			progressBarRef.current.value = audio.currentTime;
+		}
+
+		if (!audio.paused) {
 			animationRef.current = requestAnimationFrame(updateProgress);
 		}
 	};
@@ -179,26 +181,39 @@ const NowPlayingBar = () => {
 		}
 	};
 
-	// Fast forward and rewind functions are removed as they're not needed.
-	// The handleSeek function now handles all seeking functionality through the progress bar.
 	const handleSeek = (event) => {
-		if (audioRef.current && audioRef.current.duration) {
-			// Get the seek time from the input value
-			const seekTime = parseFloat(event.target.value);
+		// Đầu tiên kiểm tra xem audioRef.current có tồn tại không
+		if (!audioRef.current) return;
 
-			// Store the current playing state
-			const wasPlaying = !audioRef.current.paused;
+		// Sau đó mới an toàn để kiểm tra thuộc tính duration
+		if (!audioRef.current.duration) return;
 
-			// Set the new current time
+		const seekTime = parseFloat(event.target.value);
+
+		// Lưu trạng thái phát hiện tại trước khi tua
+		const wasPlaying = isPlaying && !audioRef.current.paused;
+
+		try {
+			// Đặt thời gian mới - đây là bước tua thực sự
 			audioRef.current.currentTime = seekTime;
 
-			// Update UI
+			// Cập nhật UI
 			setCurrentTime(formatTime(seekTime));
 
-			// If it was playing before seeking, ensure it continues playing
+			// Phát lại nếu cần thiết (một số trình duyệt sẽ tự động pause khi thay đổi currentTime)
 			if (wasPlaying && audioRef.current.paused) {
-				audioRef.current.play();
+				// Sử dụng Promise để xử lý lỗi
+				audioRef.current.play().catch((err) => {
+					console.error("Lỗi khi tiếp tục phát sau khi tua:", err);
+				});
 			}
+
+			// Cập nhật thanh tiến trình nếu cần
+			if (progressBarRef.current) {
+				progressBarRef.current.value = seekTime;
+			}
+		} catch (error) {
+			console.error("Lỗi khi tua:", error);
 		}
 	};
 

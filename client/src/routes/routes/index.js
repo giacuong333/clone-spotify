@@ -57,8 +57,7 @@ const routes = [
 		path: paths.profile,
 		Layout: MainLayout,
 		Page: Profile,
-		isPublic: true,
-		isAuthPage: false,
+		isPublic: false,
 	},
 	{
 		path: paths.search,
@@ -107,7 +106,7 @@ const routes = [
 		isAdminPage: true,
 	},
 	{
-		path: paths.statistic,
+		path: paths.statistics,
 		Layout: AdminLayout,
 		Page: AdminStatistics,
 		isPublic: false,

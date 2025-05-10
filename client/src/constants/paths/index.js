@@ -12,7 +12,7 @@ const paths = {
 	users: "/admin/users",
 	songs: "/admin/songs",
 	genres: "/admin/genres",
-	analytics: "/admin/analytics",
+	statistics: "/admin/statistics",
 	settings: "/admin/settings",
 };
 

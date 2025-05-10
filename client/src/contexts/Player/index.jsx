@@ -10,6 +10,7 @@ const PlayerProvider = ({ children }) => {
 	const [currentSongIndex, setCurrentSongIndex] = useState(0);
 	const [songList, setSongList] = useState([]);
 	const [isPlaying, setIsPlaying] = useState(false);
+
 	const { isAuthenticated } = useAuth();
 	const { isSaved, saveListenedAt, resetSaveStatus } = useListenedAt();
 
