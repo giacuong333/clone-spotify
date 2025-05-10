@@ -18,5 +18,5 @@ class GenreStatSerializer(serializers.Serializer):
 
 
 class HourlyStatSerializer(serializers.Serializer):
-    hour = serializers.DateTimeField()
+    hour = serializers.IntegerField()
     play_count = serializers.IntegerField()

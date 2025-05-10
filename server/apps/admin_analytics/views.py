@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from rest_framework.views import APIView
 from apps.songs.models import Song, Genre
-from rest_framework.permissions import IsAdminUser, IsAuthenticated
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from apps.admin_analytics.serializers import (
     SongStatSerializer,
@@ -19,41 +19,29 @@ from reportlab.lib.styles import getSampleStyleSheet
 from django.http import HttpResponse
 from reportlab.lib.units import inch
 import io
-from django.utils import timezone
 
 
 class TopSongsView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        # Lấy tham số từ query
         limit = int(request.query_params.get("limit", 20))
-        time_range = request.query_params.get("range", "30")  # Số ngày
+        time_range = request.query_params.get("range", "30")
         days = int(time_range)
-
-        # Tính thời gian bắt đầu
         start_date = timezone.now() - datetime.timedelta(days=days)
 
-        # Lấy lượt nghe trong thời gian quy định
         play_counts = {}
         for play in ListenedAt.objects(listened_at__gte=start_date):
             song_id = str(play.song.id)
-            if song_id in play_counts:
-                play_counts[song_id] += 1
-            else:
-                play_counts[song_id] = 1
+            play_counts[song_id] = play_counts.get(song_id, 0) + 1
 
-        # Lấy lượt download trong thời gian quy định
         download_counts = {}
         for download in DownloadedAt.objects(downloaded_at__gte=start_date):
             song_id = str(download.song.id)
-            if song_id in download_counts:
-                download_counts[song_id] += 1
-            else:
-                download_counts[song_id] = 1
+            download_counts[song_id] = download_counts.get(song_id, 0) + 1
 
         results = []
-        for song in Song.objects():
+        for song in Song.objects.all():
             song_id = str(song.id)
             play_count = play_counts.get(song_id, 0)
             download_count = download_counts.get(song_id, 0)
@@ -77,7 +65,6 @@ class TopSongsView(APIView):
                 }
             )
 
-        # Sắp xếp theo lượt nghe hoặc download
         sort_by = request.query_params.get("sort_by", "play_count")
         if sort_by == "play_count":
             results = sorted(results, key=lambda x: x["play_count"], reverse=True)[
@@ -88,9 +75,7 @@ class TopSongsView(APIView):
                 :limit
             ]
 
-        # Serialize kết quả
         serializer = SongStatSerializer(results, many=True)
-
         return Response(
             {"results": serializer.data, "time_range_days": days, "sorted_by": sort_by}
         )
@@ -100,51 +85,47 @@ class GenreStatsView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        # Lấy tham số từ query
-        time_range = request.query_params.get("range", "30")  # Số ngày
+        time_range = request.query_params.get("range", "30")
         days = int(time_range)
-
-        # Tính thời gian bắt đầu
         start_date = timezone.now() - datetime.timedelta(days=days)
 
-        # Lượt nghe theo bài hát
         play_counts = {}
         for play in ListenedAt.objects(listened_at__gte=start_date):
             song_id = str(play.song.id)
-            if song_id in play_counts:
-                play_counts[song_id] += 1
-            else:
-                play_counts[song_id] = 1
+            play_counts[song_id] = play_counts.get(song_id, 0) + 1
 
-        # Tính toán số lượt nghe theo thể loại
         genre_stats = {}
-        for song in Song.objects():
+        for song in Song.objects.all():
             song_id = str(song.id)
             play_count = play_counts.get(song_id, 0)
 
-            # Lấy thể loại
-            genre = song.genre if hasattr(song, "genre") else None
-            if genre:
-                genre_id = str(genre.id)
-                if genre_id not in genre_stats:
-                    genre_stats[genre_id] = {
-                        "id": genre_id,
-                        "name": genre.name,
-                        "song_count": 0,
-                        "play_count": 0,
-                    }
+            # Handle genres as a list/collection
+            genres = song.genre if hasattr(song, "genre") and song.genre else []
+            # If genres is not a list (e.g., a single genre or None), convert to list
+            if not isinstance(genres, (list, tuple)):
+                genres = [genres] if genres else []
 
-                genre_stats[genre_id]["song_count"] += 1
-                genre_stats[genre_id]["play_count"] += play_count
+            for genre in genres:
+                if genre:  # Ensure genre is not None
+                    genre_id = (
+                        str(genre.id) if hasattr(genre, "id") else str(genre)
+                    )  # Handle custom genre objects
+                    if genre_id not in genre_stats:
+                        genre_stats[genre_id] = {
+                            "id": genre_id,
+                            "name": (
+                                genre.name if hasattr(genre, "name") else str(genre)
+                            ),
+                            "song_count": 0,
+                            "play_count": 0,
+                        }
+                    genre_stats[genre_id]["song_count"] += 1
+                    genre_stats[genre_id]["play_count"] += play_count
 
-        # Chuyển dictionary thành list
         results = list(genre_stats.values())
-        # Sắp xếp theo lượt nghe
         results = sorted(results, key=lambda x: x["play_count"], reverse=True)
 
-        # Serialize kết quả
         serializer = GenreStatSerializer(results, many=True)
-
         return Response({"results": serializer.data, "time_range_days": days})
 
 
@@ -152,36 +133,24 @@ class PeekHoursView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        # Lấy tham số từ query
-        time_range = request.query_params.get("range", "30")  # Số ngày
+        time_range = request.query_params.get("range", "30")
         days = int(time_range)
-
-        # Tính thời gian bắt đầu
         start_date = timezone.now() - datetime.timedelta(days=days)
 
-        # Đếm số lượt nghe theo giờ
         hourly_counts = [0] * 24
-
         for listen in ListenedAt.objects(listened_at__gte=start_date):
             hour = listen.listened_at.hour
             hourly_counts[hour] += 1
 
-        results = []
-        for hour in range(24):
-            results.append({"hour": hour, "play_count": hourly_counts[hour]})
-
-        # Sắp xếp theo số lượt nghe
+        results = [
+            {"hour": hour, "play_count": count}
+            for hour, count in enumerate(hourly_counts)
+        ]
         sorted_results = sorted(results, key=lambda x: x["play_count"], reverse=True)
-
-        # Tìm giờ cao điểm
         peak_hour = sorted_results[0]["hour"] if sorted_results else None
-
-        # Sắp xếp lại theo giờ cho output
         results = sorted(results, key=lambda x: x["hour"])
 
-        # Serialize kết quả
         serializer = HourlyStatSerializer(results, many=True)
-
         return Response(
             {
                 "results": serializer.data,
@@ -195,34 +164,25 @@ class ExportPDFView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        # Lấy loại báo cáo từ query params
-        report_type = request.query_params.get(
-            "type", "songs"
-        )  # songs, genres, peak_hours
-        time_range = request.query_params.get("range", "30")  # Số ngày
+        report_type = request.query_params.get("type", "songs")
+        time_range = request.query_params.get("range", "30")
         days = int(time_range)
 
-        # Tạo response với content type là PDF
         response = HttpResponse(content_type="application/pdf")
         response["Content-Disposition"] = (
             f'attachment; filename="{report_type}_report.pdf"'
         )
 
-        # Tạo buffer để lưu PDF
         buffer = io.BytesIO()
-
-        # Tạo document
         doc = SimpleDocTemplate(buffer, pagesize=letter)
         elements = []
 
-        # Tiêu đề báo cáo
         styles = getSampleStyleSheet()
         title = Paragraph(
             f"Spotify Clone - {report_type.capitalize()} Report", styles["Title"]
         )
         elements.append(title)
 
-        # Thêm ngày tạo báo cáo
         date_text = Paragraph(
             f"Generated on: {timezone.now().strftime('%Y-%m-%d %H:%M:%S')}",
             styles["Normal"],
@@ -232,15 +192,12 @@ class ExportPDFView(APIView):
         elements.append(period_text)
         elements.append(Spacer(1, 0.2 * inch))
 
-        # Tạo dữ liệu báo cáo dựa trên loại báo cáo
         if report_type == "songs":
-            # Lấy API data
             view = TopSongsView()
             request._request.GET = request._request.GET.copy()
             request._request.GET["sort_by"] = "play_count"
             response_data = view.get(request).data
 
-            # Tạo bảng cho top songs
             elements.append(Paragraph("Top Songs by Play Count", styles["Heading1"]))
             elements.append(Spacer(1, 0.1 * inch))
 
@@ -256,7 +213,6 @@ class ExportPDFView(APIView):
                     ]
                 )
 
-            # Tạo bảng
             table = Table(data)
             table.setStyle(
                 TableStyle(
@@ -271,11 +227,9 @@ class ExportPDFView(APIView):
                     ]
                 )
             )
-
             elements.append(table)
             elements.append(Spacer(1, 0.3 * inch))
 
-            # Thêm top downloads
             request._request.GET["sort_by"] = "download_count"
             response_data = view.get(request).data
 
@@ -296,7 +250,6 @@ class ExportPDFView(APIView):
                     ]
                 )
 
-            # Tạo bảng
             table = Table(data)
             table.setStyle(
                 TableStyle(
@@ -311,14 +264,12 @@ class ExportPDFView(APIView):
                     ]
                 )
             )
-
             elements.append(table)
+
         elif report_type == "genres":
-            # Lấy API data
             view = GenreStatsView()
             response_data = view.get(request).data
 
-            # Tạo bảng cho thể loại
             elements.append(Paragraph("Genre Statistics", styles["Heading1"]))
             elements.append(Spacer(1, 0.1 * inch))
 
@@ -341,7 +292,6 @@ class ExportPDFView(APIView):
                     ]
                 )
 
-            # Tạo bảng
             table = Table(data)
             table.setStyle(
                 TableStyle(
@@ -356,14 +306,12 @@ class ExportPDFView(APIView):
                     ]
                 )
             )
-
             elements.append(table)
+
         elif report_type == "peak_hours":
-            # Lấy API data
             view = PeekHoursView()
             response_data = view.get(request).data
 
-            # Tạo bảng cho peak hours
             elements.append(Paragraph("Peak Hours Analysis", styles["Heading1"]))
             elements.append(Spacer(1, 0.1 * inch))
 
@@ -375,7 +323,7 @@ class ExportPDFView(APIView):
             for hour_data in sorted(response_data["results"], key=lambda x: x["hour"]):
                 hour_str = f"{hour_data['hour']}:00 - {(hour_data['hour'] + 1) % 24}:00"
                 data.append([hour_str, hour_data["play_count"]])
-            # Tạo bảng
+
             table = Table(data)
             table.setStyle(
                 TableStyle(
@@ -390,16 +338,10 @@ class ExportPDFView(APIView):
                     ]
                 )
             )
-
             elements.append(table)
 
-        # Xây dựng PDF
         doc.build(elements)
-
-        # Lấy PDF từ buffer
         pdf = buffer.getvalue()
         buffer.close()
-
-        # Trả về PDF
         response.write(pdf)
         return response
