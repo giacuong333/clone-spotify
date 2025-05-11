@@ -57,21 +57,24 @@ const PlaylistProvider = ({ children }) => {
 		[isAuthenticated]
 	);
 
-	const fetchPlaylistsByUser = useCallback(async (userId) => {
-		if (!isAuthenticated) {
-			return;
-		}
-
-		try {
-			const response = await instance.get(apis.playlists.getByUserId(userId));
-			if (response.status === 200) {
-				return response;
+	const fetchPlaylistsByUser = useCallback(
+		async (userId) => {
+			if (!isAuthenticated) {
+				return;
 			}
-		} catch (error) {
-			console.log("Error while fetching playlists by user: ", error);
-			setError(error);
-		} 
-	}, [isAuthenticated]);
+
+			try {
+				const response = await instance.get(apis.playlists.getByUserId(userId));
+				if (response.status === 200) {
+					return response;
+				}
+			} catch (error) {
+				console.log("Error while fetching playlists by user: ", error);
+				setError(error);
+			}
+		},
+		[isAuthenticated]
+	);
 
 	const addSongToPlaylist = useCallback(
 		async (payload) => {
@@ -97,6 +100,7 @@ const PlaylistProvider = ({ children }) => {
 				if (response.status === 201 || response.status === 200) {
 					notify("Added");
 					await fetchPlaylist(payload?.playlist_id);
+					await fetchPlaylists();
 				}
 			} catch (error) {
 				console.log("Error while adding song to playlist", error);
@@ -106,7 +110,7 @@ const PlaylistProvider = ({ children }) => {
 				setLoadingPlaylists(false);
 			}
 		},
-		[isAuthenticated, playlist?.songs, fetchPlaylist]
+		[isAuthenticated, playlist?.songs, fetchPlaylist, fetchPlaylists]
 	);
 
 	const removeSongFromPlaylist = useCallback(

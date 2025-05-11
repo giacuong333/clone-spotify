@@ -34,6 +34,7 @@ const Song = ({ children }) => {
 			if (response.status === 200) {
 				setSongDetails(response.data);
 			}
+			return response;
 		} catch (error) {
 			console.log("Error response:", error.response);
 		} finally {

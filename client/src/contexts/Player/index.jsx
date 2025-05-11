@@ -35,6 +35,12 @@ const PlayerProvider = ({ children }) => {
 			return;
 		}
 
+		if (!song?.audio_url || !songs?.length) {
+			notify("Invalid song or playlist", "error");
+			setIsPlaying(false);
+			return;
+		}
+
 		setCurrentSong(song);
 		setSongList(songs);
 		if (index !== null) {
@@ -47,6 +53,10 @@ const PlayerProvider = ({ children }) => {
 	};
 
 	const togglePlay = () => {
+		if (!currentSong?.audio_url) {
+			notify("No song selected", "error");
+			return;
+		}
 		setIsPlaying(!isPlaying);
 	};
 
@@ -63,6 +73,7 @@ const PlayerProvider = ({ children }) => {
 		}
 		setCurrentSongIndex(nextIndex);
 		setCurrentSong(songList[nextIndex]);
+		setIsPlaying(true);
 		return songList[nextIndex];
 	};
 
@@ -74,6 +85,7 @@ const PlayerProvider = ({ children }) => {
 			currentSongIndex === 0 ? songList.length - 1 : currentSongIndex - 1;
 		setCurrentSongIndex(prevIndex);
 		setCurrentSong(songList[prevIndex]);
+		setIsPlaying(true);
 		return songList[prevIndex];
 	};
 
@@ -84,6 +96,7 @@ const PlayerProvider = ({ children }) => {
 				currentSongIndex,
 				songList,
 				isPlaying,
+				setIsPlaying,
 				playSong,
 				togglePlay,
 				playNext,

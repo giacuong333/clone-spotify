@@ -3,57 +3,7 @@ import { Button, Spin } from "antd";
 import PlayIcon from "../Icons/PlayIcon";
 import SongList from "../SongList";
 import { useSearch } from "../../contexts/Search";
-
-const songList = [
-	{
-		id: 1,
-		imageUrl: "",
-		name: "Mất Kết Nối",
-		artist: "Đen Vâu",
-		listeners: "25,661,983",
-		duration: "3:27",
-	},
-	{
-		id: 2,
-		imageUrl: "",
-		name: "Tràn Bộ Nhớ",
-		artist: "Dương Domic",
-		listeners: "9,378,924",
-		duration: "3:30",
-	},
-	{
-		id: 3,
-		imageUrl: "",
-		name: "HÀO QUANG(feat.RHYDER, Dương Mic & Pháp Kiều) HÀO QUANG(feat.RHYDER, Dương Mic & Pháp Kiều)",
-		artist: "Tùng Dương",
-		listeners: "2,345,677",
-		duration: "4:12",
-	},
-	{
-		id: 4,
-		imageUrl: "",
-		name: "Pin Dự Phòng",
-		artist: "GDragon",
-		listeners: "21,357,833",
-		duration: "3:18",
-	},
-	{
-		id: 5,
-		imageUrl: "",
-		name: "LÀN ƯU TIÊN",
-		artist: "Đen Vâu",
-		listeners: "15,113,644",
-		duration: "4:05",
-	},
-	{
-		id: 6,
-		imageUrl: "",
-		name: "Yêu Em 2 Ngày",
-		artist: "Đen Vâu",
-		listeners: "3,876,990",
-		duration: "2:52",
-	},
-];
+import { usePlayer } from "../../contexts/Player";
 
 const types = [
 	{ id: 1, name: "All" },
@@ -65,6 +15,7 @@ const types = [
 const Search = () => {
 	const { searchResult, searchInput, type, setType, handleSearch } =
 		useSearch();
+	const { playSong } = usePlayer();
 
 	useEffect(() => {
 		setType(types[0]);
@@ -83,6 +34,15 @@ const Search = () => {
 			return searchResult.users[0]?.songs;
 		}
 	}, [searchResult.songs, searchResult.users]);
+
+	const handlePlaySongsOfUser = () => {
+		playSong(
+			searchResultSongList[
+				Math.floor(Math.random() * searchResultSongList.length)
+			],
+			searchResultSongList
+		);
+	};
 
 	return (
 		<React.Suspense
@@ -124,7 +84,10 @@ const Search = () => {
 										<span className='flex flex-col gap-2'>
 											<div className='w-24 h-auto overflow-hidden rounded-full'>
 												<img
-													src='https://i.scdn.co/image/ab6761610000517491d2d39877c13427a2651af5'
+													src={
+														searchResult?.users[0]?.user?.image ||
+														"https://i.scdn.co/image/ab6761610000517491d2d39877c13427a2651af5"
+													}
 													alt='Thumnail'
 													className='w-full h-full object-center object-cover'
 												/>
@@ -151,6 +114,7 @@ const Search = () => {
 												type='primary'
 												icon={<PlayIcon width='30' height='30' />}
 												className='!rounded-full !text-3xl !text-center !mx-auto !w-full !bg-transparent !text-black'
+												onClick={handlePlaySongsOfUser}
 											/>
 										</div>
 									</div>

@@ -55,6 +55,13 @@ class Playlist(Document):
             return Playlist.objects.get(id=playlist_id)
         except DoesNotExist:
             return None
+        
+    @staticmethod
+    def search(query):
+        try:
+            return Playlist.objects.filter(name__icontains=query)
+        except DoesNotExist:
+            return None
 
     @staticmethod
     def addSongToPlayList(playlist_id, song_id):

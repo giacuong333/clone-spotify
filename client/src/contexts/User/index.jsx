@@ -37,7 +37,7 @@ const UserProvider = ({ children }) => {
 			}
 		} catch (error) {
 			console.log("Errors occur while fetching user", error);
-		} 
+		}
 	}, []);
 
 	const fetchUserList = useCallback(async () => {

@@ -20,14 +20,13 @@ import SongIcon from "../../components/Icons/SongIcon";
 
 const NowPlayingBar = () => {
 	const [volume, setVolume] = useState(0.5);
-	const [currentTime, setCurrentTime] = useState("00:00");
-	const [duration, setDuration] = useState("00:00");
 	const [doesRepeat, setDoesRepeat] = useState(false);
 	const [isShuffled, setIsShuffled] = useState(false);
 	const [visible, setVisible] = useState(false);
+	const [currentTime, setCurrentTime] = useState(0);
+	const [duration, setDuration] = useState(0);
 
 	const audioRef = useRef(null);
-	const animationRef = useRef(null);
 	const progressBarRef = useRef(null);
 
 	const { user } = useAuth();
@@ -44,89 +43,54 @@ const NowPlayingBar = () => {
 	// Load new song when currentSong changes
 	useEffect(() => {
 		if (currentSong && audioRef.current) {
-			// Load new audio source
-			audioRef.current.src = currentSong.audio_url || "";
 			audioRef.current.load();
-
-			if (isPlaying) {
-				audioRef.current.play();
-			}
+			audioRef.current.volume = volume;
+			setCurrentTime(0);
+			setDuration(0);
+			audioRef.current.play();
 		}
 	}, [currentSong]);
 
 	// Play/pause
 	useEffect(() => {
-		if (audioRef.current) {
-			if (isPlaying) {
-				audioRef.current.play();
-				animationRef.current = requestAnimationFrame(updateProgress);
-			} else {
-				audioRef.current.pause();
-				cancelAnimationFrame(animationRef.current);
-			}
+		if (isPlaying) {
+			audioRef.current?.play();
+		} else {
+			audioRef.current?.pause();
 		}
-	}, [isPlaying]);
+	}, [isPlaying, audioRef]);
 
-	// Set up audio event listeners on component mount
 	useEffect(() => {
 		const audio = audioRef.current;
+		if (audio) {
+			audio.addEventListener("loadedmetadata", handleTimeUpdate);
+			return () => {
+				audio.removeEventListener("loadedmetadata", handleTimeUpdate);
+			};
+		}
+	}, [audioRef]);
 
-		if (!audio) return;
+	const handleTimeUpdate = () => {
+		console.log("Current time: ", audioRef.current.currentTime);
+		setCurrentTime(audioRef.current.currentTime);
+		setDuration(audioRef.current.duration);
+	};
 
-		// Initialize volume
-		audio.volume = volume;
-
-		// Time update event
-		const handleTimeUpdate = () => {
-			if (audio.duration) {
-				setCurrentTime(formatTime(audio.currentTime));
-			}
-		};
-
-		// Load metadata event
-		const handleLoadedMetadata = () => {
-			setDuration(formatTime(audio.duration));
-		};
-
-		// Ended event
-		const handleEnded = () => {
-			if (doesRepeat) {
-				audio.currentTime = 0;
-				audio.play();
-			} else {
-				const nextSong = playNext(isShuffled);
-				if (!nextSong) {
-					togglePlay();
-				}
-			}
-		};
-
+	// Update currentTime and duration continously
+	useEffect(() => {
+		const audio = audioRef.current;
 		audio.addEventListener("timeupdate", handleTimeUpdate);
-		audio.addEventListener("loadedmetadata", handleLoadedMetadata);
-		audio.addEventListener("ended", handleEnded);
 
 		return () => {
 			audio.removeEventListener("timeupdate", handleTimeUpdate);
-			audio.removeEventListener("loadedmetadata", handleLoadedMetadata);
-			audio.removeEventListener("ended", handleEnded);
-			if (animationRef.current) cancelAnimationFrame(animationRef.current);
 		};
-	}, [doesRepeat, isShuffled]);
+	}, []);
 
-	// Function to update progress bar using requestAnimationFrame
-	const updateProgress = () => {
-		const audio = audioRef.current;
-
-		if (!audio || !audio.duration) return;
-
-		setCurrentTime(formatTime(audio.currentTime));
-
-		if (progressBarRef.current) {
-			progressBarRef.current.value = audio.currentTime;
-		}
-
-		if (!audio.paused) {
-			animationRef.current = requestAnimationFrame(updateProgress);
+	const handleSeek = () => {
+		if (audioRef.current && progressBarRef.current) {
+			const newTime = Number(progressBarRef.current.value);
+			audioRef.current.currentTime = newTime;
+			setCurrentTime(newTime);
 		}
 	};
 
@@ -181,42 +145,6 @@ const NowPlayingBar = () => {
 		}
 	};
 
-	const handleSeek = (event) => {
-		// Đầu tiên kiểm tra xem audioRef.current có tồn tại không
-		if (!audioRef.current) return;
-
-		// Sau đó mới an toàn để kiểm tra thuộc tính duration
-		if (!audioRef.current.duration) return;
-
-		const seekTime = parseFloat(event.target.value);
-
-		// Lưu trạng thái phát hiện tại trước khi tua
-		const wasPlaying = isPlaying && !audioRef.current.paused;
-
-		try {
-			// Đặt thời gian mới - đây là bước tua thực sự
-			audioRef.current.currentTime = seekTime;
-
-			// Cập nhật UI
-			setCurrentTime(formatTime(seekTime));
-
-			// Phát lại nếu cần thiết (một số trình duyệt sẽ tự động pause khi thay đổi currentTime)
-			if (wasPlaying && audioRef.current.paused) {
-				// Sử dụng Promise để xử lý lỗi
-				audioRef.current.play().catch((err) => {
-					console.error("Lỗi khi tiếp tục phát sau khi tua:", err);
-				});
-			}
-
-			// Cập nhật thanh tiến trình nếu cần
-			if (progressBarRef.current) {
-				progressBarRef.current.value = seekTime;
-			}
-		} catch (error) {
-			console.error("Lỗi khi tua:", error);
-		}
-	};
-
 	const handleDownloadSong = async (event) => {
 		const downloadPromise = handleDownload(
 			event,
@@ -243,14 +171,8 @@ const NowPlayingBar = () => {
 	const songTitle = currentSong?.title || "SONG TITLE";
 	const artistName = currentSong?.user?.name || "USER";
 
-	// Convert duration string back to seconds for the progress bar max value
-	const durationInSeconds = audioRef.current?.duration || 0;
-
 	return (
 		<section className='bg-black h-20 w-full'>
-			{/* Hidden audio element for audio playback */}
-			<audio ref={audioRef} />
-
 			<div className='grid grid-cols-4 h-full'>
 				{/* Song Information */}
 				<div className='flex items-center gap-3 w-full'>
@@ -403,17 +325,24 @@ const NowPlayingBar = () => {
 
 					{/* Progress Bar */}
 					<div className='flex items-center justify-center gap-2 w-full px-20'>
-						<p className='text-white/70 text-xs'>{currentTime}</p>
+						<p className='text-white/70 text-xs'>{formatTime(currentTime)}</p>
 						<input
 							ref={progressBarRef}
 							type='range'
 							min='0'
-							max={durationInSeconds}
-							value={audioRef.current?.currentTime || 0}
+							step='0.01'
+							max={duration.toString()}
+							value={currentTime}
 							onChange={handleSeek}
-							className='w-full accent-[#009634] cursor-pointer'
+							className='w-full h-1 accent-[#009634] cursor-pointer'
 						/>
-						<p className='text-white/70 text-xs'>{duration}</p>
+						{/* Hidden audio element for audio playback */}
+						<audio
+							ref={audioRef}
+							src={currentSong?.audio_url}
+							type='audio/mp3'
+						/>
+						<p className='text-white/70 text-xs'>{formatTime(duration)}</p>
 					</div>
 				</div>
 

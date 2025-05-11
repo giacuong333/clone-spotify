@@ -8,7 +8,7 @@ import formatTotalDuration from "../../utils/formatTotalDuration";
 import SongIcon from "../Icons/SongIcon";
 
 const PlaylistDetails = () => {
-	const song_id = useParams()?.id;
+	const playlist_id = useParams()?.id;
 	const {
 		fetchPlaylist,
 		playlist,
@@ -21,8 +21,8 @@ const PlaylistDetails = () => {
 	const [savedSongs, setSavedSongs] = useState(new Set());
 
 	useEffect(() => {
-		fetchPlaylist(song_id);
-	}, [fetchPlaylist, song_id]);
+		fetchPlaylist(playlist_id);
+	}, [fetchPlaylist, playlist_id]);
 
 	useEffect(() => {
 		if (playlist?.songs) {
