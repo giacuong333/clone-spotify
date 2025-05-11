@@ -23,7 +23,7 @@ class TopSongsView(APIView):
     def get(self, request):
         # Lấy tham số từ query
         limit = int(request.query_params.get('limit', 20))
-        time_range = request.query_params.get('range', '30')  # Số ngày
+        time_range = request.query_params.get('range', '30')
         days = int(time_range)
         
         # Tính thời gian bắt đầu
