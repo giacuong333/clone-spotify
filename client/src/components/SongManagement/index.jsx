@@ -17,6 +17,14 @@ import ConfirmPopup from "../ConfirmPopup";
 import formatTime from "../../utils/formatTime";
 
 const SongManagement = () => {
+	// const { user } = useAuth();
+	const [selectionType, setSelectionType] = useState("checkbox");
+	const [isModalVisible, setIsModalVisible] = useState(false);
+	const [selectedRowKeys, setSelectedRowKeys] = useState([]);
+	const [isConfirmPopupVisible, setIsConfirmPopupVisible] = useState(false);
+	const [searchText, setSearchText] = useState("");
+	const [isDeleting, setIsDeleting] = useState(false);
+	const [mediaTypeFilter, setMediaTypeFilter] = useState("all");
 	const {
 		songList,
 		fetchSongList,
@@ -26,14 +34,6 @@ const SongManagement = () => {
 		loadingFetchSongDetails,
 		handleDeleteSongs,
 	} = useSong();
-	// const { user } = useAuth();
-	const [selectionType, setSelectionType] = useState("checkbox");
-	const [isModalVisible, setIsModalVisible] = useState(false);
-	const [selectedRowKeys, setSelectedRowKeys] = useState([]);
-	const [isConfirmPopupVisible, setIsConfirmPopupVisible] = useState(false);
-	const [searchText, setSearchText] = useState("");
-	const [isDeleting, setIsDeleting] = useState(false);
-	const [mediaTypeFilter, setMediaTypeFilter] = useState("all");
 
 	useEffect(() => {
 		fetchSongList();
@@ -198,6 +198,7 @@ const SongManagement = () => {
 	);
 
 	const handleViewDetails = async (songId) => {
+		alert(songId);
 		try {
 			await fetchSongDetails(songId);
 			setIsModalVisible(true);

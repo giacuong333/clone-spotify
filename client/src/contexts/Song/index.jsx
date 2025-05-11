@@ -41,6 +41,17 @@ const Song = ({ children }) => {
 		}
 	}, []);
 
+	const fetchSongsByUserId = useCallback(async (userId) => {
+		try {
+			const response = await instance.get(apis.songs.getByUserId(userId));
+			if (response.status === 200) {
+				return response;
+			}
+		} catch (error) {
+			console.log("Error response:", error.response);
+		}
+	}, []);
+
 	const handleDeleteSongs = async (songIds) => {
 		try {
 			const data = { song_ids: songIds };
@@ -170,6 +181,7 @@ const Song = ({ children }) => {
 				handleDeleteSongs,
 				handleDownload,
 				handleDownloadVideo,
+				fetchSongsByUserId,
 			}}>
 			{children}
 		</SongContext.Provider>

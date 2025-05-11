@@ -1,162 +1,234 @@
-import React, { useCallback, useState } from "react";
-import { apis } from "../../constants/apis";
+import { createContext, memo, useCallback, useContext, useState } from "react";
+import { useAuth } from "../Auth";
 import { instance } from "../Axios";
+import { apis } from "../../constants/apis";
 import { notify } from "../../components/Toast";
 
-const PlaylistContext = React.createContext();
+const PlaylistContext = createContext();
 
 const PlaylistProvider = ({ children }) => {
-  const [playlistList, setPlaylistList] = useState([]); // Danh sách playlist
-  const [playlistDetails, setPlaylistDetails] = useState(null); 
-  const [loadingFetchPlaylistList, setLoadingFetchPlaylistList] =
-    useState(false); // Trạng thái loading
+	const [playlists, setPlaylists] = useState([]);
+	const [playlist, setPlaylist] = useState({});
+	const [error, setError] = useState("");
+	const [loadingPlaylists, setLoadingPlaylists] = useState(false);
+	const [loadingPlaylist, setLoadingPlaylist] = useState(false);
+	const { isAuthenticated } = useAuth();
 
-  // Fetch playlist list
-  const fetchPlaylistList = useCallback(async () => {
-    try {
-      setLoadingFetchPlaylistList(true);
-      const response = await instance.get(apis.playlists.getAll());
-      if (response.status === 200) {
-        setPlaylistList(response.data);
-      }
-    } catch (error) {
-      console.error("Error fetching playlists:", error.response);
-      notify("Failed to fetch playlists", "error");
-    } finally {
-      setLoadingFetchPlaylistList(false);
-    }
-  }, []);
+	const fetchPlaylists = useCallback(async () => {
+		if (!isAuthenticated) {
+			return;
+		}
 
-    const fetchPlaylistDetails = useCallback(async (playlistId) => {
-    try {
-      const response = await instance.get(apis.playlists.getById(playlistId));
-      if (response.status === 200) {
-        setPlaylistDetails(response.data); // Cập nhật state playlistDetails
-        setPlaylistList((prev) =>
-          prev.map((playlist) =>
-            playlist.id === playlistId ? response.data : playlist
-          )
-        ); // Cập nhật danh sách playlist
-        return response.data;
-      } else {
-        throw new Error("Failed to fetch playlist details");
-      }
-    } catch (error) {
-      console.error("Error fetching playlist details:", error.response);
-      notify("Failed to fetch playlist details", "error");
-      throw error;
-    }
-  }, []);
+		try {
+			setLoadingPlaylists(true);
+			const response = await instance.get(apis.playlists.getAll());
+			if (response.status === 200) {
+				setPlaylists(response.data);
+			}
+		} catch (error) {
+			console.log("Error while fetching playlists", error);
+			setError(error);
+		} finally {
+			setLoadingPlaylists(false);
+		}
+	}, [isAuthenticated]);
 
-  // Create a new playlist
-  const createPlaylist = useCallback(
-    async (formData) => {
-      try {
-        const response = await instance.post(apis.playlists.create(), formData);
-        if (response.status === 201) {
-          notify("Playlist created successfully");
-          await fetchPlaylistList(); // Refresh the list
-        } else {
-          throw new Error("Failed to create playlist");
-        }
-      } catch (error) {
-        console.error("Error creating playlist:", error.response);
-        notify("Failed to create playlist", "error");
-        throw error;
-      }
-    },
-    [fetchPlaylistList]
-  );
+	const fetchPlaylist = useCallback(
+		async (playlist_id) => {
+			if (!isAuthenticated) {
+				return;
+			}
 
-  // Update a playlist
-  const updatePlaylist = useCallback(
-    async (playlistId, formData) => {
-      console.log(
-        "Updating playlist with ID:",
-        playlistId,
-        "and data:",
-        formData
-      ); // Log dữ liệu
-      try {
-        const response = await instance.put(
-          apis.playlists.update(playlistId),
-          formData
-        );
-        if (response.status === 200) {
-          notify("Playlist updated successfully");
-          await fetchPlaylistList(); // Refresh the list
-        } else {
-          throw new Error("Failed to update playlist");
-        }
-      } catch (error) {
-        notify("Failed to update playlist", "error");
-        throw error;
-      }
-    },
-    [fetchPlaylistList]
-  );
+			try {
+				setLoadingPlaylist(true);
+				const response = await instance.get(apis.playlists.getDetail(), {
+					params: { playlist_id },
+				});
+				if (response.status === 200) {
+					setPlaylist(response.data);
+				}
+			} catch (error) {
+				console.log("Error while fetching playlist", error);
+				setError(error);
+			} finally {
+				setLoadingPlaylist(false);
+			}
+		},
+		[isAuthenticated]
+	);
 
-  const handleDeletePlaylists = useCallback(
-    async (playlistId) => {
-      console.log("Deleting playlist with ID:", playlistId); // Log ID để kiểm tra
-      try {
-        const response = await instance.delete(
-          apis.playlists.delete(playlistId)
-        ); // Gọi API DELETE với ID
-        if (response.status === 204) {
-          notify("Playlist deleted successfully");
-          await fetchPlaylistList(); // Refresh danh sách playlist
-        }
-      } catch (error) {
-        console.error(
-          "Error deleting playlist:",
-          error.response?.data || error.message
-        ); // Log lỗi chi tiết
-        notify("Failed to delete playlist", "error");
-      }
-    },
-    [fetchPlaylistList]
-  );
+	const fetchPlaylistsByUser = useCallback(async (userId) => {
+		if (!isAuthenticated) {
+			return;
+		}
 
- const addSongToPlaylist = useCallback(
-  async (playlistId, songId) => {
-    try {
-      const response = await instance.post(apis.playlists.addSong(playlistId), {
-        song_id: songId,
-      });
-      if (response.status === 200) {
-        notify("Song added to playlist successfully");
-        await fetchPlaylistDetails(playlistId); // Fetch lại chi tiết playlist
-      } else {
-        throw new Error("Failed to add song to playlist");
-      }
-    } catch (error) {
-      console.error("Error adding song to playlist:", error.response);
-      notify("Failed to add song to playlist", "error");
-      throw error;
-    }
-  },
-  [fetchPlaylistDetails]
-);
+		try {
+			const response = await instance.get(apis.playlists.getByUserId(userId));
+			if (response.status === 200) {
+				return response;
+			}
+		} catch (error) {
+			console.log("Error while fetching playlists by user: ", error);
+			setError(error);
+		} 
+	}, [isAuthenticated]);
 
-  return (
-    <PlaylistContext.Provider
-      value={{
-        playlistList,
-        // playlistDetails,
-        fetchPlaylistList,
-        fetchPlaylistDetails,
-        loadingFetchPlaylistList,
-        createPlaylist,
-        updatePlaylist,
-        handleDeletePlaylists,
-        addSongToPlaylist,
-      }}
-    >
-      {children}
-    </PlaylistContext.Provider>
-  );
+	const addSongToPlaylist = useCallback(
+		async (payload) => {
+			if (!isAuthenticated) {
+				return;
+			}
+
+			const isInPlaylist = playlist?.songs?.some((s) => {
+				return s.song?.id === payload?.song_id;
+			});
+
+			if (isInPlaylist) {
+				notify("Song is in playlist", "error");
+				return;
+			}
+
+			try {
+				setLoadingPlaylists(true);
+				const response = await instance.post(
+					apis.playlists.addSongToPlaylist(),
+					payload
+				);
+				if (response.status === 201 || response.status === 200) {
+					notify("Added");
+					await fetchPlaylist(payload?.playlist_id);
+				}
+			} catch (error) {
+				console.log("Error while adding song to playlist", error);
+				setError(error);
+				notify(error.response.data, "error");
+			} finally {
+				setLoadingPlaylists(false);
+			}
+		},
+		[isAuthenticated, playlist?.songs, fetchPlaylist]
+	);
+
+	const removeSongFromPlaylist = useCallback(
+		async (song_id) => {
+			if (!isAuthenticated) {
+				return;
+			}
+
+			try {
+				setLoadingPlaylists(true);
+				const payload = { playlist_id: playlist?.id, song_id };
+				const response = await instance.post(
+					apis.playlists.removeSongFromPlaylist(),
+					payload
+				);
+				if (response.status === 204) {
+					notify("Deleted");
+					await fetchPlaylist(playlist?.id);
+				}
+			} catch (error) {
+				console.log("Error while removing song from playlist", error);
+				setError(error);
+			} finally {
+				setLoadingPlaylists(false);
+			}
+		},
+		[isAuthenticated, playlist?.id, fetchPlaylist]
+	);
+
+	const editPlaylistTitle = useCallback(async () => {
+		if (!isAuthenticated) {
+			return;
+		}
+
+		try {
+			setLoadingPlaylists(true);
+		} catch (error) {
+			console.log("Error while editing playlist", error);
+			setError(error);
+		} finally {
+			setLoadingPlaylists(false);
+		}
+	}, [isAuthenticated]);
+
+	const deletePlaylist = useCallback(
+		async (playlist_id) => {
+			if (!isAuthenticated) {
+				return;
+			}
+
+			try {
+				setLoadingPlaylists(true);
+				const response = await instance.delete(
+					apis.playlists.deletePlaylist(),
+					{ params: { playlist_id } }
+				);
+				if (response.status === 204) {
+					notify("Playlist deleted");
+					await fetchPlaylists();
+					await fetchPlaylist();
+				}
+			} catch (error) {
+				console.log("Error while deleting playlist", error);
+				setError(error);
+			} finally {
+				setLoadingPlaylists(false);
+			}
+		},
+		[isAuthenticated, fetchPlaylists, fetchPlaylist]
+	);
+
+	const createPlaylist = useCallback(
+		async (payload) => {
+			if (!isAuthenticated) {
+				return;
+			}
+
+			try {
+				setLoadingPlaylists(true);
+				const response = await instance.post(
+					apis.playlists.createPlaylist(),
+					payload
+				);
+				if (response.status === 201) {
+					notify("Playlist created");
+					await fetchPlaylists();
+				}
+			} catch (error) {
+				console.log("Error while deleting playlist", error);
+				setError(error);
+			} finally {
+				setLoadingPlaylists(false);
+			}
+		},
+		[isAuthenticated, fetchPlaylists]
+	);
+
+	return (
+		<PlaylistContext.Provider
+			value={{
+				playlists,
+				playlist,
+
+				loadingPlaylists,
+				loadingPlaylist,
+
+				error,
+
+				fetchPlaylists,
+				fetchPlaylist,
+				addSongToPlaylist,
+				removeSongFromPlaylist,
+				editPlaylistTitle,
+				deletePlaylist,
+				createPlaylist,
+
+				fetchPlaylistsByUser,
+			}}>
+			{children}
+		</PlaylistContext.Provider>
+	);
 };
 
-export const usePlaylist = () => React.useContext(PlaylistContext);
-export default React.memo(PlaylistProvider);
+export const usePlaylist = () => useContext(PlaylistContext);
+export default memo(PlaylistProvider);

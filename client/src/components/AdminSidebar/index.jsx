@@ -11,14 +11,14 @@ import {
 	BarChartOutlined,
 	LeftOutlined,
 	RightOutlined,
-	TagsOutlined, 
+	TagsOutlined,
 } from "@ant-design/icons";
 import { useAuth } from "../../contexts/Auth";
 import paths from "../../constants/paths";
 
 // Updated sidebar items with icons
 const items = [
-	{ name: "Dashboard", path: paths.admin, icon: <HomeOutlined /> },
+	// { name: "Dashboard", path: paths.admin, icon: <HomeOutlined /> },
 	{
 		name: "Song Management",
 		path: paths.songs,
@@ -26,8 +26,8 @@ const items = [
 	},
 	{ name: "User Management", path: paths.users, icon: <UserOutlined /> },
 	{ name: "Genre Management", path: paths.genres, icon: <TagsOutlined /> },
-	{ name: "Analytics", path: paths.analytics, icon: <BarChartOutlined /> },
-	{ name: "Settings", path: paths.settings, icon: <SettingOutlined /> },
+	{ name: "Analytics", path: paths.statistics, icon: <BarChartOutlined /> },
+	// { name: "Settings", path: paths.settings, icon: <SettingOutlined /> },
 ];
 
 const AdminSidebar = () => {

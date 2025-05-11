@@ -215,79 +215,24 @@ const Navbar = () => {
 										open={open}
 										color='black'
 										onOpenChange={handleOpenChange}>
-										{
-											user?.image ?
-											(
-												<div className='flex items-center justify-center p-2 rounded-full bg-[#1F1F1F] cursor-pointer group'>
-													<img
-														src={
-															user?.image 
-														}
-														alt={`${name}'s avatar`}
-														className='w-8 h-8 rounded-full object-cover shadow-lg'
-													/>
-												</div>
-											) :
-											(
-												<div className='flex items-center justify-center p-2 rounded-full bg-[#1F1F1F] cursor-pointer group'>
-													<p className='capitalize text-black font-bold bg-[#F573A0] w-8 h-8 flex items-center justify-center rounded-full group-hover:scale-[1.04]'>
-														{user?.name[0]}
-													</p>
-												</div>
-											)
-										}
-									</Popover>
-								</>
-							)}
-							{/* <div className='flex items-center gap-6 text-white text-sm h-full'>
-								<span className='flex items-center gap-2 cursor-pointer text-gray-400 font-bold hover:text-white hover:scale-[1.05] transition-all'>
-									<DownloadOutlined />
-									<p>Install App</p>
-								</span>
-								{isAuthenticated ? (
-									<>
-										<BellOutlined className='!text-white/70 text-xl cursor-pointer hover:!text-white' />
-										<Popover
-											content={
-												<ul>
-													{popoverItems?.map((item) => {
-														return (
-															<li key={item?.id} className='group'>
-																<div
-																	className='flex items-center justify-between gap-6 px-3 py-2.5 cursor-pointer group-hover:!bg-white/20'
-																	onClick={() =>
-																		item?.action && item?.action(logout)
-																	}>
-																	<p className='group-hover:underline text-white'>
-																		{item?.content}
-																	</p>
-																	{item?.Icon && (
-																		<item.Icon className='!text-white' />
-																	)}
-																</div>
-															</li>
-														);
-													})}
-												</ul>
-											}
-											trigger='click'
-											arrow={false}
-											open={open}
-											color='black'
-											onOpenChange={handleOpenChange}>
+										{user?.image ? (
+											<div className='flex items-center justify-center p-2 rounded-full bg-[#1F1F1F] cursor-pointer group'>
+												<img
+													src={user?.image}
+													alt={`${name}'s avatar`}
+													className='w-8 h-8 rounded-full object-cover shadow-lg'
+												/>
+											</div>
+										) : (
 											<div className='flex items-center justify-center p-2 rounded-full bg-[#1F1F1F] cursor-pointer group'>
 												<p className='capitalize text-black font-bold bg-[#F573A0] w-8 h-8 flex items-center justify-center rounded-full group-hover:scale-[1.04]'>
 													{user?.name[0]}
 												</p>
 											</div>
-										</Popover>
-									</>
-								) : (
-									<>
-										
-									</>
-								)}
-							</div> */}
+										)}
+									</Popover>
+								</>
+							)}
 						</div>
 					</div>
 				</nav>

@@ -1,8 +1,12 @@
-import { lazy, Suspense, useRef, useEffect } from "react";
+import React, { lazy, Suspense, useRef, useEffect } from "react";
 import { useUser } from "../../contexts/User";
 import { Spin } from "antd";
 import AlbumAndArtistWrap from "../AlbumAndArtistWrap";
 import { useAuth } from "../../contexts/Auth";
+import { usePlaylist } from "../../contexts/Playlist";
+import { useSong } from "../../contexts/Song";
+import { notify } from "../Toast";
+import SongListWrap from "../SongListWrap";
 
 const Header = lazy(() => import("./Header"));
 const Cover = lazy(() => import("./Cover"));
@@ -53,73 +57,45 @@ const songList = [
   },
 ];
 
-const albumList = [
-  {
-    id: 1,
-    name: "Duong Domic",
-    type: "Artist",
-    image: "https://i.scdn.co/image/ab67616100005174352d5672d70464e67c3ae963",
-  },
-  {
-    id: 2,
-    name: "HIEUTHUHAI",
-    type: "Artist",
-    image: "https://i.scdn.co/image/ab67616100005174352d5672d70464e67c3ae963",
-  },
-  {
-    id: 3,
-    name: "Sơn Tùng M-TP",
-    type: "Artist",
-    image: "https://i.scdn.co/image/ab67616100005174352d5672d70464e67c3ae963",
-  },
-  {
-    id: 4,
-    name: "ANH TRAI 'SAY HI'",
-    type: "Artist",
-    image: "https://i.scdn.co/image/ab67616100005174352d5672d70464e67c3ae963",
-  },
-  {
-    id: 5,
-    name: "ERIK",
-    type: "Artist",
-    image: "https://i.scdn.co/image/ab67616100005174352d5672d70464e67c3ae963",
-  },
-  {
-    id: 6,
-    name: "buitruonglinh",
-    type: "Artist",
-    image: "https://i.scdn.co/image/ab67616100005174352d5672d70464e67c3ae963",
-  },
-];
-
-const followingList = [
-  {
-    id: 1,
-    name: "Duong Domic",
-    type: "Artist",
-    image: "https://i.scdn.co/image/ab67616100005174352d5672d70464e67c3ae963",
-  },
-  {
-    id: 2,
-    name: "HIEUTHUHAI",
-    type: "Artist",
-    image: "https://i.scdn.co/image/ab67616100005174352d5672d70464e67c3ae963",
-  },
-  {
-    id: 3,
-    name: "Sơn Tùng M-TP",
-    type: "Artist",
-    image: "https://i.scdn.co/image/ab67616100005174352d5672d70464e67c3ae963",
-  },
-]
-
 const Profile = () => {
   const contentRef = useRef(null);
   const { user, setUser } = useAuth();
+  const [publicPlaylists, setPublicPlaylists] = React.useState([]);
+  const { fetchPlaylistsByUser } = usePlaylist();
+  const { fetchSongsByUserId } = useSong();
+  const [songs, setSongs] = React.useState([]);
 
   useEffect(() => {
     console.log("User in Profile:", user);
+    fetchPublicPlaylists();
+    fetchSongs();
   }, []);
+
+  const fetchPublicPlaylists = async () => {
+    try {
+      const response = await fetchPlaylistsByUser(user?.id);
+      if (response && response.status === 200) {
+        setPublicPlaylists(response.data);
+        console.log("Public playlists:", response.data);
+      }
+    } catch (error) {
+      console.log("Error fetching public playlists", error.message);
+      notify("Error fetching public playlists", "error");
+    }
+  };
+
+  const fetchSongs = async () => {
+    try {
+      const response = await fetchSongsByUserId(user?.id);
+      if (response && response.status === 200) {
+        setSongs(response.data.songs_by_user);
+        console.log("My songs: ", response.data.songs_by_user);
+      }
+    } catch (error) {
+      console.log("Errors occur while fetching songs", error.message);
+      notify("Error fetching songs", "error");
+    }
+  };
 
   return (
     <Suspense
@@ -130,23 +106,24 @@ const Profile = () => {
         <Header name={user?.name || "Demo"} contentRef={contentRef} />
         <Cover
           user={user}
-          followingCount={10}
-          playlistCount={5}
+          playlistCount={publicPlaylists.length}
+          songCount={songs.length}
         />
         <MainContent songList={songList} user = {user} setUser = {setUser}/>
         <div className='mt-10 flex flex-col gap-10'>
           <AlbumAndArtistWrap
             title='Public Playlists'
-            list={albumList}
+            list={publicPlaylists}
             type='album'
           />
-
-          <AlbumAndArtistWrap
-            title='Following'
-            list={followingList}
-            type='artist'
+        </div>
+        <div className='mt-10 ml-20 mr-20 flex-col gap-10'>
+          <SongListWrap 
+            title = {`My songs`}
+            songList={songs}
           />
         </div>
+        
       </div>
     </Suspense>
   );

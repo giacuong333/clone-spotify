@@ -15,9 +15,7 @@ const AlbumAndArtistDetails = lazy(() =>
 const ChatInterface = lazy(() => import("../../components/Chat/ChatInterface"));
 const Profile = lazy(() => import("../../components/Profile"));
 const Search = lazy(() => import("../../components/Search"));
-const PlaylistDetails = lazy(() =>
-	import("../../components/PlaylistDetails")
-);
+const PlaylistDetails = lazy(() => import("../../components/PlaylistDetails"));
 const UserManagement = lazy(() => import("../../components/UserManagement"));
 const SongManagement = lazy(() => import("../../components/SongManagement"));
 const GenreManagement = lazy(() => import("../../components/GenreManagement"));
@@ -59,8 +57,7 @@ const routes = [
 		path: paths.profile,
 		Layout: MainLayout,
 		Page: Profile,
-		isPublic: true,
-		isAuthPage: false,
+		isPublic: false,
 	},
 	{
 		path: paths.search,
@@ -109,7 +106,7 @@ const routes = [
 		isAdminPage: true,
 	},
 	{
-		path: paths.statistic,
+		path: paths.statistics,
 		Layout: AdminLayout,
 		Page: AdminStatistics,
 		isPublic: false,

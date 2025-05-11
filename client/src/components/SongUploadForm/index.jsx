@@ -34,32 +34,10 @@ export default function SongUploadForm({ onComplete, show, onShow }) {
 	const { genreList, fetchGenreList, loadingFetchGenreList } = useGenre();
 
 	useEffect(() => {
-		fetchGenreList();
-	}, [fetchGenreList]);
-
-	// Mock genres - in a real app, these would come from your API
-	const availableGenres = [
-		{ id: "680755a0081908b550ef9a47", name: "Rock", color: "bg-green-500" },
-		{
-			id: "680755a0081908b550ef9a46",
-			name: "Pop",
-			color: "bg-green-500",
-		},
-		{ id: "680755a0081908b550ef9a49", name: "Hip Hop", color: "bg-green-500" },
-		{ id: "680755a0081908b550ef9a4d", name: "R&B", color: "bg-green-500" },
-		{ id: "680755a0081908b550ef9a48", name: "Jazz", color: "bg-green-500" },
-		{
-			id: "680755a0081908b550ef9a4b",
-			name: "Electronic",
-			color: "bg-green-500",
-		},
-		{
-			id: "680755a0081908b550ef9a4a",
-			name: "Classical",
-			color: "bg-green-500",
-		},
-		{ id: "680755a0081908b550ef9a4c", name: "Country", color: "bg-green-500" },
-	];
+		if (show && activeStep === 4) {
+			fetchGenreList();
+		}
+	}, [fetchGenreList, show, activeStep]);
 
 	const handleSongFileChange = (e) => {
 		const file = e.target.files[0];
@@ -589,7 +567,7 @@ export default function SongUploadForm({ onComplete, show, onShow }) {
 													? selectedGenres
 															.map(
 																(id) =>
-																	availableGenres.find((g) => g.id === id)?.name
+																	genreList?.find((g) => g.id === id)?.name
 															)
 															.join(", ")
 													: "No genres selected"}

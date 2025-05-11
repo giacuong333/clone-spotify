@@ -1,10 +1,28 @@
 from rest_framework.views import APIView
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
+from .serializers import ListenedAtSerializer
 from .models import ListenedAt
 from apps.songs.models import Song
 from datetime import datetime
+
+
+class GetAllListenedAtView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        try:
+            listened_at_records = ListenedAt.objects.all()
+
+            serializer = ListenedAtSerializer(listened_at_records, many=True)
+
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            return Response(
+                {"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
 
 class SaveListenedAtView(APIView):

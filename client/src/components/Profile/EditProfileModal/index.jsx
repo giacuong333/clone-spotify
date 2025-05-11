@@ -8,15 +8,15 @@ const EditProfileModal = ({ open, onClose, user, setUser}) => {
   const [name, setName] = useState(user?.name || "");
   const [bio, setBio] = useState(user?.bio || "");
   const [image, setImage] = useState(user?.image || null);
-  const [password, setPassword] = useState(user?.password || "");
+  const [password, setPassword] = useState("");
 
   const handleSave = async (e) => {
     e.preventDefault();
 
     const formData = new FormData();
-    if (name) formData.append("name", name);
-    if (bio) formData.append("bio", bio);
-    if (password) formData.append("password", password);
+    formData.append("name", name);
+    formData.append("bio", bio);
+    if (password !== "") formData.append("password", password);
     if (image && image instanceof File) formData.append("image", image);
 
     try {

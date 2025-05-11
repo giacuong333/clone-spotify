@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     "apps.auths",
     "apps.genre",
     "apps.chat",
+    "apps.admin_analytics",
     "rest_framework_simplejwt",
     "apps.admin_analytics",
 ]

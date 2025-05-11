@@ -1,96 +1,17 @@
-import React, { lazy, memo, Suspense, useEffect, useRef } from "react";
+import React, { lazy, memo, Suspense, useEffect, useRef, useState } from "react";
 import { Spin } from "antd";
 import AlbumAndArtistWrap from "../AlbumAndArtistWrap";
+import SongCover from "./SongCover";
 import { useLocation, useSearchParams } from "react-router-dom";
 import { useSong } from "../../contexts/Song";
+import { useUser } from "../../contexts/User";
+import { usePlaylist } from "../../contexts/Playlist";
+import UserCover from "./UserCover.jsx";
+import { notify } from "../Toast/index.jsx";
+import { set } from "lodash";
 
 const Header = lazy(() => import("./Header"));
-const Cover = lazy(() => import("./Cover"));
 const MainContent = lazy(() => import("./MainContent"));
-
-const songList = [
-	{
-		id: 1,
-		imageUrl: "",
-		name: "Mất Kết Nối",
-		listeners: "25,661,983",
-		duration: "3:27",
-	},
-	{
-		id: 2,
-		imageUrl: "",
-		name: "Tràn Bộ Nhớ",
-		listeners: "9,378,924",
-		duration: "3:30",
-	},
-	{
-		id: 3,
-		imageUrl: "",
-		name: "HÀO QUANG(feat.RHYDER, Dương Mic & Pháp Kiều) HÀO QUANG(feat.RHYDER, Dương Mic & Pháp Kiều)",
-		listeners: "2,345,677",
-		duration: "4:12",
-	},
-	{
-		id: 4,
-		imageUrl: "",
-		name: "Pin Dự Phòng",
-		listeners: "21,357,833",
-		duration: "3:18",
-	},
-	{
-		id: 5,
-		imageUrl: "",
-		name: "LÀN ƯU TIÊN",
-		listeners: "15,113,644",
-		duration: "4:05",
-	},
-	{
-		id: 6,
-		imageUrl: "",
-		name: "Yêu Em 2 Ngày",
-		listeners: "3,876,990",
-		duration: "2:52",
-	},
-];
-
-const list = [
-	{
-		id: 1,
-		name: "Duong Domic",
-		type: "Artist",
-		image: "https://i.scdn.co/image/ab67616100005174352d5672d70464e67c3ae963",
-	},
-	{
-		id: 2,
-		name: "HIEUTHUHAI",
-		type: "Artist",
-		image: "https://i.scdn.co/image/ab67616100005174352d5672d70464e67c3ae963",
-	},
-	{
-		id: 3,
-		name: "Sơn Tùng M-TP",
-		type: "Artist",
-		image: "https://i.scdn.co/image/ab67616100005174352d5672d70464e67c3ae963",
-	},
-	{
-		id: 4,
-		name: "ANH TRAI 'SAY HI'",
-		type: "Artist",
-		image: "https://i.scdn.co/image/ab67616100005174352d5672d70464e67c3ae963",
-	},
-	{
-		id: 5,
-		name: "ERIK",
-		type: "Artist",
-		image: "https://i.scdn.co/image/ab67616100005174352d5672d70464e67c3ae963",
-	},
-	{
-		id: 6,
-		name: "buitruonglinh",
-		type: "Artist",
-		image: "https://i.scdn.co/image/ab67616100005174352d5672d70464e67c3ae963",
-	},
-];
 
 const AlbumAndArtistDetails = () => {
 	const contentRef = useRef(null);
@@ -99,15 +20,42 @@ const AlbumAndArtistDetails = () => {
 	const type = searchParams.get("type");
 	const detailsId = searchParams.get("detailsId");
 
-	const { songDetails, fetchSongDetails, loadingFetchDetails } = useSong();
+	const { fetchSongDetails } = useSong();
+  const { fetchUserDetail } = useUser();
+  const { fetchPlaylistsByUser } = usePlaylist();
+  const [userDetails, setUserDetails] = React.useState(null);
+  const [publicPlaylists, setPublicPlaylists] = React.useState([]);
+  const [songDetails, setSongDetails] = React.useState(null);
+  const [songsByUser, setSongsByUser] = useState([]); 
+  const { fetchSongsByUserId } = useSong();
 
 	useEffect(() => {
-		if (type === "song") {
-			fetchSongDetails(detailsId);
-		}
-	}, [detailsId, type, fetchSongDetails]);
-
-	console.log("Song details: ", songDetails);
+		const fetchDetails = async () => {
+      try {
+        console.log("Fetching details for ID:", detailsId);
+        if (type === "song") {
+          const songDetailsResponse = await fetchSongDetails(detailsId);
+          if (songDetailsResponse && songDetailsResponse.status === 200) {
+            setSongDetails(songDetailsResponse.data);
+            console.log("Song details:", songDetailsResponse.data);
+        }
+        } else if (type === "user") {
+          const userDetail = await fetchUserDetail(detailsId);
+          setUserDetails(userDetail);
+          const playlistsResponse = await fetchPlaylistsByUser(detailsId);
+          console.log("Playlists response:", playlistsResponse);
+          setPublicPlaylists(playlistsResponse.data);
+          const songsResponse = await fetchSongsByUserId(detailsId);
+          console.log("Songs by user response:", songsResponse.data.songs_by_user);
+          setSongsByUser(songsResponse.data.songs_by_user);
+        }
+      }catch (error) {
+        console.log("Error response:", error.response);
+        notify("Error fetching details", "error");
+      }
+    }
+    fetchDetails();
+	}, [detailsId]);
 
 	return (
 		<Suspense
@@ -115,27 +63,40 @@ const AlbumAndArtistDetails = () => {
 				<Spin spinning tip='Please wait...' fullscreen size='large'></Spin>
 			}>
 			<div className='w-full h-full overflow-y-auto' ref={contentRef}>
-				<Header name={songDetails?.user?.name} contentRef={contentRef} />
-				<Cover
-					name={songDetails?.user?.name}
-					isVerified={true}
-					monthlyListeners='1,897,666'
-					imageUrl={songDetails?.cover_url}
-				/>
-				<MainContent songList={songList} />
-				<div className='mt-10 flex flex-col gap-10'>
-					<AlbumAndArtistWrap
-						title='Popular artists'
-						list={list}
-						type='artist'
-					/>
-					<AlbumAndArtistWrap title='Discography' list={list} type='artist' />
-					<AlbumAndArtistWrap
-						title='Featuring Dương Domic'
-						list={list}
-						type='artist'
-					/>
-				</div>
+				<Header name={songDetails?.title || userDetails?.name || "Demo"} 
+        contentRef={contentRef} />
+        {
+          type === "user" && 
+          (
+            <>
+              <UserCover
+                user={userDetails}
+                playlistCount={publicPlaylists.length || 0}
+                songCount={songsByUser.length || 0} />
+
+              <MainContent user={userDetails} />
+
+              <div className='mt-10 flex flex-col gap-10'>
+                <AlbumAndArtistWrap
+                  title='Public playlists'
+                  list={publicPlaylists}
+                  type='album'
+                />
+              </div>
+            </>
+          )
+        }
+        {
+          type === "song" && (
+            <>
+              <SongCover
+                song={songDetails}
+              />
+              <MainContent song={songDetails}/>
+            </>
+          )
+        }
+				
 			</div>
 		</Suspense>
 	);

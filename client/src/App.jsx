@@ -1,6 +1,7 @@
 import { BrowserRouter } from "react-router-dom";
 import "./index.css";
 import AppRoutes from "./routes/AppRoutes";
+
 import Auth from "./contexts/Auth";
 import Toast from "./components/Toast";
 import Axios from "./contexts/Axios";
@@ -12,7 +13,7 @@ import GenreProvider from "./contexts/genre";
 import SearchProvider from "./contexts/Search";
 import DownloadedProvider from "./contexts/DownloadedAt";
 import ListenedProvider from "./contexts/ListenedAt";
-import PlaylistProvider from "./contexts/playlist";
+import PlaylistProvider from "./contexts/Playlist";
 
 const App = () => {
 	return (

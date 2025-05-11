@@ -1,5 +1,6 @@
 from rest_framework import serializers
 
+
 class SongStatSerializer(serializers.Serializer):
     id = serializers.CharField(read_only=True)
     title = serializers.CharField()
@@ -8,12 +9,14 @@ class SongStatSerializer(serializers.Serializer):
     play_count = serializers.IntegerField()
     download_count = serializers.IntegerField()
 
+
 class GenreStatSerializer(serializers.Serializer):
     id = serializers.CharField(read_only=True)
     name = serializers.CharField()
     song_count = serializers.IntegerField()
     play_count = serializers.IntegerField()
 
+
 class HourlyStatSerializer(serializers.Serializer):
-    hour = serializers.DateTimeField()
+    hour = serializers.IntegerField()
     play_count = serializers.IntegerField()
