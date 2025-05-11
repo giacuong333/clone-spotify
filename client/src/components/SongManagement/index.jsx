@@ -217,6 +217,7 @@ const SongManagement = () => {
 		setIsDeleting(true);
 		try {
 			const success = await handleDeleteSongs(selectedRowKeys);
+			console.log(selectedRowKeys);
 			if (success) {
 				setSelectedRowKeys([]);
 			}

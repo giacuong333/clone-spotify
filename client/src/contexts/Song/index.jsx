@@ -56,7 +56,7 @@ const Song = ({ children }) => {
 		try {
 			const data = { song_ids: songIds };
 			setLoadingFetchSongList(true);
-			const response = await instance.post(apis.songs.delete(), { data });
+			const response = await instance.post(apis.songs.delete(), data );
 			if (response.status === 204) {
 				notify("Delete successfully");
 				await fetchSongList();
