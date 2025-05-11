@@ -45,7 +45,7 @@ const SongItem = ({ item, order, playlistId }) => {
 
         <div className="grow place-items-end me-40">
           <p className="text-white/50 group-hover:text-white">
-            {item?.listeners}
+            {item?.listened_at_count}
           </p>
         </div>
 
