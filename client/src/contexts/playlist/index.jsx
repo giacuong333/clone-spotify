@@ -137,7 +137,7 @@ const PlaylistProvider = ({ children }) => {
 
 			try {
 				setLoadingPlaylists(true);
-				const payload = { playlist_id: playlist?.id, song_id };
+				const payload = { playlist_id: playlist?.id || favoritePlaylist?.id, song_id };
 				const response = await instance.post(
 					apis.playlists.removeSongFromPlaylist(),
 					payload

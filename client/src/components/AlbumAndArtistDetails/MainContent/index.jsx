@@ -15,7 +15,7 @@ const MainContent = ({ user = null, song = null }) => {
 	const [allSongs, setAllSongs] = useState([]);
 	const { fetchSongsByUserId, handleDownload } = useSong();
 	const [isFavorited, setIsFavorited] = useState(false);
-	const {favoritePlaylist, fetchFavoritePlaylist, addSongToPlaylist} = usePlaylist();
+	const {favoritePlaylist, fetchFavoritePlaylist, addSongToPlaylist, removeSongFromPlaylist} = usePlaylist();
 
 	const fetchSongsByUser = async () => {
 		try {
@@ -85,6 +85,7 @@ const MainContent = ({ user = null, song = null }) => {
 											className='text-5xl text-white hover:scale-[1.1] cursor-pointer'
 											onClick={async() => {
 												setIsFavorited(!isFavorited);
+												await removeSongFromPlaylist(song?.id)
 											}}
 										/>
 									) : (
