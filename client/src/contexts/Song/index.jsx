@@ -32,7 +32,7 @@ const Song = ({ children }) => {
 			setLoadingFetchDetails(true);
 			const response = await instance.get(apis.songs.getById(songId));
 			if (response.status === 200) {
-				return response;
+				setSongDetails(response.data);
 			}
 		} catch (error) {
 			console.log("Error response:", error.response);
@@ -49,7 +49,7 @@ const Song = ({ children }) => {
 			}
 		} catch (error) {
 			console.log("Error response:", error.response);
-		} 
+		}
 	}, []);
 
 	const handleDeleteSongs = async (songIds) => {
@@ -181,7 +181,7 @@ const Song = ({ children }) => {
 				handleDeleteSongs,
 				handleDownload,
 				handleDownloadVideo,
-				fetchSongsByUserId
+				fetchSongsByUserId,
 			}}>
 			{children}
 		</SongContext.Provider>

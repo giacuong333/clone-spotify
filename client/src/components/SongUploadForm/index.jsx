@@ -567,7 +567,7 @@ export default function SongUploadForm({ onComplete, show, onShow }) {
 													? selectedGenres
 															.map(
 																(id) =>
-																	availableGenres.find((g) => g.id === id)?.name
+																	genreList?.find((g) => g.id === id)?.name
 															)
 															.join(", ")
 													: "No genres selected"}

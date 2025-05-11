@@ -39,6 +39,9 @@ const SongModal = ({
 	const progressBarRef = useRef(null);
 	const volumeTimerRef = useRef(null);
 	const videoContainerRef = useRef(null);
+
+	console.log("Song details", songDetails);
+
 	const { handleDownload, handleDownloadVideo } = useSong();
 
 	const isVideo = songDetails?.video_url || songDetails?.media_type === "video";

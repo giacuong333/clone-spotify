@@ -75,14 +75,15 @@ class Playlist(Document):
     def removeSongFromPlayList(playlist_id, song_id):
         try:
             playlist = Playlist.findById(playlist_id)
-            song = Song.findById(song_id)
-            if not playlist or not song:
+            if not playlist:
                 return None
-            song_entry = SongsOfPlaylist(song=song)
-            playlist.songs.remove(song_entry)
-            playlist.updated_at = datetime.now()
-            playlist.save()
-            return playlist
+            for song_entry in playlist.songs:
+                if str(song_entry.song.id) == str(song_id):
+                    playlist.songs.remove(song_entry)
+                    playlist.updated_at = datetime.now()
+                    playlist.save()
+                    return playlist
+            return None
         except DoesNotExist:
             return None
 

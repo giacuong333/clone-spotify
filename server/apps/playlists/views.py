@@ -40,7 +40,7 @@ class GetDetailView(APIView):
         if not playlist:
             return Response("Playlist not found", status=status.HTTP_404_NOT_FOUND)
 
-        serializer = PlaylistSerializer(playlist)
+        serializer = PlaylistSerializer(playlist, context={"request": request})
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 

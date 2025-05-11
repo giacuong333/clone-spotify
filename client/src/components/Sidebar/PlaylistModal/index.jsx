@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { X, Music, MessageSquareWarning } from "lucide-react";
+import { X, Music, MessageSquareWarning, Pencil } from "lucide-react";
 import Overlay from "../../Overlay";
 import { usePlaylist } from "../../../contexts/playlist";
 import _ from "lodash";
@@ -9,6 +9,8 @@ const PlaylistModal = ({ toggle, onClose }) => {
 	const [desc, setDesc] = useState("");
 	const [error, setError] = useState("");
 	const { createPlaylist } = usePlaylist();
+	const [cover, setCover] = useState();
+	const [coverFile, setCoverFile] = useState();
 
 	const validate = useCallback(() => {
 		if (_.isEmpty(name.trim())) {
@@ -53,8 +55,18 @@ const PlaylistModal = ({ toggle, onClose }) => {
 					)}
 
 					<div className='flex gap-4 mb-4'>
-						<div className='w-48 h-auto bg-zinc-800 flex items-center justify-center rounded'>
-							<Music size={48} className='text-gray-400' />
+						<div className='w-48 h-auto bg-zinc-800 flex items-center justify-center rounded group'>
+							<Music
+								size={48}
+								className='text-gray-400 block group-hover:hidden'
+							/>
+							<>
+								<Pencil
+									size={48}
+									className='text-gray-400 cursor-pointer hidden group-hover:block'
+								/>
+							</>
+							<input type='file' multiple='' hidden />
 						</div>
 
 						<div className='flex-1 h-full'>
