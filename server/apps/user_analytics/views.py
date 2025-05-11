@@ -160,7 +160,7 @@ class UserGenreStatsView(APIView):
             song = listen.song
             song_id = str(song.id)
 
-                # Kiểm tra và lấy thể loại của bài hát
+            # Kiểm tra và lấy thể loại của bài hát
             if hasattr(song, 'genre') and song.genre:
                 genre_id = str(song.genre.id)
                 genre_counts[genre_id] += 1
@@ -203,5 +203,4 @@ class UserGenreStatsView(APIView):
             'time_range_days': days,
             'total_plays': total_plays,
             'genres_count': len(results),
-            'list-genres': results
         })
