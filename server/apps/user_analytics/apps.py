@@ -1,6 +1,6 @@
 from django.apps import AppConfig
 
 
-class AdminAnalyticsConfig(AppConfig):
+class UserAnalyticsConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'apps.admin_analytics'
+    name = 'apps.user_analytics'
