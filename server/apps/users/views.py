@@ -5,6 +5,7 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated, BasePermission, AllowAny
 from mongoengine import DoesNotExist
 import datetime
+from apps.playlists.models import Playlist
 
 # Import models và serializers
 from .models import User
@@ -79,6 +80,16 @@ class RegisterUserView(APIView):
             try:
                 user = User(**validated_data)
                 user.save()
+
+                playlist_data = {
+                    "user": user,
+                    "name": "Favorite",
+                    "desc": "Your favorite songs",
+                    "is_favorite": True,
+                    "created_at": datetime.datetime.now(),
+                    "updated_at": datetime.datetime.now(),
+                }
+                Playlist.create(playlist_data)
                 display_serializer = UserDisplaySerializer(user)
                 return Response(display_serializer.data, status=status.HTTP_201_CREATED)
             except Exception as e:

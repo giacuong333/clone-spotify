@@ -3,6 +3,7 @@ import { useAuth } from "../Auth";
 import { instance } from "../Axios";
 import { apis } from "../../constants/apis";
 import { notify } from "../../components/Toast";
+import {useUser} from "../User";
 
 const PlaylistContext = createContext();
 
@@ -13,6 +14,8 @@ const PlaylistProvider = ({ children }) => {
 	const [loadingPlaylists, setLoadingPlaylists] = useState(false);
 	const [loadingPlaylist, setLoadingPlaylist] = useState(false);
 	const { isAuthenticated } = useAuth();
+	const [favoritePlaylist, setFavoritePlaylist] = useState(null);
+	const { user } = useAuth();
 
 	const fetchPlaylists = useCallback(async () => {
 		if (!isAuthenticated) {
@@ -69,6 +72,23 @@ const PlaylistProvider = ({ children }) => {
 			}
 		} catch (error) {
 			console.log("Error while fetching playlists by user: ", error);
+			setError(error);
+		} 
+	}, [isAuthenticated]);
+
+	const fetchFavoritePlaylist = useCallback(async () => {
+		if (!isAuthenticated) {
+			return;
+		}
+
+		try {
+			const response = await instance.get(apis.playlists.getFavoritePlaylist(user?.id));
+			if (response.status === 200) {
+				setFavoritePlaylist(response.data);
+			}
+			return response.data;
+		} catch (error) {
+			console.log("Error while fetching favorite playlist: ", error);
 			setError(error);
 		} 
 	}, [isAuthenticated]);
@@ -224,6 +244,9 @@ const PlaylistProvider = ({ children }) => {
 				createPlaylist,
 
 				fetchPlaylistsByUser,
+				fetchFavoritePlaylist,
+				favoritePlaylist,
+			    setFavoritePlaylist,
 			}}>
 			{children}
 		</PlaylistContext.Provider>

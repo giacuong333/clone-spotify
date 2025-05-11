@@ -8,6 +8,7 @@ from apps.playlists.views import (
     DeletePlaylistView,
     CreatePlaylistView,
     GetPlaylistsByUserIdView,
+    FavoritePlaylistByUserIdView,
 )
 
 urlpatterns = [
@@ -27,4 +28,5 @@ urlpatterns = [
         GetPlaylistsByUserIdView.as_view(),
         name="get-playlists-by-user",
     ),
+    path("favorite/", FavoritePlaylistByUserIdView.as_view(), name="favorite-by-user"),
 ]

@@ -28,7 +28,7 @@ const SongCover = ({ song }) => {
 				<h1 className='text-6xl font-bold w-full max-w-md break-words'>{song?.title || "Demo"}</h1>
 				<div className="flex items-center gap-2 mt-5">
 					<div className="flex items-center gap-3">
-							<img className="w-8 h-8 rounded-b-full"
+							<img className="w-8 h-8 rounded-full"
 								src={song?.user?.image || "https://cdn.pixabay.com/photo/2023/02/18/11/00/icon-7797704_640.png"} 
 								alt="" />
 							<p className='text-md text-white/80 mb-1'>

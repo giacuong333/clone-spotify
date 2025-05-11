@@ -5,6 +5,8 @@ from rest_framework import status
 from .models import Playlist, SongsOfPlaylist
 from apps.songs.models import Song
 from .serializers import PlaylistSerializer
+from bson import ObjectId
+from rest_framework.exceptions import NotFound
 
 
 class GetAllView(APIView):
@@ -186,4 +188,35 @@ class GetPlaylistsByUserIdView(APIView):
 
         # Serialize data và trả về
         serializer = PlaylistSerializer(playlists, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class FavoritePlaylistByUserIdView(APIView):
+    permission_classes = [IsAuthenticated]  # Hoặc AllowAny nếu không cần auth
+
+    def get(self, request):
+        user_id = request.query_params.get("user_id", "").strip("/")
+
+        if not user_id:
+            return Response(
+                {"error": "user_id is required"}, status=status.HTTP_400_BAD_REQUEST
+            )
+
+        try:
+            # Convert user_id string to ObjectId
+            user_obj_id = ObjectId(user_id)
+        except Exception:
+            return Response(
+                {"error": "Invalid user_id format"}, status=status.HTTP_400_BAD_REQUEST
+            )
+
+        try:
+            favorite_playlist = Playlist.objects.get(user=user_obj_id, is_favorite=True)
+        except Playlist.DoesNotExist:
+            return Response(
+                {"error": "Favorite playlist not found"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        serializer = PlaylistSerializer(favorite_playlist, context={"request": request})
         return Response(serializer.data, status=status.HTTP_200_OK)

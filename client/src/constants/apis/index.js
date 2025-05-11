@@ -56,5 +56,6 @@ export const apis = {
 		deletePlaylist: () => `/api/playlists/delete/`,
 		createPlaylist: () => `/api/playlists/create/`,
 		getByUserId: (id) => `/api/playlists/user/?user_id=${id}/`,
+		getFavoritePlaylist: (userId) => `/api/playlists/favorite/?user_id=${userId}/`,
 	},
 };

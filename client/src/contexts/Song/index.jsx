@@ -33,7 +33,7 @@ const Song = ({ children }) => {
 			const response = await instance.get(apis.songs.getById(songId));
 			if (response.status === 200) {
 				setSongDetails(response.data);
-			}
+			} return response;
 		} catch (error) {
 			console.log("Error response:", error.response);
 		} finally {
