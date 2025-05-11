@@ -1,8 +1,15 @@
 import React from "react";
 import VerifiedBadge from "../../Icons/VerifiedBadge";
 import formatTime from "../../../utils/formatTime";
+import { useNavigate } from "react-router-dom";
+import paths from "../../../constants/paths";
 
 const SongCover = ({ song }) => {
+	const navigate = useNavigate();
+
+	const handleUserClick = () => {
+		navigate(paths.details+`?detailsId=${song?.user?.id}&type=user`);
+	}
 	return (
 		<div className='flex items-center p-6 bg-gradient-to-b from-[#2a6e7f] to-[#0f2a2e] rounded-xl text-white'>
 			{/* Avatar */}
@@ -25,7 +32,7 @@ const SongCover = ({ song }) => {
 								src={song?.user?.image || "https://cdn.pixabay.com/photo/2023/02/18/11/00/icon-7797704_640.png"} 
 								alt="" />
 							<p className='text-md text-white/80 mb-1'>
-								<span className="font-bold">{song?.user?.name}</span> &bull; {new Date(song?.released_at).getFullYear()} &bull; {formatTime(song?.duration)} &bull; {song?.listened_at_count} views
+								<span className="font-bold hover:underline hover:cursor-pointer" onClick={handleUserClick}>{song?.user?.name}</span> &bull; {new Date(song?.released_at).getFullYear()} &bull; {formatTime(song?.duration)} &bull; {song?.listened_at_count} views
 							</p>
 						</div>
 					
