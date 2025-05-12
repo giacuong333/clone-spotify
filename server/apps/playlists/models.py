@@ -121,13 +121,39 @@ class Playlist(Document):
     @staticmethod
     def update(playlist_id, data):
         try:
-            playlist = Playlist.findById(id=playlist_id)
+            playlist = Playlist.findById(playlist_id)
             if not playlist:
-                return None
-            for key, value in data.items():
-                setattr(playlist, key, value)
+                return None, "Playlist does not exist"
+
+            if playlist.user != data.get("user"):
+                return None, "Unauthorized"
+
+            name = data.get("name")
+
+            if not name:
+                return None, "Name is required"
+
+            playlist.name = name
+            playlist.desc = data.get("desc")
+            cover_file = data.get("cover")
+
+            if cover_file:
+                # Delete the existing file before adding a new one
+                if hasattr(playlist.cover, "delete"):
+                    playlist.cover.delete()
+
+                playlist.cover.put(
+                    cover_file,
+                    content_type=getattr(cover_file, "content_type", "image/jpeg"),
+                    filename=getattr(cover_file, "name", "cover"),
+                )
             playlist.updated_at = datetime.now()
+
             playlist.save()
             return playlist
-        except (DoesNotExist, ValidationError) as e:
-            return None
+        except DoesNotExist:
+            return None, "Playlist does not exist"
+        except ValidationError as e:
+            return None, f"Validation error: {str(e)}"
+        except Exception as e:
+            return None, f"Unexpected error: {str(e)}"

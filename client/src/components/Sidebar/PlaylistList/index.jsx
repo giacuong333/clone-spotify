@@ -1,10 +1,10 @@
-import { memo, useEffect, useMemo, useState } from "react";
+import { memo, useEffect, useState } from "react";
 import PlaylistItem from "../PlaylistItem";
 import { usePlaylist } from "../../../contexts/playlist";
 import _ from "lodash";
 import { SearchOutlined } from "@ant-design/icons";
 
-const PlaylistList = () => {
+const PlaylistList = ({ onPopupModal, onPlaylistInfo }) => {
 	const [searchInput, setSearchInput] = useState("");
 	const { playlists, fetchPlaylists, loadingPlaylists, searchPlaylists } =
 		usePlaylist();
@@ -62,7 +62,12 @@ const PlaylistList = () => {
 					<ul className='space-y-1'>
 						{playlists.length !== 0 ? (
 							playlists.map((item, index) => (
-								<PlaylistItem key={item?.id || index} playlistItem={item} />
+								<PlaylistItem
+									key={item?.id || index}
+									playlistItem={item}
+									onPopupModal={onPopupModal}
+									onPlaylistInfo={onPlaylistInfo}
+								/>
 							))
 						) : (
 							<li>

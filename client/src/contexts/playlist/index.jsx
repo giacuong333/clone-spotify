@@ -66,6 +66,8 @@ const PlaylistProvider = ({ children }) => {
 				return;
 			}
 
+			if (!playlist_id) return;
+
 			try {
 				setLoadingPlaylist(true);
 				const response = await instance.get(apis.playlists.getDetail(), {
@@ -186,23 +188,41 @@ const PlaylistProvider = ({ children }) => {
 				setLoadingPlaylists(false);
 			}
 		},
-		[isAuthenticated, playlist?.id, fetchPlaylist]
+		[isAuthenticated, playlist?.id, favoritePlaylist?.id, fetchPlaylist]
 	);
 
-	const editPlaylistTitle = useCallback(async () => {
-		if (!isAuthenticated) {
-			return;
-		}
+	const editPlaylist = useCallback(
+		async (payload) => {
+			if (!isAuthenticated) {
+				return;
+			}
 
-		try {
-			setLoadingPlaylists(true);
-		} catch (error) {
-			console.log("Error while editing playlist", error);
-			setError(error);
-		} finally {
-			setLoadingPlaylists(false);
-		}
-	}, [isAuthenticated]);
+			try {
+				setLoadingPlaylists(true);
+				const response = await instance.put(
+					apis.playlists.editPlaylist(),
+					payload,
+					{
+						headers: {
+							"Content-Type": "multipart/form-data",
+						},
+					}
+				);
+				if (response?.status === 200) {
+					notify("Playlist edited");
+					await fetchPlaylists();
+					await fetchPlaylist();
+				}
+				return response;
+			} catch (error) {
+				console.log("Error while deleting playlist", error);
+				setError(error);
+			} finally {
+				setLoadingPlaylists(false);
+			}
+		},
+		[isAuthenticated, fetchPlaylist, fetchPlaylists]
+	);
 
 	const deletePlaylist = useCallback(
 		async (playlist_id) => {
@@ -290,7 +310,7 @@ const PlaylistProvider = ({ children }) => {
 				fetchPlaylist,
 				addSongToPlaylist,
 				removeSongFromPlaylist,
-				editPlaylistTitle,
+				editPlaylist,
 				deletePlaylist,
 				createPlaylist,
 

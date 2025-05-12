@@ -137,7 +137,38 @@ class RemoveSongFromPlaylistView(APIView):
 
 class EditPlaylistView(APIView):
     permission_classes = [IsAuthenticated]
-    pass
+    parser_classes = [FormParser, MultiPartParser]
+
+    def put(self, request):
+        playlist_id = request.data.get("playlist_id", "")
+        cover = request.FILES.get("cover", None)
+        name = request.data.get("name", "")
+        desc = request.data.get("desc", "")
+        user = request.user
+
+        if not playlist_id:
+            return Response(
+                {"error": "Missing playlist_id parameter"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        data = {"name": name, "desc": desc, "cover": cover, "user": user}
+
+        updated_playlist = Playlist.update(playlist_id, data)
+
+        if isinstance(updated_playlist, tuple):
+            playlist, error = updated_playlist
+            if playlist is None:
+                return Response({"error": error}, status=status.HTTP_400_BAD_REQUEST)
+
+        serializer = PlaylistSerializer(updated_playlist, context={"request": request})
+
+        if not serializer.data:
+            return Response(
+                "Update failed", status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+        return Response("Updated", status=status.HTTP_200_OK)
 
 
 class DeletePlaylistView(APIView):
@@ -176,7 +207,7 @@ class CreatePlaylistView(APIView):
         name = request.data.get("name", "")
         desc = request.data.get("desc", "")
         user = request.user
-        
+
         print("Cover file: ", cover)
 
         if not desc:

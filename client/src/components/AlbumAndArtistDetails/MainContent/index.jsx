@@ -25,6 +25,8 @@ const MainContent = ({ user = null, song = null, onPlaySong }) => {
 	} = usePlaylist();
 	const { isPlaying } = usePlayer();
 
+	console.log("allSongs: ", allSongs);
+
 	const fetchSongsByUser = async () => {
 		try {
 			const response = await fetchSongsByUserId(user?.id || song?.user?.id);

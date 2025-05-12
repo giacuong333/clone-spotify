@@ -5,7 +5,7 @@ import { usePlaylist } from "../../../contexts/playlist";
 import { useNavigate } from "react-router-dom";
 import paths from "../../../constants/paths";
 
-const PlaylistItem = ({ playlistItem }) => {
+const PlaylistItem = ({ playlistItem, onPopupModal, onPlaylistInfo }) => {
 	const [visible, setVisible] = useState(false);
 	const [position, setPosition] = useState({ x: 0, y: 0 });
 	const { deletePlaylist } = usePlaylist();
@@ -29,6 +29,16 @@ const PlaylistItem = ({ playlistItem }) => {
 		navigate(paths.playlist.replace(":id", playlist_id));
 	};
 
+	const handleEdit = () => {
+		onPlaylistInfo({
+			id: playlistItem?.id,
+			name: playlistItem?.name,
+			desc: playlistItem?.desc,
+			cover: playlistItem?.cover,
+		});
+		onPopupModal();
+	};
+
 	const content = useMemo(() => {
 		return (
 			<div className='bg-gray-900/10 rounded shadow-lg py-1'>
@@ -37,12 +47,11 @@ const PlaylistItem = ({ playlistItem }) => {
 					onClick={handleDelete}>
 					Delete
 				</button>
-				<button className='w-full text-left text-white hover:bg-white/20 px-4 py-2 cursor-pointer'>
+				<button
+					className='w-full text-left text-white hover:bg-white/20 px-4 py-2 cursor-pointer'
+					onClick={handleEdit}>
 					Edit
 				</button>
-				{/* <button className='w-full text-left text-white hover:bg-white/20 px-4 py-2 cursor-pointer'>
-					Share
-				</button> */}
 			</div>
 		);
 	}, []);

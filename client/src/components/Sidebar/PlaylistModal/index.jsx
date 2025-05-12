@@ -1,17 +1,31 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { X, Music, MessageSquareWarning, Pencil } from "lucide-react";
 import Overlay from "../../Overlay";
 import { usePlaylist } from "../../../contexts/playlist";
 import _ from "lodash";
 
-const PlaylistModal = ({ toggle, onClose }) => {
+const PlaylistModal = ({
+	toggle,
+	onClose,
+	playlistInfo,
+	clearPlaylistInfo,
+}) => {
+	const [id, setId] = useState("");
 	const [name, setName] = useState("");
 	const [desc, setDesc] = useState("");
 	const [error, setError] = useState("");
 	const [cover, setCover] = useState();
 	const [coverFile, setCoverFile] = useState();
 
-	const { createPlaylist } = usePlaylist();
+	const { createPlaylist, editPlaylist } = usePlaylist();
+
+	useEffect(() => {
+		if (playlistInfo) {
+			setId(playlistInfo?.id);
+			setName(playlistInfo?.name);
+			setDesc(playlistInfo?.desc);
+		}
+	}, [playlistInfo]);
 
 	const validate = useCallback(() => {
 		if (_.isEmpty(name.trim())) {
@@ -28,15 +42,22 @@ const PlaylistModal = ({ toggle, onClose }) => {
 		}
 	}, [name, validate]);
 
-	const handleCreate = async () => {
+	const handleSave = async () => {
 		if (!validate()) return;
 
 		const payload = new FormData();
 		payload.append("name", name);
 		payload.append("desc", desc);
 		payload.append("cover", coverFile);
-		const response = await createPlaylist(payload);
-		if (response.status === 201) clearInfo();
+		if (!playlistInfo) {
+			const response = await createPlaylist(payload);
+			if (response?.status === 201) clearInfo();
+		} else {
+			payload.append("playlist_id", id);
+			const response = await editPlaylist(payload);
+			console.log("Cover file: ", coverFile);
+			if (response?.status === 200) handleClose();
+		}
 	};
 
 	const handleChangeImage = (e) => {
@@ -57,6 +78,7 @@ const PlaylistModal = ({ toggle, onClose }) => {
 	const handleClose = () => {
 		clearInfo();
 		onClose();
+		clearPlaylistInfo();
 	};
 
 	return (
@@ -80,9 +102,9 @@ const PlaylistModal = ({ toggle, onClose }) => {
 
 					<div className='flex gap-4 mb-4'>
 						<div className='w-48 h-auto bg-zinc-800 flex items-center justify-center rounded group relative'>
-							{cover && coverFile ? (
+							{(cover && coverFile) || playlistInfo?.cover ? (
 								<img
-									src={cover}
+									src={cover || playlistInfo?.cover}
 									alt={coverFile?.name}
 									className='object-cover object-center w-full h-full'
 								/>
@@ -137,7 +159,7 @@ const PlaylistModal = ({ toggle, onClose }) => {
 					<div className='flex justify-end mt-8'>
 						<button
 							className='bg-white text-black font-bold py-2 px-8 rounded-full hover:bg-gray-200 cursor-pointer'
-							onClick={handleCreate}>
+							onClick={handleSave}>
 							Save
 						</button>
 					</div>

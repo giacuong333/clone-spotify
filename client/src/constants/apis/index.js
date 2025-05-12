@@ -53,7 +53,7 @@ export const apis = {
 		getDetail: () => `/api/playlists/detail/`,
 		addSongToPlaylist: () => `/api/playlists/songs/add/`,
 		removeSongFromPlaylist: () => `/api/playlists/songs/remove/`,
-		editPlaylistTitle: () => `/api/playlists/edit/`,
+		editPlaylist: () => `/api/playlists/edit/`,
 		deletePlaylist: () => `/api/playlists/delete/`,
 		createPlaylist: () => `/api/playlists/create/`,
 		getByUserId: (id) => `/api/playlists/user/?user_id=${id}/`,
