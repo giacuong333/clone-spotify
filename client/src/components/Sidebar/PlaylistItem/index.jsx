@@ -38,7 +38,7 @@ const PlaylistItem = ({ playlistItem }) => {
 					Delete
 				</button>
 				<button className='w-full text-left text-white hover:bg-white/20 px-4 py-2 cursor-pointer'>
-					Rename
+					Edit
 				</button>
 				{/* <button className='w-full text-left text-white hover:bg-white/20 px-4 py-2 cursor-pointer'>
 					Share
@@ -73,9 +73,20 @@ const PlaylistItem = ({ playlistItem }) => {
 				onContextMenu={handleContextMenu}
 				onClick={() => handleNavigate(playlistItem?.id)}>
 				<div className='flex items-center gap-3'>
-					<div className='bg-white/20 p-4 rounded'>
-						<SongIcon className='text-white/50' width='24' height='24' />
-					</div>
+					{playlistItem?.cover ? (
+						<div className='rounded overflow-hidden w-[60px] h-[60px]'>
+							<img
+								src={playlistItem?.cover}
+								alt={playlistItem?.name}
+								className='object-center object-cover w-full h-full'
+							/>
+						</div>
+					) : (
+						<div className='bg-white/20 rounded w-[60px] h-[60px] flex items-center justify-center'>
+							<SongIcon className='text-white/50' width='24' height='24' />
+						</div>
+					)}
+
 					<div className='flex-1 min-w-0'>
 						<p className='text-white font-medium truncate'>
 							{playlistItem.name}

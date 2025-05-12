@@ -2,12 +2,30 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
+from rest_framework.parsers import FormParser, MultiPartParser
 from .models import Playlist, SongsOfPlaylist
 from apps.songs.models import Song
 from .serializers import PlaylistSerializer
+from bson import ObjectId
+
+
+class SearchView(APIView):
+
+    def get(self, request):
+        user = request.user
+        user_id = user.id
+        query = request.GET.get("query", "")
+
+        playlists = Playlist.search(query, user_id)
+        if not playlists:
+            return Response([], status=status.HTTP_200_OK)
+
+        serializer = PlaylistSerializer(playlists, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class GetAllView(APIView):
+    permission_classes = [IsAuthenticated]
 
     def get(self, request):
         user = request.user
@@ -136,6 +154,9 @@ class DeletePlaylistView(APIView):
         if not playlist:
             return Response("Playlist not found", status=status.HTTP_404_NOT_FOUND)
 
+        if playlist.is_favorite:
+            return Response("Can not delete favorite", status=status.HTTP_403_FORBIDDEN)
+
         is_deleted = Playlist.delete(playlist_id)
 
         if is_deleted == False:
@@ -147,19 +168,24 @@ class DeletePlaylistView(APIView):
 
 
 class CreatePlaylistView(APIView):
+    parser_classes = [MultiPartParser, FormParser]
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
+        cover = request.FILES.get("cover", None)
         name = request.data.get("name", "")
         desc = request.data.get("desc", "")
         user = request.user
+        
+        print("Cover file: ", cover)
 
         if not desc:
             desc = f"Playlist - {user.name}"
 
-        data = {"user": user, "name": name, "desc": desc}
+        data = {"user": user, "name": name, "desc": desc, "cover": cover}
 
         created_playlist = Playlist.create(data)
+        serializer = PlaylistSerializer(created_playlist, context={"request": request})
         if not created_playlist:
             return Response(
                 "Create failed", status=status.HTTP_500_INTERNAL_SERVER_ERROR
@@ -186,4 +212,35 @@ class GetPlaylistsByUserIdView(APIView):
 
         # Serialize data và trả về
         serializer = PlaylistSerializer(playlists, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class FavoritePlaylistByUserIdView(APIView):
+    permission_classes = [IsAuthenticated]  # Hoặc AllowAny nếu không cần auth
+
+    def get(self, request):
+        user_id = request.query_params.get("user_id", "").strip("/")
+
+        if not user_id:
+            return Response(
+                {"error": "user_id is required"}, status=status.HTTP_400_BAD_REQUEST
+            )
+
+        try:
+            # Convert user_id string to ObjectId
+            user_obj_id = ObjectId(user_id)
+        except Exception:
+            return Response(
+                {"error": "Invalid user_id format"}, status=status.HTTP_400_BAD_REQUEST
+            )
+
+        try:
+            favorite_playlist = Playlist.objects.get(user=user_obj_id, is_favorite=True)
+        except Playlist.DoesNotExist:
+            return Response(
+                {"error": "Favorite playlist not found"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        serializer = PlaylistSerializer(favorite_playlist, context={"request": request})
         return Response(serializer.data, status=status.HTTP_200_OK)

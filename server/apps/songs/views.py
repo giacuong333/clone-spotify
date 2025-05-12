@@ -3,7 +3,7 @@ from rest_framework.views import APIView
 from rest_framework.generics import ListCreateAPIView, RetrieveAPIView, DestroyAPIView
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework.parsers import MultiPartParser, FormParser
+from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from gridfs import GridFS
 from mongoengine.connection import get_db
@@ -220,8 +220,8 @@ class SongCreateView(APIView):
 
 class SongBulkDestroyView(APIView):
     permission_classes = [AllowAny]
-    http_method_names = ["post", "options"]
     # permission_classes = [IsAuthenticated]
+    parser_classes = [JSONParser]
 
     def post(self, request):
         print("REQUEST DATA: ", request.data.get("song_ids"))

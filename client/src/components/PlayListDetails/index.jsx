@@ -106,7 +106,7 @@ const PlaylistDetails = () => {
 			{/* Header Section with album info */}
 			<div className='flex flex-col md:flex-row p-6 items-center md:items-end space-y-6 md:space-y-0 md:space-x-6 bg-gradient-to-b from-green-800 to-transparent pb-12'>
 				<div className='shrink-0 h-44 md:h-60 w-44 md:w-60 flex items-center justify-center'>
-					{playlist.cover_url ? (
+					{playlist?.cover ? (
 						<img
 							src={
 								playlist?.cover !== "<GridFSProxy: <no file> (None)>" &&
@@ -115,7 +115,7 @@ const PlaylistDetails = () => {
 									: "/api/placeholder/200/200"
 							}
 							alt={`${playlist?.name || "Playlist"} Cover`}
-							className='w-40 h-40 shadow-2xl'
+							className='rounded w-full h-full shadow-2xl object-center object-cover'
 						/>
 					) : (
 						<div className='rounded bg-white/30 w-full h-full flex items-center justify-center'>

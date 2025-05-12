@@ -51,32 +51,13 @@ const NowPlayingBar = () => {
 		}
 	}, [currentSong]);
 
-	// Play/pause
-	useEffect(() => {
-		if (isPlaying) {
-			audioRef.current?.play();
-		} else {
-			audioRef.current?.pause();
-		}
-	}, [isPlaying, audioRef]);
-
-	useEffect(() => {
-		const audio = audioRef.current;
-		if (audio) {
-			audio.addEventListener("loadedmetadata", handleTimeUpdate);
-			return () => {
-				audio.removeEventListener("loadedmetadata", handleTimeUpdate);
-			};
-		}
-	}, [audioRef]);
-
 	const handleTimeUpdate = () => {
 		console.log("Current time: ", audioRef.current.currentTime);
 		setCurrentTime(audioRef.current.currentTime);
 		setDuration(audioRef.current.duration);
 	};
 
-	// Update currentTime and duration continously
+	// Update realtime
 	useEffect(() => {
 		const audio = audioRef.current;
 		audio.addEventListener("timeupdate", handleTimeUpdate);
@@ -85,6 +66,17 @@ const NowPlayingBar = () => {
 			audio.removeEventListener("timeupdate", handleTimeUpdate);
 		};
 	}, []);
+
+	// Play/pause
+	useEffect(() => {
+		if (audioRef.current) {
+			if (isPlaying) {
+				audioRef.current?.play();
+			} else {
+				audioRef.current?.pause();
+			}
+		}
+	}, [isPlaying, audioRef]);
 
 	const handleSeek = () => {
 		if (audioRef.current && progressBarRef.current) {

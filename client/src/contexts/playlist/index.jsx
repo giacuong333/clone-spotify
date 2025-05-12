@@ -3,6 +3,7 @@ import { useAuth } from "../Auth";
 import { instance } from "../Axios";
 import { apis } from "../../constants/apis";
 import { notify } from "../../components/Toast";
+import { useUser } from "../User";
 
 const PlaylistContext = createContext();
 
@@ -12,7 +13,33 @@ const PlaylistProvider = ({ children }) => {
 	const [error, setError] = useState("");
 	const [loadingPlaylists, setLoadingPlaylists] = useState(false);
 	const [loadingPlaylist, setLoadingPlaylist] = useState(false);
+	const [favoritePlaylist, setFavoritePlaylist] = useState(null);
 	const { isAuthenticated } = useAuth();
+	const { user } = useAuth();
+
+	const searchPlaylists = useCallback(
+		async (query) => {
+			if (!isAuthenticated) {
+				return;
+			}
+
+			try {
+				setLoadingPlaylists(true);
+				const response = await instance.get(apis.playlists.search(), {
+					params: { query },
+				});
+				if (response.status === 200) {
+					setPlaylists(response.data);
+				}
+			} catch (error) {
+				console.log("Error while fetching playlists", error);
+				setError(error);
+			} finally {
+				setLoadingPlaylists(false);
+			}
+		},
+		[isAuthenticated]
+	);
 
 	const fetchPlaylists = useCallback(async () => {
 		if (!isAuthenticated) {
@@ -76,6 +103,25 @@ const PlaylistProvider = ({ children }) => {
 		[isAuthenticated]
 	);
 
+	const fetchFavoritePlaylist = useCallback(async () => {
+		if (!isAuthenticated) {
+			return;
+		}
+
+		try {
+			const response = await instance.get(
+				apis.playlists.getFavoritePlaylist(user?.id)
+			);
+			if (response.status === 200) {
+				setFavoritePlaylist(response.data);
+			}
+			return response.data;
+		} catch (error) {
+			console.log("Error while fetching favorite playlist: ", error);
+			setError(error);
+		}
+	}, [isAuthenticated]);
+
 	const addSongToPlaylist = useCallback(
 		async (payload) => {
 			if (!isAuthenticated) {
@@ -121,7 +167,10 @@ const PlaylistProvider = ({ children }) => {
 
 			try {
 				setLoadingPlaylists(true);
-				const payload = { playlist_id: playlist?.id, song_id };
+				const payload = {
+					playlist_id: playlist?.id || favoritePlaylist?.id,
+					song_id,
+				};
 				const response = await instance.post(
 					apis.playlists.removeSongFromPlaylist(),
 					payload
@@ -161,6 +210,15 @@ const PlaylistProvider = ({ children }) => {
 				return;
 			}
 
+			const isFavoritePlaylist = playlists.findIndex(
+				(p) => p.is_favorite && p.id === playlist_id
+			);
+
+			if (isFavoritePlaylist !== -1) {
+				notify("Can not delete favorite", "error");
+				return;
+			}
+
 			try {
 				setLoadingPlaylists(true);
 				const response = await instance.delete(
@@ -175,6 +233,9 @@ const PlaylistProvider = ({ children }) => {
 			} catch (error) {
 				console.log("Error while deleting playlist", error);
 				setError(error);
+				if (error.response.status === 403) {
+					notify("Can not delete favorite", "error");
+				}
 			} finally {
 				setLoadingPlaylists(false);
 			}
@@ -192,12 +253,18 @@ const PlaylistProvider = ({ children }) => {
 				setLoadingPlaylists(true);
 				const response = await instance.post(
 					apis.playlists.createPlaylist(),
-					payload
+					payload,
+					{
+						headers: {
+							"Content-Type": "multipart/form-data",
+						},
+					}
 				);
 				if (response.status === 201) {
 					notify("Playlist created");
 					await fetchPlaylists();
 				}
+				return response;
 			} catch (error) {
 				console.log("Error while deleting playlist", error);
 				setError(error);
@@ -228,6 +295,11 @@ const PlaylistProvider = ({ children }) => {
 				createPlaylist,
 
 				fetchPlaylistsByUser,
+				fetchFavoritePlaylist,
+				favoritePlaylist,
+				setFavoritePlaylist,
+
+				searchPlaylists,
 			}}>
 			{children}
 		</PlaylistContext.Provider>

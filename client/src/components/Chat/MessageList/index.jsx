@@ -1,7 +1,7 @@
 import MessageItem from "../MessageItem";
 import { useChat } from "../../../contexts/Chat";
 
-export function MessageList() {
+const MessageList = () => {
 	const { messages, loadingMessages } = useChat();
 
 	if (loadingMessages) {
@@ -25,4 +25,6 @@ export function MessageList() {
 			)}
 		</div>
 	);
-}
+};
+
+export default MessageList;

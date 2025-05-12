@@ -24,7 +24,7 @@ class SongsOfPlaylist(EmbeddedDocument):
 class Playlist(Document):
     user = ReferenceField(User, required=True)
     name = StringField(required=True)
-    cover = FileField()
+    cover = FileField(required=False)
     is_favorite = BooleanField(default=False)
     desc = StringField()
     songs = ListField(EmbeddedDocumentField(SongsOfPlaylist))
@@ -36,7 +36,20 @@ class Playlist(Document):
     @staticmethod
     def create(data):
         try:
-            playlist = Playlist(**data)
+            playlist = Playlist()
+
+            playlist.user = data.get("user")
+            playlist.name = data.get("name")
+            playlist.desc = data.get("desc")
+
+            cover_file = data.get("cover")
+            if cover_file:
+                playlist.cover.put(
+                    cover_file,
+                    content_type=getattr(cover_file, "content_type", "image/jpeg"),
+                    filename=getattr(cover_file, "name", "cover"),
+                )
+
             playlist.save()
             return playlist
         except (ValidationError, ValueError) as e:
@@ -55,11 +68,11 @@ class Playlist(Document):
             return Playlist.objects.get(id=playlist_id)
         except DoesNotExist:
             return None
-        
+
     @staticmethod
-    def search(query):
+    def search(query, user_id):
         try:
-            return Playlist.objects.filter(name__icontains=query)
+            return Playlist.objects.filter(name__icontains=query, user=user_id)
         except DoesNotExist:
             return None
 
@@ -77,7 +90,7 @@ class Playlist(Document):
             return playlist
         except DoesNotExist:
             return None
-        
+
     @staticmethod
     def removeSongFromPlayList(playlist_id, song_id):
         try:

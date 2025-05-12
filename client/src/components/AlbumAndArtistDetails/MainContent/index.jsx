@@ -7,14 +7,23 @@ import { useSong } from "../../../contexts/Song";
 import { notify } from "../../Toast";
 import { AiOutlinePlusCircle } from "react-icons/ai";
 import { AiOutlineArrowDown } from "react-icons/ai";
+import { AiOutlineHeart } from "react-icons/ai";
+import { AiFillHeart } from "react-icons/ai";
+import { useUser } from "../../../contexts/User";
+import { usePlaylist } from "../../../contexts/playlist";
 import { usePlayer } from "../../../contexts/Player";
-import { usePlaylist } from "../../../contexts/Playlist";
 
 const MainContent = ({ user = null, song = null, onPlaySong }) => {
 	const [allSongs, setAllSongs] = useState([]);
 	const { fetchSongsByUserId, handleDownload } = useSong();
+	const [isFavorited, setIsFavorited] = useState(false);
+	const {
+		favoritePlaylist,
+		fetchFavoritePlaylist,
+		addSongToPlaylist,
+		removeSongFromPlaylist,
+	} = usePlaylist();
 	const { isPlaying } = usePlayer();
-	const { addSongToPlaylist } = usePlaylist();
 
 	const fetchSongsByUser = async () => {
 		try {
@@ -30,8 +39,25 @@ const MainContent = ({ user = null, song = null, onPlaySong }) => {
 	};
 
 	useEffect(() => {
-		fetchSongsByUser();
+		const fetchData = async () => {
+			await fetchSongsByUser();
+			await fetchFavoritePlaylist();
+		};
+		fetchData();
 	}, [user, song]);
+
+	useEffect(() => {
+		if (favoritePlaylist) {
+			console.log("Favorite Playlist:", favoritePlaylist);
+		}
+		if (favoritePlaylist && song) {
+			const found = favoritePlaylist.songs?.some(
+				(entry) => entry.song?.id === song.id
+			);
+			setIsFavorited(found);
+		}
+		console.log("isFavorited:", isFavorited);
+	}, [favoritePlaylist, song]);
 
 	const handleClickDownloadBtn = async (e) => {
 		handleDownload(e, song?.audio_url, song?.title, song?.user?.name);
@@ -46,8 +72,8 @@ const MainContent = ({ user = null, song = null, onPlaySong }) => {
 			fallback={
 				<Spin spinning tip='Please wait...' fullscreen size='large'></Spin>
 			}>
-			<div className=''>
-				<div className='2xl:max-w-10/12 w-full 2xl:px-0 px-10 mx-auto'>
+			<div>
+				<div className='2xl:max-w-10/12 w-full 2xl:px-0 px-10 mx-20'>
 					<div className='w-full py-6 flex items-center justify-start gap-5 mb-6'>
 						{/* Play button */}
 						{allSongs.length > 0 && (
@@ -77,10 +103,27 @@ const MainContent = ({ user = null, song = null, onPlaySong }) => {
 
 						{song && (
 							<>
-								<AiOutlinePlusCircle
-									className='text-5xl text-white hover:scale-[1.1] cursor-pointer'
-									onClick={handleAddSongToPlaylist}
-								/>
+								<AiOutlinePlusCircle className='text-5xl text-white hover:scale-[1.1] cursor-pointer' />
+								{isFavorited ? (
+									<AiFillHeart
+										className='text-5xl text-white hover:scale-[1.1] cursor-pointer'
+										onClick={async () => {
+											setIsFavorited(!isFavorited);
+											await removeSongFromPlaylist(song?.id);
+										}}
+									/>
+								) : (
+									<AiOutlineHeart
+										className='text-5xl text-white hover:scale-[1.1] cursor-pointer'
+										onClick={async () => {
+											setIsFavorited(!isFavorited);
+											await addSongToPlaylist({
+												playlist_id: favoritePlaylist.id,
+												song_id: song.id,
+											});
+										}}
+									/>
+								)}
 								<AiOutlineArrowDown
 									className='text-5xl text-white hover:scale-[1.1] cursor-pointer'
 									onClick={(e) => handleClickDownloadBtn(e)}

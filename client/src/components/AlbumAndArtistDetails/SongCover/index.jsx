@@ -1,8 +1,16 @@
 import React from "react";
 import VerifiedBadge from "../../Icons/VerifiedBadge";
 import formatTime from "../../../utils/formatTime";
+import { useNavigate } from "react-router-dom";
+import paths from "../../../constants/paths";
 
 const SongCover = ({ song }) => {
+	const navigate = useNavigate();
+
+	const handleUserClick = () => {
+		navigate(paths.details + `?detailsId=${song?.user?.id}&type=user`);
+	};
+
 	return (
 		<div className='flex items-center p-6 bg-gradient-to-b from-[#2a6e7f] to-[#0f2a2e] rounded-xl text-white'>
 			{/* Avatar */}

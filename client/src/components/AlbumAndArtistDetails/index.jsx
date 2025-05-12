@@ -26,6 +26,7 @@ const AlbumAndArtistDetails = () => {
 	const [searchParams] = useSearchParams();
 	const type = searchParams.get("type");
 	const detailsId = searchParams.get("detailsId");
+	console.log(detailsId);
 
 	const { fetchSongDetails } = useSong();
 	const { fetchUserDetail } = useUser();
@@ -44,23 +45,19 @@ const AlbumAndArtistDetails = () => {
 				console.log("Fetching details for ID:", detailsId);
 				if (type === "song") {
 					const songDetailsResponse = await fetchSongDetails(detailsId);
-					console.log("songDetailsResponse", songDetailsResponse);
 					if (songDetailsResponse && songDetailsResponse.status === 200) {
 						setSongDetails(songDetailsResponse.data);
 						console.log("Song details:", songDetailsResponse.data);
 					}
 				} else if (type === "user") {
-					const userDetail = await fetchUserDetail(detailsId);
-					setUserDetails(userDetail);
-					const playlistsResponse = await fetchPlaylistsByUser(detailsId);
-					console.log("Playlists response:", playlistsResponse);
-					setPublicPlaylists(playlistsResponse.data);
-					const songsResponse = await fetchSongsByUserId(detailsId);
-					console.log(
-						"Songs by user response:",
-						songsResponse.data.songs_by_user
-					);
-					setSongsByUser(songsResponse.data.songs_by_user);
+					const [user, playlists, songs] = await Promise.all([
+						fetchUserDetail(detailsId),
+						fetchPlaylistsByUser(detailsId),
+						fetchSongsByUserId(detailsId),
+					]);
+					setUserDetails(user);
+					setPublicPlaylists(playlists?.data || []);
+					setSongsByUser(songs?.data?.songs_by_user || []);
 				}
 			} catch (error) {
 				console.log("Error response:", error.response);
@@ -68,7 +65,14 @@ const AlbumAndArtistDetails = () => {
 			}
 		};
 		fetchDetails();
-	}, [detailsId]);
+	}, [
+		detailsId,
+		fetchPlaylistsByUser,
+		fetchSongDetails,
+		fetchSongsByUserId,
+		fetchUserDetail,
+		type,
+	]);
 
 	const handlePlaySong = () => {
 		playSong(songDetails, songsByUser);

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { X, Music, MessageSquareWarning, Pencil } from "lucide-react";
 import Overlay from "../../Overlay";
 import { usePlaylist } from "../../../contexts/playlist";
@@ -8,9 +8,10 @@ const PlaylistModal = ({ toggle, onClose }) => {
 	const [name, setName] = useState("");
 	const [desc, setDesc] = useState("");
 	const [error, setError] = useState("");
-	const { createPlaylist } = usePlaylist();
 	const [cover, setCover] = useState();
 	const [coverFile, setCoverFile] = useState();
+
+	const { createPlaylist } = usePlaylist();
 
 	const validate = useCallback(() => {
 		if (_.isEmpty(name.trim())) {
@@ -30,20 +31,43 @@ const PlaylistModal = ({ toggle, onClose }) => {
 	const handleCreate = async () => {
 		if (!validate()) return;
 
-		const payload = { name, desc };
-		await createPlaylist(payload);
+		const payload = new FormData();
+		payload.append("name", name);
+		payload.append("desc", desc);
+		payload.append("cover", coverFile);
+		const response = await createPlaylist(payload);
+		if (response.status === 201) clearInfo();
+	};
+
+	const handleChangeImage = (e) => {
+		const file = e.target.files[0];
+		setCoverFile(file);
+		const coverSrc = URL.createObjectURL(file);
+		setCover(coverSrc);
+	};
+
+	const clearInfo = () => {
+		setCoverFile(null);
+		setCover("");
+		setName("");
+		setDesc("");
+		setError("");
+	};
+
+	const handleClose = () => {
+		clearInfo();
 		onClose();
 	};
 
 	return (
 		<>
-			<Overlay toggle={toggle} setToggle={onClose} />
+			<Overlay toggle={toggle} setToggle={handleClose} />
 			<section className='fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-30'>
 				<div className='bg-zinc-900 rounded-lg w-full max-w-lg p-6 text-white'>
 					<div className='flex justify-between items-center mb-6'>
 						<h2 className='text-2xl font-bold'>Edit details</h2>
 						<button className='text-gray-400 hover:text-white cursor-pointer'>
-							<X size={24} onClick={onClose} />
+							<X size={24} onClick={handleClose} />
 						</button>
 					</div>
 
@@ -55,17 +79,35 @@ const PlaylistModal = ({ toggle, onClose }) => {
 					)}
 
 					<div className='flex gap-4 mb-4'>
-						<div className='w-48 h-auto bg-zinc-800 flex items-center justify-center rounded group'>
-							<Music
-								size={48}
-								className='text-gray-400 block group-hover:hidden'
-							/>
-							<>
-								<Pencil
-									size={48}
-									className='text-gray-400 cursor-pointer hidden group-hover:block'
+						<div className='w-48 h-auto bg-zinc-800 flex items-center justify-center rounded group relative'>
+							{cover && coverFile ? (
+								<img
+									src={cover}
+									alt={coverFile?.name}
+									className='object-cover object-center w-full h-full'
 								/>
-							</>
+							) : (
+								<Music
+									size={48}
+									className='text-gray-400 block group-hover:hidden'
+								/>
+							)}
+							<div className='group-hover:absolute group-hover:bg-black/50 group-hover:w-full group-hover:h-full flex items-center justify-center'>
+								<label htmlFor='image-file' className='cursor-pointer'>
+									<Pencil
+										size={48}
+										className='text-gray-400 hidden group-hover:block'
+									/>
+								</label>
+								<input
+									type='file'
+									multiple=''
+									accept='image/*'
+									id='image-file'
+									onChange={handleChangeImage}
+									hidden
+								/>
+							</div>
 							<input type='file' multiple='' hidden />
 						</div>
 

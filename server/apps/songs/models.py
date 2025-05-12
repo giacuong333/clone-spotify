@@ -59,10 +59,10 @@ class Song(Document):
             return result > 0
         except DoesNotExist:
             return False
-        
+
     @staticmethod
-    def search(query): 
-        try: 
+    def search(query):
+        try:
             return Song.objects.filter(title__icontains=query, deleted_at=None)
-        except DoesNotExist: 
+        except DoesNotExist:
             return []

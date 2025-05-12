@@ -34,8 +34,6 @@ class SongSerializer(serializers.Serializer):
 
 
 class EnhancedSongSerializer(SongSerializer):
-    """Enhanced serializer that includes audio, video and cover URLs"""
-
     audio_url = serializers.SerializerMethodField()
     video_url = serializers.SerializerMethodField()
     cover_url = serializers.SerializerMethodField()
