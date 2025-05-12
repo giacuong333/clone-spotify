@@ -43,6 +43,7 @@ const PlayerProvider = ({ children }) => {
 
 		setCurrentSong(song);
 		setSongList(songs);
+
 		if (index !== null) {
 			setCurrentSongIndex(index);
 		} else if (songs && songs.length) {

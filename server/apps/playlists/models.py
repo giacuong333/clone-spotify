@@ -42,6 +42,10 @@ class Playlist(Document):
             playlist.name = data.get("name")
             playlist.desc = data.get("desc")
 
+            favorite = data.get("is_favorite", False)
+            if favorite:
+                playlist.is_favorite = favorite
+
             cover_file = data.get("cover")
             if cover_file:
                 playlist.cover.put(

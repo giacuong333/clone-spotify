@@ -15,11 +15,18 @@ const AlbumAndArtistItem = ({ item, type, index, list }) => {
 
 	const handlePlay = (event) => {
 		event.stopPropagation();
-		// When play button is clicked, play this song and provide the whole list
+
 		if (type === "song" && item) {
 			playSong(item, list || [item], index);
 		}
 	};
+
+	console.log(list);
+
+	const songOrUserDefault =
+		type === "song"
+			? "https://songdewnetwork.com/sgmedia/assets/images/default-album-art.png"
+			: "https://img.freepik.com/premium-vector/user-profile-icon-flat-style-member-avatar-vector-illustration-isolated-background-human-permission-sign-business-concept_157943-15752.jpg?semt=ais_hybrid&w=740";
 
 	return (
 		<li
@@ -28,27 +35,29 @@ const AlbumAndArtistItem = ({ item, type, index, list }) => {
 			<div className='w-40 flex flex-col items-start justify-center cursor-pointer hover:bg-neutral-800 p-4 rounded-md'>
 				{/* Image */}
 				<div className='min-h-32 min-w-32 max-w-32 relative'>
-					<img
-						src={
-							item?.cover_url || // For songs
-							item?.image || // For users
-							"https://cdn.pixabay.com/photo/2023/02/18/11/00/icon-7797704_640.png"
-						}
-						alt={item?.title}
-						className={`w-full h-full object-center object-cover ${
-							type === "user" ? "rounded-full" : "rounded-lg"
-						}`}
-					/>
+					<div className='w-full h-full absolute'>
+						<img
+							src={
+								item?.cover_url || // For songs
+								item?.image || // For users
+								songOrUserDefault
+							}
+							alt={item?.title}
+							className={`w-full h-full object-cover object-center ${
+								type === "user" ? "rounded-full" : "rounded-lg"
+							}`}
+						/>
+					</div>
 
 					{/* Play button */}
 					<div
 						className='
-                absolute right-2 bottom-2 size-12 bg-[#1ED760]
-                opacity-0 translate-y-2
-                hover:bg-[#3BE477] hover:scale-[1.05]
-                group-hover:translate-y-0 group-hover:opacity-100
-                shadow-lg rounded-full flex items-center justify-center
-                transition-all duration-500'>
+							absolute right-2 bottom-2 size-12 bg-[#1ED760]
+							opacity-0 translate-y-2
+							hover:bg-[#3BE477] hover:scale-[1.05]
+							group-hover:translate-y-0 group-hover:opacity-100
+							shadow-lg rounded-full flex items-center justify-center
+							transition-all duration-500'>
 						<Button
 							type='primary'
 							onClick={handlePlay}
@@ -60,7 +69,7 @@ const AlbumAndArtistItem = ({ item, type, index, list }) => {
 
 				{/* Texts */}
 				<div className='mt-2'>
-					<p className='hover:underline text-white truncate break-words'>
+					<p className='hover:underline text-white text-left truncate text-ellipsis max-w-32 w-full'>
 						{item?.title || item?.name}
 					</p>
 					<p className='text-gray-400 text-sm'>{item?.type}</p>

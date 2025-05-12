@@ -63,7 +63,7 @@ const MessageItem = ({ message }) => {
 					</div>
 				)}
 			</div>
-			<div ref={messageEndRef} />
+			{/* <div ref={messageEndRef} /> */}
 		</>
 	);
 };

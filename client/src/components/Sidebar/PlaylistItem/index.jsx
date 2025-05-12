@@ -1,15 +1,29 @@
 import { Popover } from "antd";
 import SongIcon from "../../../components/Icons/SongIcon";
-import { useMemo, useState } from "react";
+import { memo, useMemo, useState } from "react";
 import { usePlaylist } from "../../../contexts/playlist";
+import { usePlayer } from "../../../contexts/player";
 import { useNavigate } from "react-router-dom";
 import paths from "../../../constants/paths";
+import { Play, Pause } from "lucide-react";
 
-const PlaylistItem = ({ playlistItem, onPopupModal, onPlaylistInfo }) => {
+const PlaylistItem = ({
+	playlists,
+	playlistItem,
+	onPopupModal,
+	onPlaylistInfo,
+}) => {
 	const [visible, setVisible] = useState(false);
 	const [position, setPosition] = useState({ x: 0, y: 0 });
 	const { deletePlaylist } = usePlaylist();
+	const { playSong, currentSong, togglePlay, isPlaying } = usePlayer();
 	const navigate = useNavigate();
+
+	const songsOfPlaylist = playlists?.find(
+		(playlist) => playlist?.id === playlistItem?.id
+	)?.songs;
+
+	const songOfSongs = songsOfPlaylist?.map((s) => s.song);
 
 	const handleContextMenu = (e) => {
 		e.preventDefault();
@@ -38,6 +52,32 @@ const PlaylistItem = ({ playlistItem, onPopupModal, onPlaylistInfo }) => {
 		});
 		onPopupModal();
 	};
+
+	const handleToggleOrStream = (e) => {
+		e.stopPropagation();
+
+		if (!songOfSongs || songOfSongs.length === 0) {
+			console.log("No songs in this playlist");
+			return;
+		}
+
+		if (songOfSongs?.find((s) => s?.id === currentSong?.id)) {
+			console.log("Toggle play/pause for current song");
+			togglePlay();
+		} else {
+			const randomIndex = Math.max(
+				Math.floor(Math.random() * songOfSongs?.length),
+				0
+			);
+
+			console.log("Playing song:", songOfSongs[randomIndex]);
+			playSong(songOfSongs[randomIndex], songOfSongs);
+		}
+	};
+
+	const isSongFromThisPlaylist =
+		songOfSongs?.find((s) => s?.id === currentSong?.id) &&
+		playlists?.find((p) => p?.id === playlistItem?.id);
 
 	const content = useMemo(() => {
 		return (
@@ -82,19 +122,30 @@ const PlaylistItem = ({ playlistItem, onPopupModal, onPlaylistInfo }) => {
 				onContextMenu={handleContextMenu}
 				onClick={() => handleNavigate(playlistItem?.id)}>
 				<div className='flex items-center gap-3'>
-					{playlistItem?.cover ? (
-						<div className='rounded overflow-hidden w-[60px] h-[60px]'>
-							<img
-								src={playlistItem?.cover}
-								alt={playlistItem?.name}
-								className='object-center object-cover w-full h-full'
-							/>
+					<div
+						className='relative group overflow-hidden rounded'
+						onClick={handleToggleOrStream}>
+						{playlistItem?.cover ? (
+							<div className='overflow-hidden w-[60px] h-[60px]'>
+								<img
+									src={playlistItem?.cover}
+									alt={playlistItem?.name}
+									className='object-center object-cover w-full h-full'
+								/>
+							</div>
+						) : (
+							<div className='bg-white/20 w-[60px] h-[60px] flex items-center justify-center'>
+								<SongIcon className='text-white/50' width='24' height='24' />
+							</div>
+						)}
+						<div className='absolute z-10 top-0 left-0 w-full h-full bg-black/60 group-hover:flex items-center justify-center hidden'>
+							{isPlaying && isSongFromThisPlaylist ? (
+								<Pause className='text-white' fill='white' />
+							) : (
+								<Play className='text-white' fill='white' />
+							)}
 						</div>
-					) : (
-						<div className='bg-white/20 rounded w-[60px] h-[60px] flex items-center justify-center'>
-							<SongIcon className='text-white/50' width='24' height='24' />
-						</div>
-					)}
+					</div>
 
 					<div className='flex-1 min-w-0'>
 						<p className='text-white font-medium truncate'>
@@ -110,4 +161,4 @@ const PlaylistItem = ({ playlistItem, onPopupModal, onPlaylistInfo }) => {
 	);
 };
 
-export default PlaylistItem;
+export default memo(PlaylistItem);

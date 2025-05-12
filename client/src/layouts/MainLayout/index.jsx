@@ -1,7 +1,9 @@
 import { Spin } from "antd";
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useLocation } from "react-router-dom";
 import paths from "../../constants/paths";
+import { usePlayer } from "../../contexts/player";
+import { useAuth } from "../../contexts/Auth";
 
 const Navbar = React.lazy(() => import("../../components/Navbar"));
 const Sidebar = React.lazy(() => import("../../components/Sidebar"));
@@ -13,6 +15,8 @@ const Videobar = React.lazy(() => import("../../components/Videobar"));
 
 const MainLayout = ({ children }) => {
 	const currentPath = useLocation().pathname;
+	const { currentSong } = usePlayer();
+	const { isAuthenticated } = useAuth();
 
 	const isChatPath = useMemo(() => {
 		return currentPath === paths.chats;
@@ -46,7 +50,12 @@ const MainLayout = ({ children }) => {
 						)}
 					</main>
 				</div>
-				<div className='w-full sticky bottom-0'>
+				<div
+					className={`sticky bottom-0 w-full transition ${
+						!isAuthenticated || !currentSong
+							? "translate-y-full"
+							: "translate-y-0"
+					}`}>
 					<NowPlayingBar />
 				</div>
 			</section>

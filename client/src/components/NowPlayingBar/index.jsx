@@ -52,7 +52,6 @@ const NowPlayingBar = () => {
 	}, [currentSong]);
 
 	const handleTimeUpdate = () => {
-		console.log("Current time: ", audioRef.current.currentTime);
 		setCurrentTime(audioRef.current.currentTime);
 		setDuration(audioRef.current.duration);
 	};
@@ -84,6 +83,14 @@ const NowPlayingBar = () => {
 			audioRef.current.currentTime = newTime;
 			setCurrentTime(newTime);
 		}
+	};
+
+	const handleEnded = () => {
+		togglePlay();
+		if (audioRef.current) {
+			audioRef.current.currentTime = 0;
+		}
+		playNext(isShuffled);
 	};
 
 	const handleVolumeChange = (event) => {
@@ -156,13 +163,6 @@ const NowPlayingBar = () => {
 		await addSongToPlaylist(payload);
 	};
 
-	// Get song info from current song or use placeholder
-	const songThumbnail =
-		currentSong?.cover_url ||
-		"https://i.scdn.co/image/ab67616d00004851e1379f9837c5cf0a33365ffb";
-	const songTitle = currentSong?.title || "SONG TITLE";
-	const artistName = currentSong?.user?.name || "USER";
-
 	return (
 		<section className='bg-black h-20 w-full'>
 			<div className='grid grid-cols-4 h-full'>
@@ -171,7 +171,10 @@ const NowPlayingBar = () => {
 					<div className='w-14 h-14 rounded overflow-hidden'>
 						{currentSong?.cover_url ? (
 							<img
-								src={songThumbnail}
+								src={
+									currentSong?.cover_url ||
+									"https://i.scdn.co/image/ab67616d00004851e1379f9837c5cf0a33365ffb"
+								}
 								alt='Song thumbnail'
 								className='w-full h-full object-center object-cover'
 							/>
@@ -183,10 +186,10 @@ const NowPlayingBar = () => {
 					</div>
 					<div>
 						<p className='hover:underline text-white uppercase cursor-pointer'>
-							{songTitle}
+							{currentSong?.title || "SONG TITLE"}
 						</p>
 						<p className='hover:underline text-white/50 uppercase hover:text-white text-xs cursor-pointer'>
-							{artistName}
+							{currentSong?.user?.name || "USER"}
 						</p>
 					</div>
 					<div className='flex items-center gap-6'>
@@ -205,11 +208,19 @@ const NowPlayingBar = () => {
 												onClick={() => handleAddSongToPlaylist(playlist?.id)}>
 												<div className='flex items-center justify-start gap-2'>
 													<span className='flex items-center justify-center rounded'>
-														<SongIcon
-															className='text-white/50'
-															width='26'
-															height='26'
-														/>
+														{playlist?.cover ? (
+															<img
+																src={playlist?.cover}
+																alt={playlist?.name || "Cover"}
+																className='w-5 h-5 object-center object-cover rounded-sm'
+															/>
+														) : (
+															<SongIcon
+																className='text-white/50'
+																width='26'
+																height='26'
+															/>
+														)}
 													</span>
 													<span>
 														<p className='text-white'>{playlist.name}</p>
@@ -317,7 +328,9 @@ const NowPlayingBar = () => {
 
 					{/* Progress Bar */}
 					<div className='flex items-center justify-center gap-2 w-full px-20'>
-						<p className='text-white/70 text-xs'>{formatTime(currentTime)}</p>
+						<p className='text-white/70 text-xs'>
+							{formatTime(currentTime || 0)}
+						</p>
 						<input
 							ref={progressBarRef}
 							type='range'
@@ -333,8 +346,9 @@ const NowPlayingBar = () => {
 							ref={audioRef}
 							src={currentSong?.audio_url}
 							type='audio/mp3'
+							onEnded={handleEnded}
 						/>
-						<p className='text-white/70 text-xs'>{formatTime(duration)}</p>
+						<p className='text-white/70 text-xs'>{formatTime(duration || 0)}</p>
 					</div>
 				</div>
 
@@ -355,7 +369,7 @@ const NowPlayingBar = () => {
 							onClick={toggleMute}
 						/>
 					</Tooltip>
-					<Tooltip title={Math.floor(volume * 100)}>
+					<Tooltip title={`${Math.floor(volume * 100)}%`}>
 						<input
 							type='range'
 							min='0'
@@ -363,7 +377,7 @@ const NowPlayingBar = () => {
 							step='0.01'
 							value={volume}
 							onChange={handleVolumeChange}
-							className='outline-none border-none h-1 accent-[#0bff60] cursor-pointer'
+							className='outline-none border-none h-1 accent-[#009634] cursor-pointer'
 						/>
 					</Tooltip>
 				</div>

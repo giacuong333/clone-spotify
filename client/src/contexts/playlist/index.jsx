@@ -130,11 +130,15 @@ const PlaylistProvider = ({ children }) => {
 				return;
 			}
 
-			const isInPlaylist = playlist?.songs?.some((s) => {
-				return s.song?.id === payload?.song_id;
-			});
+			const isInPlaylist = playlists
+				?.find((playlist) => playlist?.id === payload?.playlist_id)
+				?.songs?.findIndex(
+					(songItem) => songItem?.song?.id === payload?.song_id
+				);
 
-			if (isInPlaylist) {
+			console.log(playlists);
+
+			if (isInPlaylist !== -1) {
 				notify("Song is in playlist", "error");
 				return;
 			}
@@ -158,7 +162,7 @@ const PlaylistProvider = ({ children }) => {
 				setLoadingPlaylists(false);
 			}
 		},
-		[isAuthenticated, playlist?.songs, fetchPlaylist, fetchPlaylists]
+		[isAuthenticated, playlists, fetchPlaylist, fetchPlaylists]
 	);
 
 	const removeSongFromPlaylist = useCallback(
@@ -260,7 +264,7 @@ const PlaylistProvider = ({ children }) => {
 				setLoadingPlaylists(false);
 			}
 		},
-		[isAuthenticated, fetchPlaylists, fetchPlaylist]
+		[isAuthenticated, playlists, fetchPlaylists, fetchPlaylist]
 	);
 
 	const createPlaylist = useCallback(

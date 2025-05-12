@@ -9,6 +9,8 @@ import SongIcon from "../Icons/SongIcon";
 
 const PlaylistDetails = () => {
 	const playlist_id = useParams()?.id;
+	const [popoverSongId, setPopoverSongId] = useState(null);
+	const [savedSongs, setSavedSongs] = useState(new Set());
 	const {
 		fetchPlaylist,
 		playlist,
@@ -17,8 +19,6 @@ const PlaylistDetails = () => {
 		addSongToPlaylist,
 	} = usePlaylist();
 	const { playSong, currentSong, isPlaying, togglePlay } = usePlayer();
-	const [popoverSongId, setPopoverSongId] = useState(null);
-	const [savedSongs, setSavedSongs] = useState(new Set());
 
 	useEffect(() => {
 		fetchPlaylist(playlist_id);
@@ -50,8 +50,16 @@ const PlaylistDetails = () => {
 		const songs = playlist?.songs?.map((s) => {
 			return { ...s.song };
 		});
-		if (songs?.length) {
-			playSong(songs[0], songs, 0);
+
+		if (songs?.find((s) => s?.id === currentSong?.id)) {
+			togglePlay();
+		} else {
+			if (songs?.length) {
+				playSong(
+					songs[Math.max(Math.floor(Math.random() * songs?.length), 0)],
+					songs
+				);
+			}
 		}
 	};
 
@@ -75,18 +83,16 @@ const PlaylistDetails = () => {
 	};
 
 	const handleRemoveFromPlaylist = (song_id) => {
-		if (window.confirm("Remove this song from the playlist?")) {
-			removeSongFromPlaylist(playlist.id, song_id);
+		removeSongFromPlaylist(playlist.id, song_id);
 
-			// Update local state
-			const newSavedSongs = new Set(savedSongs);
-			newSavedSongs.delete(song_id);
-			setSavedSongs(newSavedSongs);
-			removeSongFromPlaylist(song_id);
+		// Update local state
+		const newSavedSongs = new Set(savedSongs);
+		newSavedSongs.delete(song_id);
+		setSavedSongs(newSavedSongs);
+		removeSongFromPlaylist(song_id);
 
-			// Close popover
-			setPopoverSongId(null);
-		}
+		// Close popover
+		setPopoverSongId(null);
 	};
 
 	const togglePopover = (songId) => {
@@ -95,7 +101,7 @@ const PlaylistDetails = () => {
 
 	if (loadingPlaylist) {
 		return (
-			<div className='flex-1 flex items-center justify-center'>
+			<div className='flex-1 flex items-center justify-center h-screen'>
 				<div className='animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-green-500'></div>
 			</div>
 		);
@@ -130,7 +136,7 @@ const PlaylistDetails = () => {
 						{playlist?.name || "Loading..."}
 					</h1>
 					<div className='flex items-center space-x-2 text-sm'>
-						<div className='flex items-center'>
+						<div className='flex items-center cursor-pointer'>
 							<div className='w-6 h-6 rounded-full bg-gray-300 mr-2'></div>
 							<span className='font-medium hover:underline'>
 								{playlist?.user?.name || "Unknown User"}
@@ -178,7 +184,7 @@ const PlaylistDetails = () => {
 				<div className='px-6 mt-4'>
 					<div className='flex justify-between text-gray-400 border-b border-gray-800 px-4 py-2 text-sm'>
 						<div className='w-8 text-center'>#</div>
-						<div className='flex-1'>Title</div>
+						<div className='flex-1 ms-1'>Title</div>
 						<div className='w-20'></div>
 						<div className='w-20 text-right'>
 							<Clock size={16} className='ms-auto' />
@@ -191,7 +197,7 @@ const PlaylistDetails = () => {
 								key={item.song?.id || index}
 								className='flex items-center px-4 py-3 hover:bg-gray-800 rounded group cursor-pointer'>
 								{/* Play/Pause or Index */}
-								<div className='w-8 text-center flex items-center justify-center'>
+								<div className='w-8 text-center flex items-center justify-center me-1'>
 									<div className='group-hover:hidden block text-gray-400 group-hover:text-white'>
 										{index + 1}
 									</div>
@@ -228,7 +234,7 @@ const PlaylistDetails = () => {
 								{/* Save/Check Button */}
 								<div className='w-10 flex items-center justify-center'>
 									<button
-										className='w-8 h-8 rounded-full flex items-center justify-center hover:bg-green-900/30 transition'
+										className='w-8 h-8 rounded-full flex items-center justify-center hover:bg-green-900/30 transition cursor-pointer'
 										onClick={() => toggleSaveToPlaylist(item.song?.id)}>
 										{savedSongs.has(item.song?.id) ? (
 											<Check size={16} className='text-green-500' />
@@ -241,19 +247,19 @@ const PlaylistDetails = () => {
 								{/* More Options */}
 								<div className='w-10 flex items-center justify-center relative'>
 									<button
-										className='w-8 h-8 rounded-full flex items-center justify-center hover:bg-gray-700 transition'
+										className='w-8 h-8 rounded-full flex items-center justify-center hover:bg-gray-700 transition cursor-pointer'
 										onClick={() => togglePopover(item.song?.id)}>
 										<MoreHorizontal size={16} className='text-gray-400' />
 									</button>
 
 									{/* Popover Menu */}
 									{popoverSongId === item.song?.id && (
-										<div className='absolute right-0 top-8 bg-gray-900 rounded shadow-lg py-1 z-10 w-40'>
+										<div className='absolute right-0 top-8 bg-gray-900 rounded shadow-lg py-1 z-10 w-48 cursor-pointer'>
 											<button
-												className='px-4 py-2 text-sm text-white hover:bg-gray-800 w-full text-left flex items-center'
+												className='px-4 py-2 text-sm text-white hover:bg-gray-800 w-full text-left flex items-center gap-2 cursor-pointer'
 												onClick={() => handleRemoveFromPlaylist(item.song?.id)}>
-												<X size={16} className='mr-2' />
-												Remove from playlist
+												<X size={16} />
+												<p className='w-full'>Remove from playlist</p>
 											</button>
 										</div>
 									)}

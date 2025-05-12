@@ -44,10 +44,7 @@ const ConversationList = () => {
 		);
 	}
 
-	if (
-		(loadingConversations && !searchUserInput) ||
-		(loadingSearchUserResult && searchUserInput)
-	) {
+	if (loadingConversations || loadingSearchUserResult) {
 		return (
 			<div className='flex-1 flex items-center justify-center'>
 				<div className='animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-green-700'></div>

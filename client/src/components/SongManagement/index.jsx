@@ -198,7 +198,6 @@ const SongManagement = () => {
 	);
 
 	const handleViewDetails = async (songId) => {
-		alert(songId);
 		try {
 			await fetchSongDetails(songId);
 			setIsModalVisible(true);
