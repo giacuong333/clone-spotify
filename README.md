@@ -20,17 +20,16 @@
 
 ## Cài đặt
 
-1. Sao chép kho lưu trữ
-   git clone https://github.com/giacuong333/clone-spotify.git
-2. Di chuyển vào thư mục client của dự án
-   cd clone-spotify/client
-3. Cài đặt các gói phụ thuộc
-   yarn install
-4. Di chuyển vào thư mục server của dự án
-   pip install -r requirements.txt
-5. Khởi động client
+1. Sao chép kho lưu trữ: git clone https://github.com/giacuong333/clone-spotify.git
+2. Di chuyển vào thư mục 'client' của dự án: cd clone-spotify/client
+3. Cài đặt các gói phụ thuộc: yarn install
+4. Di chuyển vào thư mục 'server' của dự án: cd clone-spotify/server
+5. Tạo môi trường ảo: py -m venv venv
+6. Vào môi trường ảo: \venv\Script\active
+7. Cài đặt các gói phụ thuộc: pip install -r requirements.txt
+8. Vào thư mục 'client', khởi động frontend:
    yarn run dev
-6. Khởi động server
+9. Vào thư mục 'server', khởi đọng backend
    python manage.py runserver
 
 ## Sử dụng
@@ -56,32 +55,42 @@ Tìm kiếm bài hát, tạo danh sách phát và thưởng thức nhạc.
 - Upload Song Form Step 2
   ![Alt text](https://drive.usercontent.google.com/download?id=1TP4SxIMXznyUwNlmKPACiU48f9L76Hys&authuser=0)
 - Upload Song Form Step 3
-  ![Alt text](https://drive.usercontent.google.com/download?id=1_2cWkT2htyayDwVr8pZLVuC2SE_z9KQ5&authuser=0)
+  ![Alt text](https://drive.usercontent.google.com/download?id=1eefqARZjz1SzE2nwz2Sdj-HO2vY5iCcl&authuser=0)
 - Upload Song Form Step 4
+  ![Alt text](https://drive.usercontent.google.com/download?id=1_2cWkT2htyayDwVr8pZLVuC2SE_z9KQ5&authuser=0)
+- Upload Song Form Step 5
   ![Alt text](https://drive.usercontent.google.com/download?id=1zvLFq1OgGE7ONW4fBUpaOaJBnAXyPlP-&authuser=0)
 - Upload Song Success
   ![Alt text](https://drive.usercontent.google.com/download?id=1lPdb6da7ztevcAjFeizmp9U9Wz-4bwrk&authuser=0)
+- Chat
+  ![Alt text](https://drive.usercontent.google.com/download?id=177PSyDPwA_A4dbpMVFFCXuI9JOvAwbz3&authuser=0)
+- Create playlist
+  ![Alt text](https://drive.usercontent.google.com/download?id=1sMXsK_WI3MPmn13x5on-iuPhJn3X0NqW&authuser=0)
+- Profile
+  ![Alt text](https://drive.usercontent.google.com/download?id=1W5RAD_9SFjRi39knD4Pvf5LuvRXTAs_I&authuser=0)
+- Playlist details
+  ![Alt text](https://drive.usercontent.google.com/download?id=1HzacF8F6cUziyIfSO3PTtRnfzwTwud8w&authuser=0)
 
 ### Server:
 
-- Dashboard
-  ![Alt text](https://drive.usercontent.google.com/download?id=1NMX4sMCZCbHOMbMIqqoR1ehd3Afa2Xap&authuser=0)
-- Song management
-  ![Alt text](https://drive.usercontent.google.com/download?id=1NMX4sMCZCbHOMbMIqqoR1ehd3Afa2Xap&authuser=0)
-- Song details management
-  ![Alt text](https://drive.usercontent.google.com/download?id=19liTXFmtLda3zALMSxTT_TKUbbmMjnE2&authuser=0)
-- User management
-  ![Alt text]()
-- Genre management
-  ![Alt text]()
+- Song list
+  ![Alt text](https://drive.usercontent.google.com/download?id=1C0OUN69T_79uLOSBS9HbHGgQ9ZkRNyhp)
+- Song details
+  ![Alt text](https://drive.usercontent.google.com/download?id=17YkTyMqRkIzNemmV4wZSkmi5pzg-xn02)
+- User list
+  ![Alt text](https://drive.usercontent.google.com/download?id=1Y2cllaq1XMD9Uhzt6SbF01hBbEvPQkIC)
+- Genre list
+  ![Alt text](https://drive.usercontent.google.com/download?id=1MHsJWilMt26UBByZNYH5xMzoO0HCBwo_&authuser=0)
+- Statistics
+  ![Alt text](https://drive.usercontent.google.com/download?id=1BI7zvBpC1y3X0xa36qnqS4azJfDftu3O&authuser=0)
 
 ## Thành viên nhóm
 
-- Lê Gia Cường
-- Võ Đình Văn
-- Phạm Minh Trung
-- Hoàng Sỹ Khiêm
-- Koong Chấn Phong
+- Lê Gia Cường - legiacuong789@gmail.com
+- Võ Đình Văn - Dinhvanvo510@gmail.com
+- Phạm Minh Trung - stsupermarik@gmail.com
+- Hoàng Sỹ Khiêm - dkyytbytb5@gmail.com
+- Koong Chấn Phong - koongchanphong0712@gmail.com
 
 ## Đóng góp
 

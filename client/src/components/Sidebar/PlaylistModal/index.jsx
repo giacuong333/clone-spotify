@@ -49,7 +49,7 @@ const PlaylistModal = ({
 		payload.append("name", name);
 		payload.append("desc", desc);
 		payload.append("cover", coverFile);
-		if (!playlistInfo) {
+		if (!playlistInfo?.id) {
 			const response = await createPlaylist(payload);
 			if (response?.status === 201) clearInfo();
 		} else {
