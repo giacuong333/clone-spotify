@@ -29,7 +29,7 @@ const Navbar = () => {
 			{
 				id: 2.5,
 				content: "My Statistics",
-				action: () => navigate(paths.myStats),
+				action: () => navigate(paths.myStatistics),
 			},
 			{
 				id: 3,

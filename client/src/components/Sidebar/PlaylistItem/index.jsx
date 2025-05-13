@@ -16,7 +16,8 @@ const PlaylistItem = ({
 	const [visible, setVisible] = useState(false);
 	const [position, setPosition] = useState({ x: 0, y: 0 });
 	const { deletePlaylist } = usePlaylist();
-	const { playSong, currentSong, togglePlay, isPlaying } = usePlayer();
+	const { playSong, currentSong, togglePlay, isPlaying, currentPlaylistId } =
+		usePlayer();
 	const navigate = useNavigate();
 
 	const songsOfPlaylist = playlists?.find(
@@ -56,6 +57,11 @@ const PlaylistItem = ({
 	const handleToggleOrStream = (e) => {
 		e.stopPropagation();
 
+		console.log(
+			": ",
+			playlists?.find((p) => p?.id === playlistItem?.id)
+		);
+
 		if (!songOfSongs || songOfSongs.length === 0) {
 			console.log("No songs in this playlist");
 			return;
@@ -65,19 +71,15 @@ const PlaylistItem = ({
 			console.log("Toggle play/pause for current song");
 			togglePlay();
 		} else {
-			const randomIndex = Math.max(
-				Math.floor(Math.random() * songOfSongs?.length),
-				0
-			);
-
-			console.log("Playing song:", songOfSongs[randomIndex]);
-			playSong(songOfSongs[randomIndex], songOfSongs);
+			const randomIndex = Math.floor(Math.random() * songOfSongs.length);
+			playSong(songOfSongs[randomIndex], songOfSongs, null, playlistItem?.id);
 		}
 	};
 
-	const isSongFromThisPlaylist =
-		songOfSongs?.find((s) => s?.id === currentSong?.id) &&
-		playlists?.find((p) => p?.id === playlistItem?.id);
+	const isSongFromThisPlaylistPlaying =
+		songOfSongs?.some((s) => s?.id === currentSong?.id) &&
+		currentPlaylistId === playlistItem?.id &&
+		isPlaying;
 
 	const content = useMemo(() => {
 		return (
@@ -139,7 +141,7 @@ const PlaylistItem = ({
 							</div>
 						)}
 						<div className='absolute z-10 top-0 left-0 w-full h-full bg-black/60 group-hover:flex items-center justify-center hidden'>
-							{isPlaying && isSongFromThisPlaylist ? (
+							{isSongFromThisPlaylistPlaying ? (
 								<Pause className='text-white' fill='white' />
 							) : (
 								<Play className='text-white' fill='white' />

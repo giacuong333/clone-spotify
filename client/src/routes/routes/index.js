@@ -16,10 +16,13 @@ const ChatInterface = lazy(() => import("../../components/Chat/ChatInterface"));
 const Profile = lazy(() => import("../../components/Profile"));
 const Search = lazy(() => import("../../components/Search"));
 const PlaylistDetails = lazy(() => import("../../components/PlaylistDetails"));
+const MyStatistics = lazy(() =>
+	import("../../components/MyStatistics/index.jsx")
+);
+
 const UserManagement = lazy(() => import("../../components/UserManagement"));
 const SongManagement = lazy(() => import("../../components/SongManagement"));
 const GenreManagement = lazy(() => import("../../components/GenreManagement"));
-
 const Admin = lazy(() => import("../../pages/Admin"));
 const AdminStatistics = lazy(() =>
 	import("../../components/AdminStatistics/index.jsx")
@@ -51,6 +54,12 @@ const routes = [
 		path: paths.details,
 		Layout: MainLayout,
 		Page: AlbumAndArtistDetails,
+		isPublic: true,
+	},
+	{
+		path: paths.myStatistics,
+		Layout: MainLayout,
+		Page: MyStatistics,
 		isPublic: true,
 	},
 	{

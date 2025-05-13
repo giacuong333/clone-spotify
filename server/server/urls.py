@@ -28,4 +28,5 @@ urlpatterns = [
     path("api/playlists/", include("apps.playlists.urls")),
     path("api/chat/", include("apps.chat.urls")),
     path("api/analytics/", include("apps.admin_analytics.urls")),
+    path("api/user_analytics/", include("apps.user_analytics.urls")),
 ]

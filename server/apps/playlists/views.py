@@ -39,7 +39,9 @@ class GetAllView(APIView):
         if not playlists:
             return Response([], status=status.HTTP_200_OK)
 
-        serializer = PlaylistSerializer(playlists, many=True)
+        serializer = PlaylistSerializer(
+            playlists, context={"request": request}, many=True
+        )
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 

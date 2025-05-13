@@ -60,4 +60,9 @@ export const apis = {
 		getFavoritePlaylist: (userId) =>
 			`/api/playlists/favorite/?user_id=${userId}/`,
 	},
+	my_statistics: {
+		recentlyPlayed: () => `/api/user_analytics/recently-played/`,
+		uploadStats: () => `/api/user_analytics/upload-stats/`,
+		genreStats: () => `/api/user_analytics/genre-stats/`,
+	},
 };

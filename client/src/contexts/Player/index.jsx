@@ -10,6 +10,7 @@ const PlayerProvider = ({ children }) => {
 	const [currentSongIndex, setCurrentSongIndex] = useState(0);
 	const [songList, setSongList] = useState([]);
 	const [isPlaying, setIsPlaying] = useState(false);
+	const [currentPlaylistId, setCurrentPlaylistId] = useState(null);
 
 	const { isAuthenticated } = useAuth();
 	const { isSaved, saveListenedAt, resetSaveStatus } = useListenedAt();
@@ -29,7 +30,7 @@ const PlayerProvider = ({ children }) => {
 		}
 	}, [currentSong, resetSaveStatus]);
 
-	const playSong = (song, songs, index = null) => {
+	const playSong = (song, songs, index = null, playlistId = null) => {
 		if (!isAuthenticated) {
 			notify("Log in to listen", "error");
 			return;
@@ -43,6 +44,7 @@ const PlayerProvider = ({ children }) => {
 
 		setCurrentSong(song);
 		setSongList(songs);
+		setCurrentPlaylistId(playlistId);
 
 		if (index !== null) {
 			setCurrentSongIndex(index);
@@ -95,6 +97,7 @@ const PlayerProvider = ({ children }) => {
 			value={{
 				currentSong,
 				currentSongIndex,
+				currentPlaylistId,
 				songList,
 				isPlaying,
 				setIsPlaying,
