@@ -32,7 +32,7 @@ const MainContent = ({ user = null, song = null, onPlaySong }) => {
 			const response = await fetchSongsByUserId(user?.id || song?.user?.id);
 			if (response && response.status === 200) {
 				setAllSongs(response.data.songs_by_user);
-				console.log("Songs by this user: ", response.data.songs_by_user);
+				console.log("Songs by this user: ", response);
 			}
 		} catch (error) {
 			console.log("Errors occur while fetching songs", error.message);
@@ -42,9 +42,14 @@ const MainContent = ({ user = null, song = null, onPlaySong }) => {
 
 	useEffect(() => {
 		const fetchData = async () => {
-			await fetchSongsByUser();
+		try {
+			if (song) await fetchSongsByUser();
 			await fetchFavoritePlaylist();
+		} catch (error) {
+			console.error("Error fetching data:", error);
+		}
 		};
+
 		fetchData();
 	}, [user, song]);
 
@@ -78,7 +83,7 @@ const MainContent = ({ user = null, song = null, onPlaySong }) => {
 				<div className='2xl:max-w-10/12 w-full 2xl:px-0 px-10 mx-20'>
 					<div className='w-full py-6 flex items-center justify-start gap-5 mb-6'>
 						{/* Play button */}
-						{allSongs.length > 0 && (
+						{allSongs?.length > 0 && (
 							<div
 								className='
 									size-12 bg-[#1ED760] 

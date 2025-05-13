@@ -27,7 +27,7 @@ export const apis = {
 		getById: (id) => `/api/songs/${id}/`,
 		delete: () => `/api/songs/delete/`,
 		create: () => `/api/songs/create/`,
-		getByUserId: (id) => `/api/songs/search/?user_id=${id}/`,
+		getByUserId: (id) => `/api/songs/search/?user_id=${id}&type=User/`,
 	},
 	chats: {
 		getConversations: () => "/api/chat/conversations/",
