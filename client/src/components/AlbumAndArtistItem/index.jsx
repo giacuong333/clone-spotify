@@ -21,8 +21,6 @@ const AlbumAndArtistItem = ({ item, type, index, list }) => {
 		}
 	};
 
-	console.log(list);
-
 	const songOrUserDefault =
 		type === "song"
 			? "https://songdewnetwork.com/sgmedia/assets/images/default-album-art.png"

@@ -40,6 +40,13 @@ class Song(Document):
             return Song.objects.get(id=song_id, deleted_at=None)
         except DoesNotExist:
             return None
+    
+    @staticmethod
+    def findAllByUser(user_id):
+        try:
+            return Song.objects.filter(user=user_id, deleted_at=None)
+        except DoesNotExist:
+            return None
 
     @staticmethod
     def create(data):

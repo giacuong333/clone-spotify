@@ -36,6 +36,7 @@ class UserListSerializer(serializers.Serializer):
     name = serializers.CharField(read_only=True)
     email = serializers.CharField()
     image = serializers.SerializerMethodField(allow_null=True, read_only=True)
+    song_count = serializers.SerializerMethodField()
 
     def get_image(self, obj):
         try:
@@ -47,6 +48,14 @@ class UserListSerializer(serializers.Serializer):
         except Exception as e:
             print("Error reading image from GridFS:", e)
         return None
+
+    def get_song_count(self, obj):
+        try:
+            songs = Song.findAllByUser(obj.pk)
+            return len(songs) if songs else 0
+        except Exception as e:
+            print("Error get song count:", e)
+        return 0
 
 
 # class UserRegisterSerializer(serializers.Serializer):

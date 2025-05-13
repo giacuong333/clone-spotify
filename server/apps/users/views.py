@@ -36,7 +36,9 @@ class UserRenderView(ListCreateAPIView):
     permission_classes = [AllowAny]  # For testing
 
     def get_queryset(self):
-        return User.findAllByRoleUser()
+        users =  User.findAllByRoleUser()
+        return [user for user in users if Song.findAllByUser(user.pk)]
+
 
     def get(self, request, *args, **kwargs):
         queryset = self.get_queryset()

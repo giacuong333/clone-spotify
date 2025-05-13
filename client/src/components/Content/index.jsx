@@ -33,7 +33,7 @@ const Content = () => {
 			) : (
 				<>
 					<AlbumAndArtistWrap title='Songs' list={songList} type='song' />
-					<AlbumAndArtistWrap title='Users' list={userList} type='user' />
+					<AlbumAndArtistWrap title='Artists' list={userList} type='user' />
 				</>
 			)}
 		</div>

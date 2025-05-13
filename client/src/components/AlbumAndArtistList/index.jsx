@@ -6,6 +6,7 @@ const AlbumAndArtistList = ({ list, type }) => {
 		if (type === "user") return <p className='text-white'>No artist</p>;
 		if (type === "song") return <p className='text-white'>No song</p>;
 	}
+
 	return (
 		<ul className='flex flex-row flex-wrap gap-0 justify-start'>
 			{list?.map((item, index) => {
