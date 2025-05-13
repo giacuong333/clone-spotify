@@ -16,7 +16,7 @@ const SongList = ({ songList, playlistId }) => {
 	};
 
 	const handleAddSongToPlaylist = async (song_id) => {
-		const payload = { playlist_id: playlistId, song_id };
+		const payload = { song_id };
 		await addSongToPlaylist(payload);
 	};
 

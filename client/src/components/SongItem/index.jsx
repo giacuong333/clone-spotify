@@ -11,7 +11,6 @@ const SongItem = ({
 	onPlaySong,
 	onAddSongToPlaylist,
 }) => {
-	console.log("Item:", item);
 	return (
 		<li className='group'>
 			<div className='px-4 py-2 flex items-center justify-between group-hover:bg-white/25 rounded'>
@@ -42,13 +41,12 @@ const SongItem = ({
 					</div>
 				</div>
 
-				<div className='grow place-items-end me-40'>
-					<p className='text-white/50 group-hover:text-white'>
-						{item?.listened_at_count}
-					</p>
-				</div>
-
 				<div className='flex items-center gap-4'>
+					<span className='grow place-items-end ms-auto'>
+						<p className='text-white/50 group-hover:text-white'>
+							{item?.listened_at_count}
+						</p>
+					</span>
 					<span
 						className='opacity-0 group-hover:opacity-100'
 						onClick={onAddSongToPlaylist}>

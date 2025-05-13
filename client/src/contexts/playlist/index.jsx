@@ -130,17 +130,17 @@ const PlaylistProvider = ({ children }) => {
 				return;
 			}
 
-			const isInPlaylist = playlists
-				?.find((playlist) => playlist?.id === payload?.playlist_id)
-				?.songs?.findIndex(
-					(songItem) => songItem?.song?.id === payload?.song_id
-				);
+			if (payload?.playlist_id) {
+				const isInPlaylist = playlists
+					?.find((playlist) => playlist?.id === payload?.playlist_id)
+					?.songs?.findIndex(
+						(songItem) => songItem?.song?.id === payload?.song_id
+					);
 
-			console.log(playlists);
-
-			if (isInPlaylist !== -1) {
-				notify("Song is in playlist", "error");
-				return;
+				if (isInPlaylist !== -1) {
+					notify("Song is in playlist", "error");
+					return;
+				}
 			}
 
 			try {

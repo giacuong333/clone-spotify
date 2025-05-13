@@ -104,12 +104,12 @@ const Search = () => {
 										{/* Play button */}
 										<div
 											className='
-                absolute right-4 bottom-4 size-12 bg-[#1ED760] 
-                opacity-0 translate-y-2 
-                hover:bg-[#3BE477] hover:scale-[1.05] 
-                group-hover:translate-y-0 group-hover:opacity-100 
-                shadow-2xl rounded-full flex items-center justify-center
-                transition-all duration-500'>
+												absolute right-4 bottom-4 size-12 bg-[#1ED760] 
+												opacity-0 translate-y-2 
+												hover:bg-[#3BE477] hover:scale-[1.05] 
+												group-hover:translate-y-0 group-hover:opacity-100 
+												shadow-2xl rounded-full flex items-center justify-center
+												transition-all duration-500'>
 											<Button
 												type='primary'
 												icon={<PlayIcon width='30' height='30' />}

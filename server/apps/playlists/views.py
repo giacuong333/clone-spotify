@@ -7,6 +7,7 @@ from .models import Playlist, SongsOfPlaylist
 from apps.songs.models import Song
 from .serializers import PlaylistSerializer
 from bson import ObjectId
+from datetime import datetime
 
 
 class SearchView(APIView):
@@ -84,14 +85,15 @@ class AddSongToPlayListView(APIView):
 
         # Nếu nhấn vào nút + ở NowPlayingBar -> Tạo playlist mới với tên của playlist là tên của bài hát
         if not playlist_id:
-            song_entry = SongsOfPlaylist(song=song)
+            song_entry = SongsOfPlaylist(song=song, added_at=datetime.now())
             data = {
                 "user": user,
                 "name": song.title,
                 "desc": f"Playlist - {user.name}",
                 "songs": [song_entry],
             }
-            added_playlist = Playlist.create(data)
+            created_playlist = Playlist.create(data)
+            added_playlist = Playlist.addSongToPlayList(created_playlist.id, song_id)
             if not added_playlist:
                 return Response("Create failed", status=status.HTTP_404_NOT_FOUND)
             return Response("Created", status=status.HTTP_201_CREATED)

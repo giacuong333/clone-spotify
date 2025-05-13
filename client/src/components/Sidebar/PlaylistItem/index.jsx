@@ -54,20 +54,20 @@ const PlaylistItem = ({
 		onPopupModal();
 	};
 
+	const isSongFromThisPlaylistPlaying =
+		songOfSongs?.some((s) => s?.id === currentSong?.id) &&
+		currentPlaylistId === playlistItem?.id &&
+		isPlaying;
+
 	const handleToggleOrStream = (e) => {
 		e.stopPropagation();
-
-		console.log(
-			": ",
-			playlists?.find((p) => p?.id === playlistItem?.id)
-		);
 
 		if (!songOfSongs || songOfSongs.length === 0) {
 			console.log("No songs in this playlist");
 			return;
 		}
 
-		if (songOfSongs?.find((s) => s?.id === currentSong?.id)) {
+		if (songOfSongs?.some((s) => s?.id === currentSong?.id)) {
 			console.log("Toggle play/pause for current song");
 			togglePlay();
 		} else {
@@ -75,11 +75,6 @@ const PlaylistItem = ({
 			playSong(songOfSongs[randomIndex], songOfSongs, null, playlistItem?.id);
 		}
 	};
-
-	const isSongFromThisPlaylistPlaying =
-		songOfSongs?.some((s) => s?.id === currentSong?.id) &&
-		currentPlaylistId === playlistItem?.id &&
-		isPlaying;
 
 	const content = useMemo(() => {
 		return (
