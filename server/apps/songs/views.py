@@ -256,8 +256,8 @@ class SongSearchView(APIView):
 
     def get(self, request, *args, **kwargs):
         query = request.query_params.get("query", "").strip()
-        search_type = request.query_params.get("type", "All").strip()
-        user_id = request.query_params.get("user_id", "").strip("/")
+        search_type = request.query_params.get("type", "All").strip().strip("/")
+        user_id = request.query_params.get("user_id", "").strip()
 
         print("QUERY:", query)
         print("SEARCH TYPE:", search_type)
@@ -307,7 +307,7 @@ class SongSearchView(APIView):
                 )
                 response_data["playlists"] = playlist_serializer.data
 
-            if user_id:
+            if search_type == "User":
                 try:
                     user = User.objects.get(id=user_id)  # Lấy thông tin người dùng
                     user_songs = Song.objects.filter(user=user, deleted_at=None)

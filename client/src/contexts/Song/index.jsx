@@ -45,9 +45,7 @@ const Song = ({ children }) => {
 	const fetchSongsByUserId = useCallback(async (userId) => {
 		try {
 			const response = await instance.get(apis.songs.getByUserId(userId));
-			if (response.status === 200) {
-				return response;
-			}
+			return response;
 		} catch (error) {
 			console.log("Error response:", error.response);
 		}
