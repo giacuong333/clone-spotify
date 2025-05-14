@@ -17,6 +17,8 @@ import { useAuth } from "../../contexts/Auth";
 import { usePlaylist } from "../../contexts/playlist";
 import { Popover } from "antd";
 import SongIcon from "../../components/Icons/SongIcon";
+import { useNavigate } from "react-router-dom";
+import paths from "../../constants/paths";
 
 const NowPlayingBar = () => {
 	const [volume, setVolume] = useState(0.5);
@@ -39,6 +41,17 @@ const NowPlayingBar = () => {
 	const handleVisibleChange = (newVisible) => {
 		setVisible(newVisible);
 	};
+
+	const navigate = useNavigate();
+
+	const handleSongNavigateClick = () => {
+		navigate(paths.details + `?detailsId=${currentSong?.id}&type=song`);
+	}
+
+	const handleUserNavigateClick = () => {
+		navigate(paths.details + `?detailsId=${currentSong?.user.id}&type=user`);
+	}
+	
 
 	// Load new song when currentSong changes
 	useEffect(() => {
@@ -176,7 +189,8 @@ const NowPlayingBar = () => {
 									"https://i.scdn.co/image/ab67616d00004851e1379f9837c5cf0a33365ffb"
 								}
 								alt='Song thumbnail'
-								className='w-full h-full object-center object-cover'
+								className='w-full h-full object-center object-cover cursor-pointer'
+								onClick={handleSongNavigateClick}
 							/>
 						) : (
 							<span className='bg-white/20 w-full h-full flex items-center justify-center'>
@@ -185,10 +199,12 @@ const NowPlayingBar = () => {
 						)}
 					</div>
 					<div>
-						<p className='hover:underline text-white uppercase cursor-pointer'>
+						<p className='hover:underline text-white uppercase cursor-pointer'
+							onClick={handleSongNavigateClick}>
 							{currentSong?.title || "SONG TITLE"}
 						</p>
-						<p className='hover:underline text-white/50 uppercase hover:text-white text-xs cursor-pointer'>
+						<p className='hover:underline text-white/50 uppercase hover:text-white text-xs cursor-pointer'
+							onClick={handleUserNavigateClick}>
 							{currentSong?.user?.name || "USER"}
 						</p>
 					</div>
