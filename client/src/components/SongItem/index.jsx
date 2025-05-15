@@ -3,6 +3,8 @@ import PlusCircleIcon from "../Icons/PlusCircleIcon";
 import ThreeDotsIcon from "../Icons/ThreeDotsIcon";
 import PlayIcon from "../Icons/PlayIcon";
 import formatTime from "../../utils/formatTime";
+import { useNavigate } from "react-router-dom";
+import paths from "../../constants/paths";
 
 const SongItem = ({
 	item,
@@ -11,6 +13,11 @@ const SongItem = ({
 	onPlaySong,
 	onAddSongToPlaylist,
 }) => {
+	const navigate = useNavigate();
+	const handleSongDetailsNavigate = () => {
+		navigate(paths.details + `?detailsId=${item?.id}&type=song`);
+	};
+
 	return (
 		<li className='group'>
 			<div className='px-4 py-2 flex items-center justify-between group-hover:bg-white/25 rounded'>
@@ -27,11 +34,14 @@ const SongItem = ({
 							<img
 								src={item?.cover_url}
 								alt='Song'
-								className='w-full h-full object-center object-cover'
+								className='w-full h-full object-center object-cover cursor-pointer'
+								onClick={handleSongDetailsNavigate}
 							/>
 						</div>
 						<div className='flex flex-col items-start'>
-							<p className='capitalize text-white font-semibold hover:underline cursor-pointer truncate md:max-w-3xs lg:max-w-sm 2xl:max-w-fit'>
+							<p 
+								className='capitalize text-white font-semibold hover:underline cursor-pointer truncate md:max-w-3xs lg:max-w-sm 2xl:max-w-fit'
+								onClick={handleSongDetailsNavigate}>
 								{item?.title}
 							</p>
 							<p className='capitalize text-white/75 group-hover:text-white text-sm hover:underline cursor-pointer truncate md:max-w-3xs lg:max-w-sm 2xl:max-w-fit'>

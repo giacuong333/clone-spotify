@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState} from "react";
+import { useNavigate } from "react-router-dom";
 import { Play, Pause, Clock, MoreHorizontal, Check, X } from "lucide-react";
 import { useParams } from "react-router-dom";
 import { usePlaylist } from "../../contexts/playlist";
@@ -6,6 +7,7 @@ import { usePlayer } from "../../contexts/Player";
 import formatTime from "../../utils/formatTime";
 import formatTotalDuration from "../../utils/formatTotalDuration";
 import SongIcon from "../Icons/SongIcon";
+import paths from "../../constants/paths";
 
 const PlaylistDetails = () => {
 	const playlist_id = useParams()?.id;
@@ -19,6 +21,7 @@ const PlaylistDetails = () => {
 		addSongToPlaylist,
 	} = usePlaylist();
 	const { playSong, currentSong, isPlaying, togglePlay } = usePlayer();
+	const navigate = useNavigate();
 
 	useEffect(() => {
 		fetchPlaylist(playlist_id);
@@ -99,6 +102,10 @@ const PlaylistDetails = () => {
 		setPopoverSongId(popoverSongId === songId ? null : songId);
 	};
 
+	const handleUserClick = () => {
+		navigate(paths.details + `?detailsId=${playlist?.user?.id}&type=user`);
+	};
+
 	if (loadingPlaylist) {
 		return (
 			<div className='flex-1 flex items-center justify-center h-screen'>
@@ -136,9 +143,18 @@ const PlaylistDetails = () => {
 						{playlist?.name || "Loading..."}
 					</h1>
 					<div className='flex items-center space-x-2 text-sm'>
-						<div className='flex items-center cursor-pointer'>
-							<div className='w-6 h-6 rounded-full bg-gray-300 mr-2'></div>
-							<span className='font-medium hover:underline'>
+						<div className='flex items-center cursor-pointer gap-3'>
+							<img
+								className='w-8 h-8 rounded-full hover:cursor-pointer'
+								src={
+									playlist?.user?.image ||
+									"https://cdn.pixabay.com/photo/2023/02/18/11/00/icon-7797704_640.png"
+								}
+								alt=''
+								onClick={handleUserClick}
+							/>
+							<span className='font-bold hover:underline hover:cursor-pointer'
+								onClick={handleUserClick}>
 								{playlist?.user?.name || "Unknown User"}
 							</span>
 						</div>

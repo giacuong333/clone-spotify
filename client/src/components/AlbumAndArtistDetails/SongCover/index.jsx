@@ -32,7 +32,8 @@ const SongCover = ({ song }) => {
 				<div className='flex items-center gap-2 mt-5'>
 					<div className='flex items-center gap-3'>
 						<img
-							className='w-8 h-8 rounded-full'
+							className='w-8 h-8 rounded-full hover:cursor-pointer'
+							onClick={handleUserClick}
 							src={
 								song?.user?.image ||
 								"https://cdn.pixabay.com/photo/2023/02/18/11/00/icon-7797704_640.png"
@@ -40,7 +41,11 @@ const SongCover = ({ song }) => {
 							alt=''
 						/>
 						<p className='text-md text-white/80 mb-1'>
-							<span className='font-bold'>{song?.user?.name}</span> &bull;{" "}
+							<span 
+								className='font-bold hover:underline hover:cursor-pointer'
+								onClick={handleUserClick}>
+									{song?.user?.name}
+							</span> &bull;{" "}
 							{new Date(song?.released_at).getFullYear()} &bull;{" "}
 							{formatTime(song?.duration)} &bull; {song?.listened_at_count}{" "}
 							views

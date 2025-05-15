@@ -88,7 +88,7 @@ const MainContent = ({ user = null, song = null }) => {
 				<Spin spinning tip='Please wait...' fullscreen size='large'></Spin>
 			}>
 			<div>
-				<div className='2xl:max-w-10/12 w-full 2xl:px-0 px-10'>
+				<div className='2xl:max-w-10/12 w-full 2xl:px-0 px-10 mx-20'>
 					<div className='w-full py-6 flex items-center justify-start gap-5 mb-6'>
 						{/* Play button */}
 						{allSongs?.length > 0 && (
