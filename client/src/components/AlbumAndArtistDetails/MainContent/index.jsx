@@ -13,19 +13,18 @@ import { useUser } from "../../../contexts/User";
 import { usePlaylist } from "../../../contexts/playlist";
 import { usePlayer } from "../../../contexts/Player";
 
-const MainContent = ({ user = null, song = null, onPlaySong }) => {
+const MainContent = ({ user = null, song = null }) => {
 	const [allSongs, setAllSongs] = useState([]);
 	const { fetchSongsByUserId, handleDownload } = useSong();
 	const [isFavorited, setIsFavorited] = useState(false);
 	const {
 		favoritePlaylist,
 		fetchFavoritePlaylist,
+		setFavoritePlaylist,
 		addSongToPlaylist,
 		removeSongFromPlaylist,
 	} = usePlaylist();
-	const { isPlaying } = usePlayer();
-
-	console.log("allSongs: ", allSongs);
+	const { isPlaying, playSong } = usePlayer();
 
 	const fetchSongsByUser = async () => {
 		try {
@@ -71,7 +70,16 @@ const MainContent = ({ user = null, song = null, onPlaySong }) => {
 	};
 
 	const handleAddSongToPlaylist = async () => {
-		await addSongToPlaylist({ song_id: song?.id });
+		alert(favoritePlaylist?.id);
+		await addSongToPlaylist({
+			playlist_id: favoritePlaylist?.id,
+			song_id: song?.id,
+			checkFavorite: true,
+		});
+	};
+
+	const handlePlaySong = () => {
+		playSong(allSongs[0], allSongs);
 	};
 
 	return (
@@ -103,14 +111,17 @@ const MainContent = ({ user = null, song = null, onPlaySong }) => {
 										)
 									}
 									className='!rounded-full !text-3xl !text-center !mx-auto !w-full !bg-transparent !text-black'
-									onClick={onPlaySong}
+									onClick={handlePlaySong}
 								/>
 							</div>
 						)}
 
 						{song && (
 							<>
-								<AiOutlinePlusCircle className='text-5xl text-white hover:scale-[1.1] cursor-pointer' />
+								<AiOutlinePlusCircle
+									className='text-5xl text-white hover:scale-[1.1] cursor-pointer'
+									onClick={handleAddSongToPlaylist}
+								/>
 								{isFavorited ? (
 									<AiFillHeart
 										className='text-5xl text-white hover:scale-[1.1] cursor-pointer'

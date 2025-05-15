@@ -15,7 +15,6 @@ import { useUser } from "../../contexts/User";
 import { usePlaylist } from "../../contexts/Playlist";
 import UserCover from "./UserCover.jsx";
 import { notify } from "../Toast/index.jsx";
-import { usePlayer } from "../../contexts/Player/index.jsx";
 
 const Header = lazy(() => import("./Header"));
 const MainContent = lazy(() => import("./MainContent"));
@@ -36,8 +35,6 @@ const AlbumAndArtistDetails = () => {
 	const [songDetails, setSongDetails] = React.useState(null);
 	const [songsByUser, setSongsByUser] = useState([]);
 	const { fetchSongsByUserId } = useSong();
-	const { playSong, togglePlay } = usePlayer();
-	const { addSongToPlaylíst } = usePlaylist();
 
 	useEffect(() => {
 		const fetchDetails = async () => {
@@ -74,10 +71,6 @@ const AlbumAndArtistDetails = () => {
 		type,
 	]);
 
-	const handlePlaySong = () => {
-		playSong(songDetails, songsByUser);
-	};
-
 	return (
 		<Suspense
 			fallback={
@@ -110,11 +103,7 @@ const AlbumAndArtistDetails = () => {
 				{type === "song" && (
 					<>
 						<SongCover song={songDetails} />
-						<MainContent
-							song={songDetails}
-							user={userDetails}
-							onPlaySong={handlePlaySong}
-						/>
+						<MainContent song={songDetails} user={userDetails} />
 					</>
 				)}
 			</div>
