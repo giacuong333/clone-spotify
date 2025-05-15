@@ -2,7 +2,6 @@ import base64
 from mongoengine import DoesNotExist
 from rest_framework import serializers
 from apps.users.serializers import UserCreationSerializer
-from apps.songs.serializers import EnhancedSongSerializer
 
 
 class SongsOfPlaylistSerializer(serializers.Serializer):
@@ -13,6 +12,7 @@ class SongsOfPlaylistSerializer(serializers.Serializer):
         try:
             if not obj.song:
                 return None
+            from apps.songs.serializers import EnhancedSongSerializer
             return EnhancedSongSerializer(obj.song, context=self.context).data
         except DoesNotExist:
             return None

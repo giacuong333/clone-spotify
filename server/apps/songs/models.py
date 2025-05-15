@@ -12,6 +12,7 @@ from mongoengine import (
 from apps.genre.models import Genre
 from apps.users.models import User
 from datetime import datetime
+from bson import ObjectId
 
 
 class Song(Document):
@@ -40,7 +41,7 @@ class Song(Document):
             return Song.objects.get(id=song_id, deleted_at=None)
         except DoesNotExist:
             return None
-    
+
     @staticmethod
     def findAllByUser(user_id):
         try:
@@ -68,8 +69,25 @@ class Song(Document):
             return False
 
     @staticmethod
-    def search(query):
+    def search(query, genre):
         try:
-            return Song.objects.filter(title__icontains=query, deleted_at=None)
+            filters = {"deleted_at": None}
+
+            if genre:
+                genre_obj = Genre.objects(name__iexact=genre).first()
+                if genre_obj:
+                    filters["genre__in"] = [genre_obj.id]
+                else:
+                    return []
+
+            if query:
+                filters["title__icontains"] = query
+
+            song_list = Song.objects.filter(**filters)
+            return list(song_list)
+
         except DoesNotExist:
+            return []
+        except Exception as e:
+            print(f"[Song.search] Error: {e}")
             return []

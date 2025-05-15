@@ -81,7 +81,7 @@ const AlbumAndArtistDetails = () => {
 					name={songDetails?.title || userDetails?.name || "Demo"}
 					contentRef={contentRef}
 				/>
-				{type === "user" && (
+				{type === "user" ? (
 					<>
 						<UserCover
 							user={userDetails}
@@ -99,11 +99,10 @@ const AlbumAndArtistDetails = () => {
 							/>
 						</div>
 					</>
-				)}
-				{type === "song" && (
+				) : (
 					<>
 						<SongCover song={songDetails} />
-						<MainContent song={songDetails} user={userDetails} />
+						<MainContent song={songDetails} />
 					</>
 				)}
 			</div>

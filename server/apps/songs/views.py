@@ -1,6 +1,6 @@
 from django.http import HttpResponse, StreamingHttpResponse
 from rest_framework.views import APIView
-from rest_framework.generics import ListCreateAPIView, RetrieveAPIView, DestroyAPIView
+from rest_framework.generics import ListCreateAPIView, RetrieveAPIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
@@ -10,16 +10,13 @@ from mongoengine.connection import get_db
 from .models import Song
 from .serializers import EnhancedSongSerializer, SongCreateSerializer
 from apps.users.models import User
-from apps.playlists.models import Playlist
-from apps.playlists.serializers import PlaylistSerializer
-from apps.users.serializers import UserListSerializer, UserDetailSerializer
 from django.http import StreamingHttpResponse
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from bson import ObjectId
 from gridfs.errors import NoFile
-import mimetypes
+from apps.playlists.models import Playlist
 
 # Use the existing MongoDB connection from MongoEngine
 db = get_db()
@@ -251,75 +248,167 @@ class SongBulkDestroyView(APIView):
             )
 
 
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from rest_framework.permissions import AllowAny
+from apps.users.models import User
+from apps.songs.models import Song
+from apps.playlists.models import Playlist
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from rest_framework.permissions import AllowAny
+from apps.users.serializers import UserDetailSerializer
+from apps.playlists.serializers import PlaylistSerializer
+from apps.listenedAt.models import ListenedAt
+from rest_framework.views import APIView
+from rest_framework.permissions import AllowAny
+from rest_framework.response import Response
+from rest_framework import status
+from apps.users.models import User
+from apps.songs.models import Song
+from apps.listenedAt.models import ListenedAt
+from apps.playlists.models import Playlist
+from .serializers import (
+    UserDetailSerializer,
+    EnhancedSongSerializer,
+    PlaylistSerializer,
+)
+
+
+from rest_framework.views import APIView
+from rest_framework.permissions import AllowAny
+from rest_framework.response import Response
+from rest_framework import status
+from apps.users.models import User
+from apps.songs.models import Song
+from apps.listenedAt.models import ListenedAt
+from apps.playlists.models import Playlist
+from .serializers import (
+    UserDetailSerializer,
+    EnhancedSongSerializer,
+    PlaylistSerializer,
+)
+
+
 class SongSearchView(APIView):
     permission_classes = [AllowAny]
 
-    def get(self, request, *args, **kwargs):
+    def searchUserAndSortByListen(self, request, query):
+        # Filter users
+        users = User.search(query)
+
+        user_list = []
+
+        for user in users:
+            # Get songs of the user
+            songs = Song.findAllByUser(user.id)
+            # Parse query_set to JSON
+            songs_serializer = EnhancedSongSerializer(
+                songs, many=True, context={"request": request}
+            )
+            # Calculate total of listens of user
+            total_listen = sum(
+                (song.get("listened_at_count", 0)) for song in songs_serializer.data
+            )
+
+            # Parse query_set to JSON
+            user_data = UserDetailSerializer(user, context={"request": request}).data
+
+            user_data["total_listen"] = total_listen
+
+            user_list.append(user_data)
+
+        sorted_users = sorted(user_list, key=lambda x: x["total_listen"], reverse=True)
+
+        return sorted_users
+
+    def searchSongAndSortByListen(self, request, query, genre):
+        songs = Song.search(query, genre)
+
+        songs_data = EnhancedSongSerializer(
+            songs, many=True, context={"request": request}
+        ).data
+
+        sorted_songs = sorted(
+            songs_data, key=lambda x: x["listened_at_count"], reverse=True
+        )
+
+        return sorted_songs
+
+    def searchPlaylistAndSortByListen(self, request, query):
+        playlists = Playlist.search(query)
+
+        playlist_with_listen_data = []
+
+        for playlist in playlists:
+            playlist_data = PlaylistSerializer(
+                playlist, context={"request": request}
+            ).data
+
+            total_listen = sum(
+                (song.get("listened_at_count", 0))
+                for song in playlist_data.get("songs", [])
+            )
+
+            playlist_data["total_listen"] = total_listen
+
+            if playlist_data["is_favorite"] == False:
+                playlist_with_listen_data.append(playlist_data)
+
+        sorted_playlists = sorted(
+            playlist_with_listen_data, key=lambda x: x["total_listen"], reverse=True
+        )
+
+        return sorted_playlists
+
+    def get(self, request):
         query = request.query_params.get("query", "").strip()
-        search_type = request.query_params.get("type", "All").strip().strip("/")
+        search_type = request.query_params.get("type", "All").strip()
+        search_genre = request.query_params.get("genre", "").strip()
+
         user_id = request.query_params.get("user_id", "").strip()
+        print("user_id",user_id)
+        if user_id and search_type == "User":
+            try:
+                user_songs = Song.objects.filter(user=user_id, deleted_at=None)
+                song_serializer = EnhancedSongSerializer(
+                    user_songs, many=True, context={"request": request}
+                )
+                return Response(
+                    {"songs_by_user": song_serializer.data}, status=status.HTTP_200_OK
+                )
+            except User.DoesNotExist:
+                return Response(
+                    {"error": "User not found"}, status=status.HTTP_404_NOT_FOUND
+                )
 
-        print("QUERY:", query)
-        print("SEARCH TYPE:", search_type)
-        print("USER ID:", user_id)
+        response = {
+            "users": [],
+            "songs": [],
+            "playlists": [],
+        }
 
-        if not query and not user_id:
+        if not query:
             return Response({}, status=status.HTTP_200_OK)
 
-        try:
-            response_data = {}
+        if search_type == "All":
+            response["users"] = self.searchUserAndSortByListen(request, query)
+            response["songs"] = self.searchSongAndSortByListen(
+                request, query, search_genre
+            )
+            response["playlists"] = self.searchPlaylistAndSortByListen(request, query)
+        elif search_type == "Users":
+            response["users"] = self.searchUserAndSortByListen(request, query)
+        elif search_type == "Songs" or (search_type == "Genres" and search_genre):
+            response["songs"] = self.searchSongAndSortByListen(
+                request, query, search_genre
+            )
+        elif search_type == "Playlists":
+            response["playlists"] = self.searchPlaylistAndSortByListen(request, query)
 
-            if search_type == "All" or search_type == "Songs":
-                songs = Song.search(query)
-                song_serializer = EnhancedSongSerializer(
-                    songs, many=True, context={"request": request}
-                )
-                response_data["songs"] = song_serializer.data
-
-            if search_type == "All" or search_type == "Users":
-                users = User.search(query)
-                user_data = []
-                for user in users:
-                    user_songs = Song.objects.filter(user=user, deleted_at=None)
-                    user_playlists = Playlist.objects.filter(user=user)
-                    user_serializer = UserDetailSerializer(
-                        user, context={"request": request}
-                    )
-                    playlist_serializer = PlaylistSerializer(
-                        user_playlists, many=True, context={"request": request}
-                    )
-                    song_serializer = EnhancedSongSerializer(
-                        user_songs, many=True, context={"request": request}
-                    )
-                    user_data.append(
-                        {
-                            "user": user_serializer.data,
-                            "songs": song_serializer.data,
-                            "playlists": playlist_serializer.data,
-                        }
-                    )
-                response_data["users"] = user_data
-
-            if search_type == "All" or search_type == "Playlists":
-                playlists = Playlist.search(query)
-                playlist_serializer = PlaylistSerializer(
-                    playlists, many=True, context={"request": request}
-                )
-                response_data["playlists"] = playlist_serializer.data
-
-            if search_type == "User":
-                try:
-                    user = User.objects.get(id=user_id)  # Lấy thông tin người dùng
-                    user_songs = Song.objects.filter(user=user, deleted_at=None)
-                    song_serializer = EnhancedSongSerializer(
-                        user_songs, many=True, context={"request": request}
-                    )
-                    response_data["songs_by_user"] = song_serializer.data
-                except User.DoesNotExist:
-                    return Response(
-                        {"error": "User not found"}, status=status.HTTP_404_NOT_FOUND
-                    )
-
-            return Response(response_data, status=status.HTTP_200_OK)
-        except Exception as e:
-            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        return Response(
+            response,
+            status=status.HTTP_200_OK,
+        )

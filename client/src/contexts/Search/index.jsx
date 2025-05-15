@@ -14,8 +14,7 @@ const Search = ({ children }) => {
 	const [loadingSearchResult, setLoadingSearchResult] = useState(false);
 	const [searchInput, setSearchInput] = useState({});
 	const [type, setType] = useState({});
-
-	console.log("Search Input: ", searchInput);
+	const [genre, setGenre] = useState("");
 
 	const handleSearch = useCallback(async () => {
 		if (_.isEmpty(searchInput)) {
@@ -27,8 +26,9 @@ const Search = ({ children }) => {
 			setLoadingSearchResult(true);
 			const response = await instance.get(apis.songs.search(), {
 				params: {
-					query: searchInput,
+					query: searchInput || "",
 					type: type.name || "All",
+					genre: genre || "",
 				},
 			});
 			console.log("Search resposne: ", response);
@@ -54,10 +54,16 @@ const Search = ({ children }) => {
 			value={{
 				searchInput,
 				setSearchInput,
+
 				type,
 				setType,
+
 				handleSearch,
 				searchResult,
+
+				genre,
+				setGenre,
+
 				loadingSearchResult,
 			}}>
 			{children}

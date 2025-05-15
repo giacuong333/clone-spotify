@@ -48,6 +48,13 @@ class User(Document):
         except DoesNotExist:
             return None
 
+    @staticmethod
+    def findById(user_id):
+        try:
+            return User.objects.get(deleted_at=None, id=user_id)
+        except DoesNotExist:
+            return None
+
     @property
     def is_authenticated(self):
         return True
@@ -116,11 +123,6 @@ class User(Document):
 
     @staticmethod
     def search(query):
-        try:
-            if not query or query.strip() == "":
-                return User.objects.none()
-            return User.objects.filter(
-                name__icontains=query, deleted_at=None, role="user"
-            )
-        except DoesNotExist:
-            return []
+        if not query or query.strip() == "":
+            return User.objects.none()
+        return User.objects.filter(name__icontains=query, deleted_at=None, role="user")

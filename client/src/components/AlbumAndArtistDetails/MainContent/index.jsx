@@ -1,4 +1,4 @@
-import React, { Suspense, useEffect, useState } from "react";
+import React, { Suspense, useCallback, useEffect, useState } from "react";
 import { Button, Spin } from "antd";
 import PlayIcon from "../../Icons/PlayIcon";
 import PauseIcon from "../../Icons/PauseIcon";
@@ -26,10 +26,13 @@ const MainContent = ({ user = null, song = null }) => {
 	} = usePlaylist();
 	const { isPlaying, playSong } = usePlayer();
 
-	const fetchSongsByUser = async () => {
+	const fetchSongsByUser = useCallback(async () => {
 		try {
-			const response = await fetchSongsByUserId(user?.id || song?.user?.id);
-			if (response && response.status === 200) {
+			const userId = user?.id || song?.user?.id;
+			if (!userId) return;
+
+			const response = await fetchSongsByUserId(userId);
+			if (response.status === 200) {
 				setAllSongs(response.data.songs_by_user);
 				console.log("Songs by this user: ", response);
 			}
@@ -37,7 +40,7 @@ const MainContent = ({ user = null, song = null }) => {
 			console.log("Errors occur while fetching songs", error.message);
 			notify("Error fetching songs", "error");
 		}
-	};
+	}, [fetchSongsByUserId, user?.id, song?.user?.id]);
 
 	useEffect(() => {
 		const fetchData = async () => {
@@ -149,17 +152,14 @@ const MainContent = ({ user = null, song = null }) => {
 							</>
 						)}
 					</div>
-
-					{user && (
-						<SongListWrap songList={allSongs} title='Songs by this user' />
-					)}
-
-					{song && (
-						<SongListWrap
-							title={`Other songs by ${song?.user?.name}`}
-							songList={allSongs}
-						/>
-					)}
+					<SongListWrap
+						songList={allSongs}
+						title={`${
+							user
+								? "Songs by this user"
+								: `Other songs by ${song?.user?.name} `
+						} `}
+					/>
 				</div>
 			</div>
 		</Suspense>

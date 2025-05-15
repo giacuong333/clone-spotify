@@ -14,6 +14,7 @@ const SongItem = ({
 	onAddSongToPlaylist,
 }) => {
 	const navigate = useNavigate();
+
 	const handleSongDetailsNavigate = () => {
 		navigate(paths.details + `?detailsId=${item?.id}&type=song`);
 	};
@@ -39,7 +40,7 @@ const SongItem = ({
 							/>
 						</div>
 						<div className='flex flex-col items-start'>
-							<p 
+							<p
 								className='capitalize text-white font-semibold hover:underline cursor-pointer truncate md:max-w-3xs lg:max-w-sm 2xl:max-w-fit'
 								onClick={handleSongDetailsNavigate}>
 								{item?.title}

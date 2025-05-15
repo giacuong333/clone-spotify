@@ -1,11 +1,13 @@
 from rest_framework import serializers
 from .models import Song
+from apps.users.models import User
 from apps.listenedAt.models import ListenedAt
 from apps.genre.serializers import GenreSerializer
 from apps.users.serializers import UserDetailSerializer
 from bson import ObjectId
 from mongoengine.errors import DoesNotExist
 from datetime import datetime
+from apps.playlists.serializers import PlaylistSerializer
 
 
 class SongSerializer(serializers.Serializer):
@@ -130,3 +132,10 @@ class SongCreateSerializer(serializers.Serializer):
 
         # Create the song
         return Song.create(validated_data)
+
+
+class SearchSerializer(serializers.Serializer):
+    songs = EnhancedSongSerializer(required=False, many=True)
+    users = UserDetailSerializer(required=False, many=True)
+    playlists = PlaylistSerializer(required=False, many=True)
+    most_listened_songs = EnhancedSongSerializer(required=False, many=True)

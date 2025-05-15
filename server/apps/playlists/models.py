@@ -76,7 +76,9 @@ class Playlist(Document):
     @staticmethod
     def search(query, user_id=None):
         try:
-            return Playlist.objects.filter(name__icontains=query, user=user_id)
+            if user_id:
+                Playlist.objects.filter(name__icontains=query, user=user_id)
+            return Playlist.objects.filter(name__icontains=query)
         except DoesNotExist:
             return None
 
