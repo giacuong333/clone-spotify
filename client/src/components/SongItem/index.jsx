@@ -5,31 +5,50 @@ import PlayIcon from "../Icons/PlayIcon";
 import formatTime from "../../utils/formatTime";
 import { useNavigate } from "react-router-dom";
 import paths from "../../constants/paths";
+import { PauseIcon } from "lucide-react";
+import { usePlayer } from "../../contexts/Player";
 
 const SongItem = ({
 	item,
+	songList,
 	order,
 	playlistId,
 	onPlaySong,
 	onAddSongToPlaylist,
 }) => {
+	const { isPlaying, currentSong, playSong, togglePlay } = usePlayer();
 	const navigate = useNavigate();
 
 	const handleSongDetailsNavigate = () => {
 		navigate(paths.details + `?detailsId=${item?.id}&type=song`);
 	};
 
+	const handlePlaySong = (item) => {
+		if (item?.id === currentSong?.id) {
+			togglePlay();
+		} else {
+			playSong(item, songList);
+		}
+	};
+
 	return (
 		<li className='group'>
 			<div className='px-4 py-2 flex items-center justify-between group-hover:bg-white/25 rounded'>
 				<div className='flex items-center gap-4'>
-					<>
-						<PlayIcon
-							className='group-hover:block hidden w-4 h-4 text-white cursor-pointer'
-							onClick={onPlaySong}
-						/>
+					<div onClick={() => handlePlaySong(item)}>
+						{item?.id === currentSong?.id && isPlaying ? (
+							<PauseIcon
+								className='group-hover:block hidden w-4 h-4 text-white cursor-pointer'
+								fill='white'
+							/>
+						) : (
+							<PlayIcon
+								className='group-hover:block hidden w-4 h-4 text-white cursor-pointer'
+								fill='white'
+							/>
+						)}
 						<p className='group-hover:hidden text-white/50'>{order}</p>
-					</>
+					</div>
 					<div className='flex items-center gap-4'>
 						<div className='max-w-10 h-auto rounded-md overflow-hidden'>
 							<img

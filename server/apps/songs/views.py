@@ -343,6 +343,10 @@ class SongSearchView(APIView):
         playlist_with_listen_data = []
 
         for playlist in playlists:
+            # Chỉ lấy playlist có bài hát
+            if len(playlist.songs) == 0:
+                continue
+
             playlist_data = PlaylistSerializer(
                 playlist, context={"request": request}
             ).data
@@ -369,7 +373,7 @@ class SongSearchView(APIView):
         search_genre = request.query_params.get("genre", "").strip()
 
         user_id = request.query_params.get("user_id", "").strip()
-        print("user_id",user_id)
+        print("user_id", user_id)
         if user_id and search_type == "User":
             try:
                 user_songs = Song.objects.filter(user=user_id, deleted_at=None)

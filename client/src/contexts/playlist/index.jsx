@@ -3,7 +3,6 @@ import { useAuth } from "../Auth";
 import { instance } from "../Axios";
 import { apis } from "../../constants/apis";
 import { notify } from "../../components/Toast";
-import { useUser } from "../User";
 
 const PlaylistContext = createContext();
 
@@ -130,7 +129,7 @@ const PlaylistProvider = ({ children }) => {
 				return;
 			}
 
-			if (payload?.playlist_id) {
+			if (payload?.playlist_id && !payload?.checkFavorite) {
 				const isInPlaylist = playlists
 					?.find((playlist) => playlist?.id === payload?.playlist_id)
 					?.songs?.findIndex(
@@ -139,6 +138,15 @@ const PlaylistProvider = ({ children }) => {
 
 				if (isInPlaylist !== -1) {
 					notify("Song is in playlist", "error");
+					return;
+				}
+			} else if (payload?.checkFavorite && favoritePlaylist) {
+				const isInFavoritePlaylist = favoritePlaylist?.songs?.some(
+					(entry) => entry.song?.id === payload?.song_id
+				);
+
+				if (isInFavoritePlaylist) {
+					notify("Song is already in favorites", "error");
 					return;
 				}
 			}
@@ -153,6 +161,9 @@ const PlaylistProvider = ({ children }) => {
 					notify("Added");
 					await fetchPlaylist(payload?.playlist_id);
 					await fetchPlaylists();
+					if (payload?.playlist_id === favoritePlaylist?.id) {
+						await fetchFavoritePlaylist();
+					}
 				}
 			} catch (error) {
 				console.log("Error while adding song to playlist", error);
@@ -162,7 +173,14 @@ const PlaylistProvider = ({ children }) => {
 				setLoadingPlaylists(false);
 			}
 		},
-		[isAuthenticated, playlists, fetchPlaylist, fetchPlaylists]
+		[
+			isAuthenticated,
+			favoritePlaylist,
+			playlists,
+			fetchPlaylist,
+			fetchPlaylists,
+			fetchFavoritePlaylist,
+		]
 	);
 
 	const removeSongFromPlaylist = useCallback(
@@ -177,6 +195,7 @@ const PlaylistProvider = ({ children }) => {
 					playlist_id: playlist?.id || favoritePlaylist?.id,
 					song_id,
 				};
+				console.log("playlist name", playlist?.name);
 				const response = await instance.post(
 					apis.playlists.removeSongFromPlaylist(),
 					payload
@@ -184,6 +203,7 @@ const PlaylistProvider = ({ children }) => {
 				if (response.status === 204) {
 					notify("Deleted");
 					await fetchPlaylist(playlist?.id);
+					await fetchFavoritePlaylist();
 				}
 			} catch (error) {
 				console.log("Error while removing song from playlist", error);
@@ -192,7 +212,14 @@ const PlaylistProvider = ({ children }) => {
 				setLoadingPlaylists(false);
 			}
 		},
-		[isAuthenticated, playlist?.id, favoritePlaylist?.id, fetchPlaylist]
+		[
+			isAuthenticated,
+			playlist?.id,
+			playlist?.name,
+			favoritePlaylist?.id,
+			fetchPlaylist,
+			fetchFavoritePlaylist,
+		]
 	);
 
 	const editPlaylist = useCallback(

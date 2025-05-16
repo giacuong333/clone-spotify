@@ -9,36 +9,38 @@ import { AiOutlinePlusCircle } from "react-icons/ai";
 import { AiOutlineArrowDown } from "react-icons/ai";
 import { AiOutlineHeart } from "react-icons/ai";
 import { AiFillHeart } from "react-icons/ai";
-import { useUser } from "../../../contexts/User";
-import { usePlaylist } from "../../../contexts/playlist";
+import { usePlaylist } from "../../../contexts/Playlist";
 import { usePlayer } from "../../../contexts/Player";
 
 const MainContent = ({ user = null, song = null }) => {
 	const [allSongs, setAllSongs] = useState([]);
+	const [loading, setLoading] = useState(false);
 	const { fetchSongsByUserId, handleDownload } = useSong();
 	const [isFavorited, setIsFavorited] = useState(false);
 	const {
 		favoritePlaylist,
 		fetchFavoritePlaylist,
-		setFavoritePlaylist,
 		addSongToPlaylist,
 		removeSongFromPlaylist,
+		loadingPlaylists,
 	} = usePlaylist();
-	const { isPlaying, playSong } = usePlayer();
+	const { isPlaying, playSong, currentSong, togglePlay } = usePlayer();
 
 	const fetchSongsByUser = useCallback(async () => {
 		try {
 			const userId = user?.id || song?.user?.id;
 			if (!userId) return;
 
+			setLoading(true);
 			const response = await fetchSongsByUserId(userId);
 			if (response.status === 200) {
 				setAllSongs(response.data.songs_by_user);
-				console.log("Songs by this user: ", response);
 			}
 		} catch (error) {
 			console.log("Errors occur while fetching songs", error.message);
 			notify("Error fetching songs", "error");
+		} finally {
+			setLoading(false);
 		}
 	}, [fetchSongsByUserId, user?.id, song?.user?.id]);
 
@@ -53,37 +55,62 @@ const MainContent = ({ user = null, song = null }) => {
 		};
 
 		fetchData();
-	}, [user, song]);
+	}, [user, song, fetchSongsByUser, fetchFavoritePlaylist]);
 
+	// Check if song is in favorite playlist
 	useEffect(() => {
-		if (favoritePlaylist) {
-			console.log("Favorite Playlist:", favoritePlaylist);
-		}
 		if (favoritePlaylist && song) {
 			const found = favoritePlaylist.songs?.some(
 				(entry) => entry.song?.id === song.id
 			);
 			setIsFavorited(found);
 		}
-		console.log("isFavorited:", isFavorited);
 	}, [favoritePlaylist, song]);
 
 	const handleClickDownloadBtn = async (e) => {
 		handleDownload(e, song?.audio_url, song?.title, song?.user?.name);
 	};
 
-	const handleAddSongToPlaylist = async () => {
-		alert(favoritePlaylist?.id);
-		await addSongToPlaylist({
-			playlist_id: favoritePlaylist?.id,
-			song_id: song?.id,
-			checkFavorite: true,
-		});
+	// Handle favorite/unfavorite
+	const handleToggleFavorite = async () => {
+		try {
+			setLoading(true);
+
+			if (isFavorited) {
+				// If already favorited, remove from playlist
+				await removeSongFromPlaylist(song?.id);
+			} else {
+				// If not favorited, add to playlist
+				await addSongToPlaylist({
+					playlist_id: favoritePlaylist?.id,
+					song_id: song?.id,
+					checkFavorite: true, // Flag to use proper checking logic
+				});
+			}
+
+			// Let the effect handle state update when playlist refreshes
+		} catch (error) {
+			console.error("Error toggling favorite status:", error);
+		} finally {
+			setLoading(false);
+		}
 	};
 
 	const handlePlaySong = () => {
-		playSong(allSongs[0], allSongs);
+		if (allSongs?.find((s) => s?.id === currentSong?.id)) {
+			togglePlay();
+		} else if (allSongs?.length > 0) {
+			playSong(allSongs[0], allSongs);
+		}
 	};
+
+	const handleAddSongToPlaylist = async (song_id) => {
+		await addSongToPlaylist({
+			song_id,
+		});
+	};
+
+	const isLoading = loading || loadingPlaylists;
 
 	return (
 		<Suspense
@@ -123,28 +150,24 @@ const MainContent = ({ user = null, song = null }) => {
 							<>
 								<AiOutlinePlusCircle
 									className='text-5xl text-white hover:scale-[1.1] cursor-pointer'
-									onClick={handleAddSongToPlaylist}
+									onClick={() => handleAddSongToPlaylist(song?.id)}
 								/>
-								{isFavorited ? (
+
+								{/* Heart icon with loading state handling */}
+								{isLoading ? (
+									<Spin className='text-5xl' />
+								) : isFavorited ? (
 									<AiFillHeart
 										className='text-5xl text-white hover:scale-[1.1] cursor-pointer'
-										onClick={async () => {
-											setIsFavorited(!isFavorited);
-											await removeSongFromPlaylist(song?.id);
-										}}
+										onClick={handleToggleFavorite}
 									/>
 								) : (
 									<AiOutlineHeart
 										className='text-5xl text-white hover:scale-[1.1] cursor-pointer'
-										onClick={async () => {
-											setIsFavorited(!isFavorited);
-											await addSongToPlaylist({
-												playlist_id: favoritePlaylist.id,
-												song_id: song.id,
-											});
-										}}
+										onClick={handleToggleFavorite}
 									/>
 								)}
+
 								<AiOutlineArrowDown
 									className='text-5xl text-white hover:scale-[1.1] cursor-pointer'
 									onClick={(e) => handleClickDownloadBtn(e)}

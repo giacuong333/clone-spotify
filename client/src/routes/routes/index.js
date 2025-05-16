@@ -1,14 +1,14 @@
 import { lazy } from "react";
 import paths from "../../constants/paths";
 
-// Layouts
 const MainLayout = lazy(() => import("../../layouts/MainLayout"));
 const AdminLayout = lazy(() => import("../../layouts/AdminLayout"));
 
-// Pages
 const Home = lazy(() => import("../../pages/Home"));
 const Login = lazy(() => import("../../pages/Login"));
 const Register = lazy(() => import("../../pages/Register"));
+const Admin = lazy(() => import("../../pages/Admin"));
+
 const AlbumAndArtistDetails = lazy(() =>
 	import("../../components/AlbumAndArtistDetails")
 );
@@ -16,19 +16,15 @@ const ChatInterface = lazy(() => import("../../components/Chat/ChatInterface"));
 const Profile = lazy(() => import("../../components/Profile"));
 const Search = lazy(() => import("../../components/Search"));
 const PlaylistDetails = lazy(() => import("../../components/PlaylistDetails"));
-const MyStatistics = lazy(() =>
-	import("../../components/MyStatistics/index.jsx")
-);
+const MyStatistics = lazy(() => import("../../components/MyStatistics"));
 
 const UserManagement = lazy(() => import("../../components/UserManagement"));
 const SongManagement = lazy(() => import("../../components/SongManagement"));
 const GenreManagement = lazy(() => import("../../components/GenreManagement"));
-const Admin = lazy(() => import("../../pages/Admin"));
-const AdminStatistics = lazy(() =>
-	import("../../components/AdminStatistics/index.jsx")
-);
+const AdminStatistics = lazy(() => import("../../components/AdminStatistics"));
 
 const routes = [
+	// Public routes
 	{
 		path: paths.home,
 		Layout: MainLayout,
@@ -57,10 +53,24 @@ const routes = [
 		isPublic: true,
 	},
 	{
+		path: paths.search,
+		Layout: MainLayout,
+		Page: Search,
+		isPublic: true,
+	},
+	{
+		path: paths.playlist,
+		Layout: MainLayout,
+		Page: PlaylistDetails,
+		isPublic: true,
+	},
+
+	// Authenticated user routes
+	{
 		path: paths.myStatistics,
 		Layout: MainLayout,
 		Page: MyStatistics,
-		isPublic: true,
+		isPublic: false,
 	},
 	{
 		path: paths.profile,
@@ -69,23 +79,13 @@ const routes = [
 		isPublic: false,
 	},
 	{
-		path: paths.search,
-		Layout: MainLayout,
-		Page: Search,
-		isPublic: true,
-	},
-	{
 		path: paths.chats,
 		Layout: MainLayout,
 		Page: ChatInterface,
 		isPublic: false,
 	},
-	{
-		path: paths.playlist,
-		Layout: MainLayout,
-		Page: PlaylistDetails,
-		isPublic: true,
-	},
+
+	// Admin routes
 	{
 		path: paths.admin,
 		Layout: AdminLayout,

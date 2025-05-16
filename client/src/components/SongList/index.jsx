@@ -28,6 +28,7 @@ const SongList = ({ songList, playlistId }) => {
 					<SongItem
 						key={item?.id || index}
 						item={item}
+						songList={songList}
 						order={index + 1}
 						playlistId={playlistId}
 						onPlaySong={() => handlePlaySong(item)}

@@ -28,82 +28,6 @@ const ChatProvider = ({ children }) => {
 	const { searchUserResult } = useUser();
 	const { user } = useAuth();
 
-	// Connect to WebSocket when activeConversation changes
-	useEffect(() => {
-		// Close previous socket connection if exists
-		if (socket) {
-			socket.close();
-		}
-
-		// Only create a new socket if we have an active conversation and user
-		if (activeConversation && user?.id) {
-			const newSocket = new WebSocket(
-				`ws://${import.meta.env.VITE_SOCKET_URL}/ws/chat/${
-					user?.id
-				}/${activeConversation}/`
-			);
-
-			// Handle connection open
-			newSocket.onopen = () => {
-				console.log("WebSocket connected");
-			};
-
-			// Handle incoming messages
-			newSocket.onmessage = (event) => {
-				const data = JSON.parse(event.data);
-				console.log("Data: ", data);
-				setMessages((prev) => [
-					...prev,
-					{
-						id: data.messageId,
-						text: data.message,
-						sender: { id: data.senderId, name: data.senderName },
-						timestamp: data.timestamp,
-						time: new Date(data.timestamp).toLocaleTimeString([], {
-							hour: "2-digit",
-							minute: "2-digit",
-						}),
-					},
-				]);
-
-				// Scroll to bottom when new message arrives
-				if (messageEndRef.current) {
-					messageEndRef.current.scrollIntoView({ behavior: "smooth" });
-				}
-			};
-
-			// Handle connection close
-			newSocket.onclose = () => {
-				console.log("WebSocket disconnected");
-			};
-
-			// Handle connection errors
-			newSocket.onerror = (error) => {
-				console.error("WebSocket error:", error);
-				setError("Connection error. Please try again later.");
-			};
-
-			setSocket(newSocket);
-
-			// Fetch messages for this conversation
-			fetchMessages(activeConversation);
-
-			// Cleanup when component unmounts or conversation changes
-			return () => {
-				if (newSocket) {
-					newSocket.close();
-				}
-			};
-		}
-	}, [activeConversation, user?.id]);
-
-	// Scroll to bottom when messages change
-	useEffect(() => {
-		if (messageEndRef.current) {
-			messageEndRef.current.scrollIntoView({ behavior: "smooth" });
-		}
-	}, [messages]);
-
 	const fetchConversations = useCallback(async () => {
 		try {
 			setLoadingConversations(true);
@@ -195,8 +119,78 @@ const ChatProvider = ({ children }) => {
 				setError("Failed to send message");
 			}
 		},
-		[inputMessage, socket, activeConversation, user?.id, user?.name]
+		[inputMessage, socket, activeConversation, user?.id]
 	);
+
+	// Connect to WebSocket when activeConversation changes
+	useEffect(() => {
+		let newSocket;
+
+		// Only create a new socket if we have an active conversation and user
+		if (activeConversation && user?.id) {
+			newSocket = new WebSocket(
+				`ws://${import.meta.env.VITE_SOCKET_URL}/ws/chat/${
+					user?.id
+				}/${activeConversation}/`
+			);
+
+			// Handle connection open
+			newSocket.onopen = () => {
+				console.log("WebSocket connected");
+			};
+
+			// Handle incoming messages
+			newSocket.onmessage = (event) => {
+				const data = JSON.parse(event.data);
+				console.log("Data: ", data);
+				setMessages((prev) => [
+					...prev,
+					{
+						id: data.messageId,
+						text: data.message,
+						sender: { id: data.senderId, name: data.senderName },
+						timestamp: data.timestamp,
+						time: new Date(data.timestamp).toLocaleTimeString([], {
+							hour: "2-digit",
+							minute: "2-digit",
+						}),
+					},
+				]);
+
+				// Scroll to bottom when new message arrives
+				if (messageEndRef.current) {
+					messageEndRef.current.scrollIntoView({ behavior: "smooth" });
+				}
+			};
+
+			// Handle connection close
+			newSocket.onclose = () => {
+				console.log("WebSocket disconnected");
+			};
+
+			// Handle connection errors
+			newSocket.onerror = (error) => {
+				console.error("WebSocket error:", error);
+				setError("Connection error. Please try again later.");
+			};
+
+			setSocket(newSocket);
+			fetchMessages(activeConversation);
+		}
+
+		return () => {
+			if (newSocket) {
+				newSocket.close();
+			}
+		};
+	}, [activeConversation, user?.id]);
+
+	// Scroll to bottom when messages change
+	useEffect(() => {
+		if (messageEndRef.current) {
+			messageEndRef.current.scrollIntoView({ behavior: "smooth" });
+		}
+	}, [messages]);
 
 	return (
 		<ChatContext.Provider
