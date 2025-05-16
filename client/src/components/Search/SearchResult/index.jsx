@@ -6,6 +6,7 @@ import PlusCircleIcon from "../../Icons/PlusCircleIcon";
 import ThreeDotsIcon from "../../Icons/ThreeDotsIcon";
 import { useNavigate } from "react-router-dom";
 import { usePlayer } from "../../../contexts/Player";
+import paths from "../../../constants/paths";
 
 const SearchResult = ({ searchResult, type }) => {
 	const navigate = useNavigate();
@@ -19,7 +20,12 @@ const SearchResult = ({ searchResult, type }) => {
 		return <div className='text-white/70 text-lg mt-6'>Not Found.</div>;
 	}
 
-	const handleNavigate = () => {};
+	const handleNavigate = (item, type) => {
+		if (type === "playlist")
+			navigate(paths.playlist.replace(":id", item?.id))
+		else 
+			navigate(paths.details + `?detailsId=${item?.id}&type=${type}`)
+	};
 
 	const handlePlaySong = (song, playlist) => {
 		if (song?.id === currentSong?.id) {
@@ -64,10 +70,12 @@ const SearchResult = ({ searchResult, type }) => {
 																src={item?.cover_url}
 																alt='Song'
 																className='w-full h-full object-center object-cover cursor-pointer'
+																onClick={()=>handleNavigate(item, "song")}
 															/>
 														</div>
 														<div className='flex flex-col items-start'>
-															<p className='capitalize text-white font-semibold hover:underline cursor-pointer truncate md:max-w-3xs lg:max-w-sm 2xl:max-w-fit'>
+															<p className='capitalize text-white font-semibold hover:underline cursor-pointer truncate md:max-w-3xs lg:max-w-sm 2xl:max-w-fit'
+																onClick={()=>handleNavigate(item, "song")}>
 																{item?.title}
 															</p>
 															{item?.genres?.length !== 0 && (
@@ -122,10 +130,14 @@ const SearchResult = ({ searchResult, type }) => {
 																}
 																alt='Song'
 																className='w-full h-full object-center object-cover cursor-pointer'
+																onClick={() => handleNavigate(item, "user")}
 															/>
 														</div>
 														<div className='flex flex-col items-start'>
-															<p className='capitalize text-white font-semibold hover:underline cursor-pointer truncate md:max-w-3xs lg:max-w-sm 2xl:max-w-fit'>
+															<p
+																className='capitalize text-white font-semibold hover:underline cursor-pointer truncate md:max-w-3xs lg:max-w-sm 2xl:max-w-fit'
+																onClick={() => handleNavigate(item, "user")}
+															>
 																{item?.name}
 															</p>
 															{item?.genres?.length !== 0 && (
@@ -172,16 +184,19 @@ const SearchResult = ({ searchResult, type }) => {
 																	src={item?.cover}
 																	alt='Song'
 																	className='w-full h-full object-center object-cover cursor-pointer'
+																	onClick={()=>handleNavigate(item, "playlist")}
 																/>
 															) : (
 																<Music size={30} className='text-gray-400' />
 															)}
 														</div>
 														<div className='flex flex-col items-start'>
-															<p className='capitalize text-white font-semibold hover:underline cursor-pointer truncate md:max-w-3xs lg:max-w-sm 2xl:max-w-fit'>
+															<p className='capitalize text-white font-semibold hover:underline cursor-pointer truncate md:max-w-3xs lg:max-w-sm 2xl:max-w-fit'
+																onClick={()=>handleNavigate(item, "playlist")}>
 																{item?.name}
 															</p>
-															<p className='capitalize text-white/50 hover:text-white hover:underline cursor-pointer truncate md:max-w-3xs lg:max-w-sm 2xl:max-w-fit'>
+															<p className='capitalize text-white/50 hover:text-white hover:underline cursor-pointer truncate md:max-w-3xs lg:max-w-sm 2xl:max-w-fit'
+																onClick={()=>handleNavigate(item?.user, "user")}>
 																{item?.user?.name}
 															</p>
 														</div>
