@@ -1,50 +1,94 @@
-import React, { Suspense } from "react";
+// src/routes/AppRoutes.jsx
+import { Suspense, useCallback } from "react";
 import { Routes, Route } from "react-router-dom";
-import routes from "../routes";
 import { Spin } from "antd";
+import routes from "../routes";
 import ProtectedRoute from "../ProtectedRoute";
 import PublicRoute from "../PublicRoute";
+// import ErrorBoundary from "../components/ErrorBoundary";
 
+/**
+ * Custom loading component with a skeleton effect
+ */
+const PageLoader = () => (
+	<div className='page-loading-container'>
+		<Spin spinning tip='Loading...' size='large' className='page-spinner' />
+	</div>
+);
+
+/**
+ * Main router component that renders all application routes
+ */
 const AppRoutes = () => {
+	/**
+	 * Render a route based on its configuration
+	 *
+	 * @param {import('./index').RouteConfig} routeConfig
+	 * @returns {JSX.Element}
+	 */
+	const renderRoute = useCallback(
+		({ path, Layout, Page, isPublic, isAuthPage, isAdminPage, index }) => {
+			// Wrap component based on authentication requirements
+			let RouteElement = (
+				// <ErrorBoundary
+				// fallback={}>
+				<Suspense fallback={<PageLoader />}>
+					<Page />
+				</Suspense>
+				// </ErrorBoundary>
+			);
+
+			// Apply protection based on route type
+			if (!isPublic) {
+				RouteElement = (
+					<ProtectedRoute adminOnly={isAdminPage}>
+						{RouteElement}
+					</ProtectedRoute>
+				);
+			}
+
+			// Apply additional auth page handling (redirect logged-in users)
+			if (isAuthPage) {
+				RouteElement = <PublicRoute>{RouteElement}</PublicRoute>;
+			}
+
+			// Apply layout if specified
+			if (Layout) {
+				RouteElement = (
+					<Suspense fallback={<PageLoader />}>
+						<Layout>{RouteElement}</Layout>
+					</Suspense>
+				);
+			}
+
+			return (
+				<Route
+					key={path || `index-${index}`}
+					path={path}
+					index={index}
+					element={RouteElement}
+				/>
+			);
+		},
+		[]
+	);
+
 	return (
-		<Suspense
-			fallback={
-				<Spin spinning tip='Please wait...' fullscreen size='large'></Spin>
-			}>
-			<Routes>
-				{routes?.map(
-					(
-						{ path, Layout, Page, isPublic, isAuthPage, isAdminPage, index },
-						idx // Use array index as fallback
-					) => {
-						let RenderPage = isPublic ? (
-							<Page />
-						) : (
-							<ProtectedRoute adminOnly={isAdminPage}>
-								<Page />
-							</ProtectedRoute>
-						);
+		<Routes>
+			{routes.map(renderRoute)}
 
-						if (isAuthPage) {
-							RenderPage = <PublicRoute>{RenderPage}</PublicRoute>;
-						}
-
-						// Use path if defined, otherwise use index or array index
-						const key = path || (index ? `index-${idx}` : `route-${idx}`);
-
-						return (
-							<Route
-								key={key}
-								path={path}
-								index={index}
-								element={Layout ? <Layout>{RenderPage}</Layout> : RenderPage}
-							/>
-						);
-					}
-				)}
-			</Routes>
-		</Suspense>
+			{/* Add a catch-all route for 404 handling */}
+			<Route
+				path='*'
+				element={
+					<div className='not-found'>
+						<h1>404 - Page Not Found</h1>
+						<p>The page you're looking for doesn't exist.</p>
+					</div>
+				}
+			/>
+		</Routes>
 	);
 };
 
-export default React.memo(AppRoutes);
+export default AppRoutes;
