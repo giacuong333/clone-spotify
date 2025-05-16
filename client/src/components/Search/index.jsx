@@ -1,304 +1,143 @@
-import { Music, Pause, PauseIcon } from "lucide-react";
-import formatTime from "../../../utils/formatTime";
-import formatTotalDuration from "../../../utils/formatTotalDuration";
-import PlayIcon from "../../Icons/PlayIcon";
-import PlusCircleIcon from "../../Icons/PlusCircleIcon";
-import ThreeDotsIcon from "../../Icons/ThreeDotsIcon";
-import { useNavigate } from "react-router-dom";
-import { usePlayer } from "../../../contexts/Player";
-import paths from "../../../constants/paths";
+import React, { useEffect, useMemo, useState } from "react";
+import { Button, Popover, Spin } from "antd";
+import PlayIcon from "../Icons/PlayIcon";
+import PauseIcon from "../Icons/PauseIcon";
+import SongList from "../SongList";
+import { useSearch } from "../../contexts/Search";
+import { usePlayer } from "../../contexts/Player";
+import { useGenre } from "../../contexts/genre";
+import { CloseOutlined } from "@ant-design/icons";
+import SearchResult from "./SearchResult";
 
-const SearchResult = ({ searchResult, type }) => {
-	const navigate = useNavigate();
-	const { playSong, currentSong, togglePlay, isPlaying } = usePlayer();
+const types = [
+	{ id: 1, name: "All" },
+	{ id: 2, name: "Songs" },
+	{ id: 3, name: "Playlists" },
+	{ id: 4, name: "Users" },
+	{ id: 5, name: "Genres" },
+];
 
-	const users = searchResult.users;
-	const songs = searchResult.songs;
-	const playlists = searchResult.playlists;
+const Search = () => {
+	const [toggleShowGenre, setToggleShowGenre] = useState(false);
+	const {
+		searchResult,
+		searchInput,
+		type,
+		setType,
+		handleSearch,
+		genre,
+		setGenre,
+		loadingSearchResult,
+	} = useSearch();
+	const { playSong, currentSong } = usePlayer();
+	const { fetchGenreList, genreList } = useGenre();
 
-	if (users?.length === 0 && songs?.length === 0 && playlists?.length === 0) {
-		return <div className='text-white/70 text-lg mt-6'>Not Found.</div>;
-	}
+	useEffect(() => {
+		if (toggleShowGenre) fetchGenreList();
+	}, [fetchGenreList, toggleShowGenre]);
 
-	const handleNavigate = (item, type) => {
-		if (type === "playlist")
-			navigate(paths.playlist.replace(":id", item?.id))
-		else 
-			navigate(paths.details + `?detailsId=${item?.id}&type=${type}`)
-	};
+	useEffect(() => {
+		if (!type?.id) setType(types[0]);
+	}, []);
 
-	const handlePlaySong = (song, playlist) => {
-		if (song?.id === currentSong?.id) {
-			togglePlay();
-		} else {
-			playSong(song, songs || playlist, 0, playlist?.id);
+	useEffect(() => {
+		if (searchInput || type || genre) {
+			handleSearch();
 		}
-	};
+	}, [searchInput, type, genre, handleSearch]);
 
 	return (
-		<div className='overflow-y-scroll min-h-screen'>
-			<div>
-				{(type?.name === "Songs" || type?.name === "All") &&
-					songs?.length !== 0 && (
-						<>
-							<p className='text-white text-lg font-bold mt-6 pb-4'>Songs</p>
-							<ul>
-								{songs?.map((item, index) => {
-									return (
-										<li key={item?.id} className='group'>
-											<div className='px-4 py-2 flex items-center justify-between group-hover:bg-white/25 rounded'>
-												<div className='flex items-center gap-4'>
-													<div onClick={() => handlePlaySong(item)}>
-														{item?.id === currentSong?.id && isPlaying ? (
-															<PauseIcon
-																className='group-hover:block hidden w-4 h-4 text-white cursor-pointer'
-																fill='white'
-															/>
-														) : (
-															<PlayIcon
-																className='group-hover:block hidden w-4 h-4 text-white cursor-pointer'
-																fill='white'
-															/>
-														)}
-														<p className='group-hover:hidden text-white/50'>
-															{index + 1}
-														</p>
-													</div>
-													<div className='flex items-center gap-4'>
-														<div className='w-10 h-10 overflow-hidden rounded-full'>
-															<img
-																src={item?.cover_url}
-																alt='Song'
-																className='w-full h-full object-center object-cover cursor-pointer'
-																onClick={()=>handleNavigate(item, "song")}
-															/>
-														</div>
-														<div className='flex flex-col items-start'>
-															<p className='capitalize text-white font-semibold hover:underline cursor-pointer truncate md:max-w-3xs lg:max-w-sm 2xl:max-w-fit'
-																onClick={()=>handleNavigate(item, "song")}>
-																{item?.title}
-															</p>
-															{item?.genres?.length !== 0 && (
-																<p className='capitalize text-white/75 group-hover:text-white text-sm hover:underline cursor-pointer truncate md:max-w-3xs lg:max-w-sm 2xl:max-w-fit'>
-																	{item?.genre?.map((g) => g.name).join(", ")}
-																</p>
-															)}
-														</div>
-													</div>
-												</div>
-												<div className='flex items-center gap-4'>
-													<span className='grow place-items-end ms-auto'>
-														<p className='text-white/50 group-hover:text-white'>
-															{item?.listened_at_count}
-														</p>
-													</span>
-													<span className='opacity-0 group-hover:opacity-100'>
-														<PlusCircleIcon className='w-4 h-4 text-white/75 cursor-pointer hover:text-white' />
-													</span>
-													<p className='text-white/50'>
-														{formatTime(item?.duration)}
-													</p>
-													<span className='opacity-0 group-hover:opacity-100'>
-														<ThreeDotsIcon className='w-6 h-6 text-white/75 cursor-pointer hover:text-white' />
-													</span>
-												</div>
-											</div>
-										</li>
-									);
-								})}
-							</ul>
-						</>
-					)}
+		<React.Suspense
+			fallback={
+				<Spin spinning tip='Please wait...' fullscreen size='large'></Spin>
+			}>
+			<section className='2xl:max-w-10/12 w-full min-h-screen mx-auto 2xl:px-0 px-10 py-4'>
+				{/* Type filter */}
+				<div>
+					<ul className='flex items-center gap-3 w-full flex-wrap'>
+						{types.map((t) => {
+							const isGenre = t.name === "Genres";
+							const isSelected = t.id === type?.id;
 
-				{(type?.name === "Users" || type?.name === "All") &&
-					users?.length !== 0 && (
-						<>
-							<p className='text-white text-lg font-bold mt-6 pb-4'>Users</p>
-							<ul>
-								{users?.map((item, index) => {
-									return (
-										<li key={item?.id} className='group'>
-											<div className='px-4 py-2 flex items-center justify-between group-hover:bg-white/25 rounded'>
-												<div className='flex items-center gap-4'>
-													<p className='text-white/50'>{index + 1}</p>
-													<div className='flex items-center gap-4'>
-														<div className='w-10 h-10 overflow-hidden rounded'>
-															<img
-																src={
-																	item?.image ||
-																	"https://cdn.pixabay.com/photo/2023/02/18/11/00/icon-7797704_640.png"
-																}
-																alt='Song'
-																className='w-full h-full object-center object-cover cursor-pointer'
-																onClick={() => handleNavigate(item, "user")}
-															/>
-														</div>
-														<div className='flex flex-col items-start'>
-															<p
-																className='capitalize text-white font-semibold hover:underline cursor-pointer truncate md:max-w-3xs lg:max-w-sm 2xl:max-w-fit'
-																onClick={() => handleNavigate(item, "user")}
-															>
+							const typeButton = (
+								<p
+									className={`
+										text-white px-4 py-1 cursor-pointer 
+										bg-white/10 hover:bg-white/20 rounded-full w-fit truncate text-sm 
+										${isSelected ? "!bg-white !text-black" : ""}
+									`}
+									onClick={() => {
+										setType(t);
+										if (!isGenre) {
+											setToggleShowGenre(false);
+											setGenre(""); // Clear genre if switching type
+										}
+									}}>
+									{t.name}
+								</p>
+							);
+
+							return (
+								<li key={t.id} className='w-fit'>
+									{isGenre ? (
+										<Popover
+											content={
+												<ul className='flex flex-col max-h-72 overflow-y-auto'>
+													{genreList?.map((item) => (
+														<li key={item?.id}>
+															<button
+																className='text-white hover:bg-white/10 rounded px-3 py-1 w-full text-left'
+																onClick={() => {
+																	setGenre(item?.name);
+																	setToggleShowGenre(false);
+																}}>
 																{item?.name}
-															</p>
-															{item?.genres?.length !== 0 && (
-																<p className='capitalize text-white/75 group-hover:text-white text-sm hover:underline cursor-pointer truncate md:max-w-3xs lg:max-w-sm 2xl:max-w-fit'>
-																	{item?.genre?.map((g) => g.name).join(", ")}
-																</p>
-															)}
-														</div>
-													</div>
-												</div>
-											</div>
-										</li>
-									);
-								})}
-							</ul>
-						</>
-					)}
+															</button>
+														</li>
+													))}
+												</ul>
+											}
+											trigger='click'
+											arrow={false}
+											open={toggleShowGenre}
+											color='black'
+											onOpenChange={(open) => {
+												setToggleShowGenre(open);
+												if (open) setType(t);
+											}}>
+											{typeButton}
+										</Popover>
+									) : (
+										typeButton
+									)}
+								</li>
+							);
+						})}
 
-				{(type?.name === "Playlists" || type?.name === "All") &&
-					playlists?.length !== 0 && (
-						<>
-							<p className='text-white text-lg font-bold mt-6 pb-4'>
-								Playlists
-							</p>
-							<ul>
-								{playlists?.map((item, index) => {
-									return (
-										<li key={item?.id} className='group'>
-											<div className='px-4 py-2 flex items-center justify-between group-hover:bg-white/25 rounded'>
-												<div className='flex items-center gap-4'>
-													<div
-														onClick={() =>
-															handlePlaySong(item?.songs[0], item)
-														}>
-														<PlayIcon className='group-hover:block hidden w-4 h-4 text-white cursor-pointer' />
-														<p className='group-hover:hidden text-white/50'>
-															{index + 1}
-														</p>
-													</div>
-													<div className='flex items-center gap-4'>
-														<div className='w-10 h-10 overflow-hidden rounded bg-gray-700/50 flex items-center justify-center'>
-															{item?.cover ? (
-																<img
-																	src={item?.cover}
-																	alt='Song'
-																	className='w-full h-full object-center object-cover cursor-pointer'
-																	onClick={()=>handleNavigate(item, "playlist")}
-																/>
-															) : (
-																<Music size={30} className='text-gray-400' />
-															)}
-														</div>
-														<div className='flex flex-col items-start'>
-															<p className='capitalize text-white font-semibold hover:underline cursor-pointer truncate md:max-w-3xs lg:max-w-sm 2xl:max-w-fit'
-																onClick={()=>handleNavigate(item, "playlist")}>
-																{item?.name}
-															</p>
-															<p className='capitalize text-white/50 hover:text-white hover:underline cursor-pointer truncate md:max-w-3xs lg:max-w-sm 2xl:max-w-fit'
-																onClick={()=>handleNavigate(item?.user, "user")}>
-																{item?.user?.name}
-															</p>
-														</div>
-													</div>
-												</div>
-												<div className='flex items-center gap-4'>
-													<span className='grow place-items-end ms-auto'>
-														<p className='text-white/50 group-hover:text-white'>
-															{item?.listened_at_count}
-														</p>
-													</span>
-													<span>
-														<p className='text-white/50'>
-															{formatTotalDuration(item?.songs)}
-														</p>
-													</span>
-													<span className='opacity-0 group-hover:opacity-100'>
-														<PlusCircleIcon className='w-4 h-4 text-white/75 cursor-pointer hover:text-white' />
-													</span>
-													<span className='opacity-0 group-hover:opacity-100'>
-														<ThreeDotsIcon className='w-6 h-6 text-white/75 cursor-pointer hover:text-white' />
-													</span>
-												</div>
-											</div>
-										</li>
-									);
-								})}
-							</ul>
-						</>
-					)}
+						{/* Display selected genre with clear button */}
+						{genre && (
+							<li className='w-fit flex items-center gap-1 px-3 py-1 rounded-full bg-green-600 text-white text-sm'>
+								{genre}
+								<CloseOutlined
+									className='cursor-pointer'
+									onClick={() => setGenre("")}
+								/>
+							</li>
+						)}
+					</ul>
+				</div>
 
-				{type?.name === "Genres" && songs?.length !== 0 && (
-					<>
-						<p className='text-white text-lg font-bold mt-6 pb-4'>Genres</p>
-						<ul>
-							{songs?.map((item, index) => {
-								return (
-									<li key={item?.id} className='group'>
-										<div className='px-4 py-2 flex items-center justify-between group-hover:bg-white/25 rounded'>
-											<div className='flex items-center gap-4'>
-												<div onClick={() => handlePlaySong(item)}>
-													{item?.id === currentSong?.id && isPlaying ? (
-														<PauseIcon
-															className='group-hover:block hidden w-4 h-4 text-white cursor-pointer'
-															fill='white'
-														/>
-													) : (
-														<PlayIcon
-															className='group-hover:block hidden w-4 h-4 text-white cursor-pointer'
-															fill='white'
-														/>
-													)}
-													<p className='group-hover:hidden text-white/50'>
-														{index + 1}
-													</p>
-												</div>
-												<div className='flex items-center gap-4'>
-													<div className='w-10 h-10 overflow-hidden rounded-full'>
-														<img
-															src={item?.cover_url}
-															alt='Song'
-															className='w-full h-full object-center object-cover cursor-pointer'
-														/>
-													</div>
-													<div className='flex flex-col items-start'>
-														<p className='capitalize text-white font-semibold hover:underline cursor-pointer truncate md:max-w-3xs lg:max-w-sm 2xl:max-w-fit'>
-															{item?.title}
-														</p>
-														{item?.genres?.length !== 0 && (
-															<p className='capitalize text-white/75 group-hover:text-white text-sm hover:underline cursor-pointer truncate md:max-w-3xs lg:max-w-sm 2xl:max-w-fit'>
-																{item?.genre?.map((g) => g.name).join(", ")}
-															</p>
-														)}
-													</div>
-												</div>
-											</div>
-											<div className='flex items-center gap-4'>
-												<span className='grow place-items-end ms-auto'>
-													<p className='text-white/50 group-hover:text-white'>
-														{item?.listened_at_count}
-													</p>
-												</span>
-												<span className='opacity-0 group-hover:opacity-100'>
-													<PlusCircleIcon className='w-4 h-4 text-white/75 cursor-pointer hover:text-white' />
-												</span>
-												<p className='text-white/50'>
-													{formatTime(item?.duration)}
-												</p>
-												<span className='opacity-0 group-hover:opacity-100'>
-													<ThreeDotsIcon className='w-6 h-6 text-white/75 cursor-pointer hover:text-white' />
-												</span>
-											</div>
-										</div>
-									</li>
-								);
-							})}
-						</ul>
-					</>
+				{/* Render search results */}
+				{loadingSearchResult ? (
+					<div className='flex-1 flex items-center justify-center h-60'>
+						<div className='animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-green-500'></div>
+					</div>
+				) : (
+					<SearchResult searchResult={searchResult} type={type} />
 				)}
-			</div>
-		</div>
+			</section>
+		</React.Suspense>
 	);
 };
 
-export default SearchResult;
+export default React.memo(Search);
