@@ -102,8 +102,8 @@ const PlaylistDetails = () => {
 		setPopoverSongId(popoverSongId === songId ? null : songId);
 	};
 
-	const handleUserClick = () => {
-		navigate(paths.details + `?detailsId=${playlist?.user?.id}&type=user`);
+	const handleNavigate = (item, type) => {
+		navigate(paths.details + `?detailsId=${item?.id}&type=${type}`)
 	};
 
 	if (loadingPlaylist) {
@@ -151,10 +151,10 @@ const PlaylistDetails = () => {
 									"https://cdn.pixabay.com/photo/2023/02/18/11/00/icon-7797704_640.png"
 								}
 								alt=''
-								onClick={handleUserClick}
+								onClick={()=>handleNavigate(playlist?.user, "user")}
 							/>
 							<span className='font-bold hover:underline hover:cursor-pointer'
-								onClick={handleUserClick}>
+								onClick={()=>handleNavigate(playlist?.user, "user")}>
 								{playlist?.user?.name || "Unknown User"}
 							</span>
 						</div>
@@ -240,9 +240,10 @@ const PlaylistDetails = () => {
 												? "text-green-500"
 												: "text-white"
 										}`}>
-										{item.song?.title || "Unknown Title"}
+										<p onClick={()=>handleNavigate(item?.song, "song")}>{item.song?.title || "Unknown Title"}</p>
 									</div>
-									<div className='text-sm text-gray-400 hover:underline hover:text-white cursor-pointer'>
+									<div className='text-sm text-gray-400 hover:underline hover:text-white cursor-pointer'
+										onClick={()=>handleNavigate(item?.song?.user, "user")}>
 										{item.song?.user?.name || "Unknown Artist"}
 									</div>
 								</div>
